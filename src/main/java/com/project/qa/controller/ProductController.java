@@ -17,9 +17,5 @@ class ProductController {
         return "test";
     }
 
-    @GetMapping(path = "/logout")
-    public String logout(HttpServletRequest request) throws ServletException {
-        request.logout();
-        return "/";
-    }
+
 }

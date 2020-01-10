@@ -1,6 +1,7 @@
 package com.project.qa.controller;
 
 import com.project.qa.service.AdminService;
+import org.apache.http.HttpException;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ public class AdminController {
     }
 
     @GetMapping(path = "/add")
-    public String addUser(HttpServletRequest request, @RequestParam UserRepresentation user) {
+    public String addUser(HttpServletRequest request, @RequestParam UserRepresentation user) throws HttpException {
         return adminService.addUser(request, user);
     }
 
@@ -34,14 +35,13 @@ public class AdminController {
     }
 
     @GetMapping(path = "/findUser")
-    public UserRepresentation findUser(HttpServletRequest request, @RequestParam String search) {
-        return adminService.findUser(request, search);
+    public UserRepresentation findUser(HttpServletRequest request, @RequestParam String username) {
+        return adminService.findUser(request, username);
     }
 
     @GetMapping(path = "/roles")
     public List<RoleRepresentation> roles(HttpServletRequest request) {
         return adminService.findAllRoles(request);
     }
-
 
 }

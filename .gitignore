@@ -1,7 +1,6 @@
 # Default ignored files
 .idea
 **/target/
-mvnw
 mvwn.cmd
 *.iml
 .mvn/
