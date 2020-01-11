@@ -4,6 +4,7 @@ import com.project.qa.config.KeycloakConfig;
 import com.project.qa.enums.Roles;
 import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.admin.client.resource.GroupsResource;
+import org.keycloak.admin.client.resource.RoleMappingResource;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -100,8 +101,10 @@ public class GroupServiceImpl implements GroupService {
 
         RoleRepresentation role = roleService.findRole(request, Roles.ROLE_USER.name());
         List<RoleRepresentation> roles = Collections.singletonList(role);
-        groupsResource.group(groupId).roles().realmLevel().add(roles);
-        groupsResource.group(groupId).roles().clientLevel(clientId).add(roles);
+
+        RoleMappingResource roleMappingResource = groupsResource.group(groupId).roles();
+        roleMappingResource.realmLevel().add(roles);
+        roleMappingResource.clientLevel(clientId).add(roles);
 
        // groupsResource.group(groupId).members().add(userService.findCurrentUser(request));
     }
