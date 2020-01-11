@@ -31,4 +31,8 @@ public class UserController {
         return userService.findCurrentUserGroup(request);
     }
 
+    @GetMapping(path = "/token")
+    public String getUserToken(HttpServletRequest request) {
+        return userService.getUserToken(request);
+    }
 }

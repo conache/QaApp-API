@@ -40,6 +40,11 @@ public class KeycloakConfig {
         return context.getToken().getPreferredUsername();
     }
 
+    public String getUserToken(HttpServletRequest request) {
+        KeycloakSecurityContext context = (KeycloakSecurityContext) request.getAttribute(KeycloakSecurityContext.class.getName());
+        return context.getTokenString();
+    }
+
     public String getClient() {
         return credentials.getResource();
     }

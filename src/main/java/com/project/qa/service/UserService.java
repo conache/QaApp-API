@@ -22,4 +22,6 @@ public interface UserService {
     UserRepresentation findCurrentUser(HttpServletRequest request);
 
     GroupRepresentation findCurrentUserGroup(HttpServletRequest request);
+
+    String getUserToken(HttpServletRequest request);
 }

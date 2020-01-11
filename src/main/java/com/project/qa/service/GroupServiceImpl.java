@@ -86,5 +86,4 @@ public class GroupServiceImpl implements GroupService {
 
         getGroupsResource(request).add(groupRepresentation);
     }
-
 }

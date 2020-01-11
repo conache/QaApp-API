@@ -114,4 +114,9 @@ public class UserServiceImpl implements UserService {
         }
         return null;
     }
+
+    @Override
+    public String getUserToken(HttpServletRequest request) {
+        return keycloakConfig.getUserToken(request);
+    }
 }
