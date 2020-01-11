@@ -1,8 +1,8 @@
 package com.project.qa.service;
 
-import com.project.qa.config.KeycloakConfig;
 import org.apache.http.HttpException;
 import org.keycloak.admin.client.resource.UserResource;
+import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +15,11 @@ import java.util.List;
 @Service
 public class AdminServiceImpl implements AdminService {
 
-    private final KeycloakConfig keycloakConfig;
     private final UserService userService;
     private final GroupService groupService;
 
     @Autowired
-    public AdminServiceImpl(KeycloakConfig keycloakConfig, UserService userService, GroupService groupService) {
-        this.keycloakConfig = keycloakConfig;
+    public AdminServiceImpl(UserService userService, GroupService groupService) {
         this.userService = userService;
         this.groupService = groupService;
     }
@@ -38,12 +36,12 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public List<UserRepresentation> findAllUsers(HttpServletRequest request) {
-        return null;
+        return userService.findAllUsers(request);
     }
 
     @Override
     public UserRepresentation findUser(HttpServletRequest request, String search) {
-        return null;
+        return userService.findUser(request,"bog");
     }
 
     @Override
@@ -62,10 +60,13 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public List<String> findGroups(HttpServletRequest request) {
-        groupService.findGroupByName(request,"asdas");
-        return null;
+    public List<GroupRepresentation> findGroups(HttpServletRequest request) {
+        return groupService.findGroups(request);
     }
 
+    @Override
+    public GroupRepresentation findGroup(HttpServletRequest request, String group) {
+        return groupService.findGroupByName(request, group);
+    }
 
 }

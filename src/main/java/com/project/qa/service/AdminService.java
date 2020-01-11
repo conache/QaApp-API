@@ -2,6 +2,7 @@ package com.project.qa.service;
 
 import org.apache.http.HttpException;
 import org.keycloak.admin.client.resource.UserResource;
+import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 
@@ -24,5 +25,7 @@ public interface AdminService {
 
     List<String> findUserRoles(HttpServletRequest request, String username);
 
-    List<String> findGroups(HttpServletRequest request);
+    List<GroupRepresentation> findGroups(HttpServletRequest request);
+
+    GroupRepresentation findGroup(HttpServletRequest request, String group);
 }

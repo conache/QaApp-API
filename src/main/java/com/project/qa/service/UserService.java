@@ -18,4 +18,6 @@ public interface UserService {
     List<String> findUserRoles(HttpServletRequest request, String username);
 
     void addUserGroup(HttpServletRequest request, UserResource storedUser, GroupRepresentation group);
+
+    UserRepresentation findCurrentUser(HttpServletRequest request);
 }

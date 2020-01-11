@@ -5,10 +5,11 @@ import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.admin.client.resource.GroupsResource;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.NotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,7 +46,7 @@ public class GroupServiceImpl implements GroupService {
                 .stream()
                 .filter(elem -> name.equals(elem.getName()))
                 .findFirst()
-                .orElseThrow(() -> new NotFoundException("Group " + name + " not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Group " + name + " not found"));
     }
 
     public GroupResource getGroupResource(HttpServletRequest request, String name) {
@@ -61,6 +62,4 @@ public class GroupServiceImpl implements GroupService {
         GroupRepresentation group = findGroupByName(request, name);
 
     }
-
-
 }

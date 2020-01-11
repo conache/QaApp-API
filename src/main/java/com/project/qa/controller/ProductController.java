@@ -1,21 +1,17 @@
 package com.project.qa.controller;
 
-import org.springframework.ui.Model;
+import org.apache.http.HttpException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import java.util.Arrays;
+import java.util.InvalidPropertiesFormatException;
 
 @RestController
 class ProductController {
 
-    @GetMapping(path = "/products")
-    public String getProducts(Model model) {
-        model.addAttribute("products", Arrays.asList("iPad", "iPhone", "iPod"));
-        return "test";
+    @GetMapping(path = "/products", produces = {"application/json"})
+    public String getProducts() throws HttpException, InvalidPropertiesFormatException {
+        throw new InvalidPropertiesFormatException("not ok");
     }
-
 
 }

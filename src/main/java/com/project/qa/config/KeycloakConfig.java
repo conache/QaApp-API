@@ -21,14 +21,22 @@ public class KeycloakConfig {
     }
 
     public RealmResource getRealm(HttpServletRequest request) {
+        Keycloak keycloak = getKeycloak(request);
+        return keycloak.realm(credentials.getRealm());
+    }
+
+    private Keycloak getKeycloak(HttpServletRequest request) {
         KeycloakSecurityContext context = (KeycloakSecurityContext) request.getAttribute(KeycloakSecurityContext.class.getName());
-        Keycloak keycloak = KeycloakBuilder.builder()
+        return KeycloakBuilder.builder()
                 .serverUrl(credentials.getAuthServerUrl())
                 .realm(credentials.getRealm())
                 .authorization(context.getTokenString())
                 .resteasyClient(new ResteasyClientBuilder().connectionPoolSize(20).build())
                 .build();
+    }
 
-        return keycloak.realm(credentials.getRealm());
+    public String getCurrentUsername(HttpServletRequest request) {
+        KeycloakSecurityContext context = (KeycloakSecurityContext) request.getAttribute(KeycloakSecurityContext.class.getName());
+        return context.getToken().getPreferredUsername();
     }
 }

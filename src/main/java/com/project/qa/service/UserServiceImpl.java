@@ -88,6 +88,12 @@ public class UserServiceImpl implements UserService {
         storedUser.groups().add(group);
     }
 
+    @Override
+    public UserRepresentation findCurrentUser(HttpServletRequest request) {
+        String username = keycloakConfig.getCurrentUsername(request);
+        return findUser(request, username);
+    }
+
     /*private void setDefaultUserPassword(UserResource storedUser) {
         CredentialRepresentation passwordCred = new CredentialRepresentation();
         passwordCred.setTemporary(false);
