@@ -2,13 +2,13 @@ package com.project.qa.controller;
 
 import com.project.qa.service.AdminService;
 import org.apache.http.HttpException;
-import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 @RestController
 public class CompanyAdministratorController {
@@ -21,8 +21,9 @@ public class CompanyAdministratorController {
     }
 
 
-    @GetMapping(path = "/add")
-    public String addUser(HttpServletRequest request, @RequestParam UserRepresentation user) throws HttpException {
-        return adminService.addUser(request, user);
+    @PostMapping(path = "/add")
+    public String addUser(HttpServletRequest request, @RequestBody Map<String, Object> requestBody) throws HttpException {
+        //return adminService.addUser(request, requestBody);
+        return null;
     }
 }

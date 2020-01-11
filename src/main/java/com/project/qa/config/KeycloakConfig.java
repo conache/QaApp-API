@@ -39,4 +39,8 @@ public class KeycloakConfig {
         KeycloakSecurityContext context = (KeycloakSecurityContext) request.getAttribute(KeycloakSecurityContext.class.getName());
         return context.getToken().getPreferredUsername();
     }
+
+    public String getClient() {
+        return credentials.getResource();
+    }
 }

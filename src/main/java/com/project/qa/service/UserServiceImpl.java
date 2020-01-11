@@ -11,8 +11,10 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
+import java.util.Arrays;
 import java.util.List;
 
+import static com.project.qa.enums.Roles.ROLE_USER;
 import static com.project.qa.utils.UserUtils.defaultRequiredActions;
 import static org.springframework.http.HttpStatus.CREATED;
 
@@ -21,16 +23,24 @@ public class UserServiceImpl implements UserService {
 
     private final KeycloakConfig keycloakConfig;
     private final RoleService roleService;
+    private final GroupService groupService;
 
     @Autowired
-    public UserServiceImpl(KeycloakConfig keycloakConfig, RoleService roleService) {
+    public UserServiceImpl(KeycloakConfig keycloakConfig, RoleService roleService, GroupService groupService) {
         this.keycloakConfig = keycloakConfig;
         this.roleService = roleService;
+        this.groupService = groupService;
     }
 
     @Override
     public List<UserRepresentation> findAllUsers(HttpServletRequest request) {
         return keycloakConfig.getRealm(request).users().list();
+    }
+
+    @Override
+    public UserRepresentation findCurrentUser(HttpServletRequest request) {
+        String username = keycloakConfig.getCurrentUsername(request);
+        return findUser(request, username);
     }
 
     @Override
@@ -47,15 +57,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String addUser(HttpServletRequest request, UserRepresentation user) throws HttpException {
-        user.setUsername("cosminmarian2006@gmail.com");
-        user.setFirstName("First");
-        user.setLastName("Last");
-        user.setEmail("cosminmarian2006@gmail.com");
-
 
         user.setRequiredActions(defaultRequiredActions);
         user.setEnabled(true);
-        user.setEmailVerified(true);
+
+       // user.setClientRoles(Arrays.asList(ROLE_USER.name()));
 
         UsersResource userResource = keycloakConfig.getRealm(request).users();
         Response response = userResource.create(user);
@@ -65,7 +71,7 @@ public class UserServiceImpl implements UserService {
 
         String userId = response.getLocation().getPath().replaceAll(".*/([^/]+)$", "$1");
         UserResource storedUser = userResource.get(userId);
-        roleService.setUserRole(request, storedUser, "ROLE_USER");
+        roleService.setUserRole(request, storedUser, ROLE_USER.name());
         // setDefaultUserPassword(storedUser);
 
         return userId;
@@ -88,11 +94,7 @@ public class UserServiceImpl implements UserService {
         storedUser.groups().add(group);
     }
 
-    @Override
-    public UserRepresentation findCurrentUser(HttpServletRequest request) {
-        String username = keycloakConfig.getCurrentUsername(request);
-        return findUser(request, username);
-    }
+
 
     /*private void setDefaultUserPassword(UserResource storedUser) {
         CredentialRepresentation passwordCred = new CredentialRepresentation();
@@ -102,4 +104,14 @@ public class UserServiceImpl implements UserService {
 
         storedUser.resetPassword(passwordCred);
     }*/
+
+    @Override
+    public GroupRepresentation findCurrentUserGroup(HttpServletRequest request) {
+        UserRepresentation user = findCurrentUser(request);
+        List<String> userGroups = user.getGroups();
+        if (userGroups.size() == 1) {
+            return groupService.findGroupByName(request, userGroups.get(0));
+        }
+        return null;
+    }
 }

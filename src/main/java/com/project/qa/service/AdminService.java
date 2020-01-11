@@ -8,10 +8,11 @@ import org.keycloak.representations.idm.UserRepresentation;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 
 public interface AdminService {
 
-    String addUser(HttpServletRequest request,UserRepresentation user) throws HttpException;
+    String addUser(HttpServletRequest request, Map<String, Object> user) throws HttpException;
 
     void setUserRole(HttpServletRequest request, UserResource storedUser, String role);
 

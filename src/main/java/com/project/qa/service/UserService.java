@@ -20,4 +20,6 @@ public interface UserService {
     void addUserGroup(HttpServletRequest request, UserResource storedUser, GroupRepresentation group);
 
     UserRepresentation findCurrentUser(HttpServletRequest request);
+
+    GroupRepresentation findCurrentUserGroup(HttpServletRequest request);
 }

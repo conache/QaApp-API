@@ -9,6 +9,7 @@ public class KeycloakCredentials {
 
     private String realm;
     private String authServerUrl;
+    private String resource;
 
     public String getRealm() {
         return realm;
@@ -24,5 +25,13 @@ public class KeycloakCredentials {
 
     public void setAuthServerUrl(String authServerUrl) {
         this.authServerUrl = authServerUrl;
+    }
+
+    public String getResource() {
+        return resource;
+    }
+
+    public void setResource(String resource) {
+        this.resource = resource;
     }
 }

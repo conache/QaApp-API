@@ -1,6 +1,7 @@
 package com.project.qa.controller;
 
 import com.project.qa.service.UserService;
+import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,8 +22,13 @@ public class UserController {
     }
 
     @GetMapping(path = "/currentUser")
-    public UserRepresentation getCurrentUser(HttpServletRequest request) {
+    public UserRepresentation findCurrentUser(HttpServletRequest request) {
         return userService.findCurrentUser(request);
+    }
+
+    @GetMapping(path = "/currentUserGroup")
+    public GroupRepresentation findCurrentUserGroup(HttpServletRequest request) {
+        return userService.findCurrentUserGroup(request);
     }
 
 }

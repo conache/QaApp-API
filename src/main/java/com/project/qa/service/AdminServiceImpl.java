@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -25,8 +26,9 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public String addUser(HttpServletRequest request, UserRepresentation user) throws HttpException {
-        return userService.addUser(request, user);
+    public String addUser(HttpServletRequest request, Map<String, Object> user) throws HttpException {
+        //return userService.addUser(request, user);
+        return null;
     }
 
     @Override
