@@ -1,10 +1,11 @@
 package com.project.qa.service;
 
 import com.project.qa.config.KeycloakConfig;
-import com.project.qa.utils.RoleUtils;
+import com.project.qa.enums.Roles;
 import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.admin.client.resource.GroupsResource;
 import org.keycloak.representations.idm.GroupRepresentation;
+import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,11 +13,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.Response;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.project.qa.utils.KeycloakUtils.getEntityId;
 import static com.project.qa.utils.RoleUtils.DEFAULT_ROLES;
 import static java.util.Collections.singletonMap;
 
@@ -24,10 +26,14 @@ import static java.util.Collections.singletonMap;
 public class GroupServiceImpl implements GroupService {
 
     private final KeycloakConfig keycloakConfig;
+    private final RoleService roleService;
+    private final ClientService clientService;
 
     @Autowired
-    public GroupServiceImpl(KeycloakConfig keycloakConfig) {
+    public GroupServiceImpl(KeycloakConfig keycloakConfig, RoleService roleService, ClientService clientService) {
         this.keycloakConfig = keycloakConfig;
+        this.roleService = roleService;
+        this.clientService = clientService;
     }
 
     private GroupsResource getGroupsResource(HttpServletRequest request) {
@@ -63,6 +69,7 @@ public class GroupServiceImpl implements GroupService {
         return null;
     }
 
+    @Override
     public void deleteGroup(HttpServletRequest request, String name) {
         GroupRepresentation group = findGroupByName(request, name);
     }
@@ -84,6 +91,18 @@ public class GroupServiceImpl implements GroupService {
         groupRepresentation.setRealmRoles(DEFAULT_ROLES);
         groupRepresentation.setClientRoles(singletonMap(keycloakConfig.getClient(), DEFAULT_ROLES));
 
-        getGroupsResource(request).add(groupRepresentation);
+
+        GroupsResource groupsResource = getGroupsResource(request);
+        Response response = groupsResource.add(groupRepresentation);
+        String groupId = getEntityId(response);
+
+        String clientId = clientService.findClientIdByName(request, keycloakConfig.getClient());
+
+        RoleRepresentation role = roleService.findRole(request, Roles.ROLE_USER.name());
+        List<RoleRepresentation> roles = Collections.singletonList(role);
+        groupsResource.group(groupId).roles().realmLevel().add(roles);
+        groupsResource.group(groupId).roles().clientLevel(clientId).add(roles);
+
+       // groupsResource.group(groupId).members().add(userService.findCurrentUser(request));
     }
 }

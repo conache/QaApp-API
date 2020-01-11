@@ -15,6 +15,7 @@ import org.keycloak.representations.AccessToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.*;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -26,6 +27,9 @@ import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
@@ -64,7 +68,8 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
                 .antMatchers("/products/**").hasRole("USER")
                 .antMatchers("/admin/**").hasRole("USER")
                 .antMatchers("/user/**").hasRole("USER")
-                .anyRequest().permitAll();
+                .anyRequest().permitAll()
+                .and().csrf().disable();
     }
 
     @Bean
@@ -118,5 +123,21 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public KeycloakRestTemplate keycloakRestTemplate() {
         return new KeycloakRestTemplate(keycloakClientRequestFactory);
+    }
+
+
+    @Bean
+    public FilterRegistrationBean corsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.addAllowedOrigin("*");
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
+        source.registerCorsConfiguration("/**", config);
+
+        FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
+        bean.setOrder(0);
+        return bean;
     }
 }

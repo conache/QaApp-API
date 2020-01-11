@@ -13,6 +13,8 @@ public interface GroupService {
 
     GroupRepresentation findGroupByName(HttpServletRequest request, String groupName);
 
+    void deleteGroup(HttpServletRequest request, String name);
+
     List<UserRepresentation> findAllGroupMembers(HttpServletRequest request, String groupId);
 
     void addGroup(HttpServletRequest request, String name);

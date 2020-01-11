@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
-import java.util.Arrays;
 import java.util.List;
 
 import static com.project.qa.enums.Roles.ROLE_USER;
