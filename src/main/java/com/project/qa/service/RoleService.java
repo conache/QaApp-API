@@ -13,5 +13,5 @@ public interface RoleService {
 
     RoleRepresentation findRole(HttpServletRequest request, String roleName);
 
-    List<String> getUserRoles(UserResource user);
+    List<String> findUserRoles(UserResource user);
 }

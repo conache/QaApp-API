@@ -31,6 +31,7 @@ public class AdminController {
 
     @GetMapping(path = "/users")
     public List<UserRepresentation> users(HttpServletRequest request) {
+        adminService.findGroups(request);
         return adminService.findAllUsers(request);
     }
 

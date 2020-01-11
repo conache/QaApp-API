@@ -22,7 +22,7 @@ public interface AdminService {
 
     RoleRepresentation findRole(HttpServletRequest request, String roleName);
 
-    List<String> getUserRoles(HttpServletRequest request, String username);
+    List<String> findUserRoles(HttpServletRequest request, String username);
 
-    List<String> getGroups(HttpServletRequest request);
+    List<String> findGroups(HttpServletRequest request);
 }

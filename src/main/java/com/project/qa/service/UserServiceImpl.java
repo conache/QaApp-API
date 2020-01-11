@@ -4,6 +4,7 @@ import com.project.qa.config.KeycloakConfig;
 import org.apache.http.HttpException;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
+import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -71,15 +72,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<String> getUserRoles(HttpServletRequest request, String username) {
+    public List<String> findUserRoles(HttpServletRequest request, String username) {
         UserRepresentation user = findUser(request, username);
         UserResource userResource = loadUser(request, user);
 
-        return roleService.getUserRoles(userResource);
+        return roleService.findUserRoles(userResource);
     }
 
     private UserResource loadUser(HttpServletRequest request, UserRepresentation user) {
         return keycloakConfig.getRealm(request).users().get(user.getId());
+    }
+
+    @Override
+    public void addUserGroup(HttpServletRequest request, UserResource storedUser, GroupRepresentation group) {
+        storedUser.groups().add(group);
     }
 
     /*private void setDefaultUserPassword(UserResource storedUser) {

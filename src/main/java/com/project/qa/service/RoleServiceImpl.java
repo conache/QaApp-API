@@ -38,7 +38,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public List<String> getUserRoles(UserResource user) {
+    public List<String> findUserRoles(UserResource user) {
         List<RoleRepresentation> rolesRepresentations = user.roles().realmLevel().listEffective();
 
         return rolesRepresentations

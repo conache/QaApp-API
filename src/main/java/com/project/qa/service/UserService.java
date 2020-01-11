@@ -1,6 +1,8 @@
 package com.project.qa.service;
 
 import org.apache.http.HttpException;
+import org.keycloak.admin.client.resource.UserResource;
+import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,5 +15,7 @@ public interface UserService {
 
     String addUser(HttpServletRequest request, UserRepresentation user) throws HttpException;
 
-    List<String> getUserRoles(HttpServletRequest request, String username);
+    List<String> findUserRoles(HttpServletRequest request, String username);
+
+    void addUserGroup(HttpServletRequest request, UserResource storedUser, GroupRepresentation group);
 }
