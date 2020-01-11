@@ -67,13 +67,12 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
-        http
+        http.cors().and()
                 .authorizeRequests()
                 .antMatchers("/products/**").hasRole("USER")
                 .antMatchers("/admin/**").hasRole("USER")
                 .antMatchers("/user/**").hasRole("USER")
-                .anyRequest().permitAll()
-                .and().cors();
+                .anyRequest().permitAll();
     }
 
     @Bean
