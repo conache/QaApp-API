@@ -1,16 +1,17 @@
 package com.project.qa.controller;
 
+import com.project.qa.model.CustomUser;
 import com.project.qa.service.AdminService;
 import com.project.qa.service.CompanyAdministratorService;
 import com.project.qa.service.GroupService;
 import org.apache.http.HttpException;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -28,11 +29,9 @@ public class CompanyAdministratorController {
         this.companyAdministratorService = companyAdministratorService;
     }
 
-
-    @PostMapping(path = "/add")
-    public String addUser(HttpServletRequest request, @RequestBody Map<String, Object> requestBody) throws HttpException {
-        //return adminService.addUser(request, requestBody);
-        return null;
+    @PostMapping(path = "/addUser")
+    public String addUser(HttpServletRequest request, @RequestBody CustomUser customUser) throws HttpException {
+        return adminService.addUser(request, customUser);
     }
 
     @PostMapping(path = "/addGroup")
@@ -40,8 +39,13 @@ public class CompanyAdministratorController {
         companyAdministratorService.addGroup(request, name);
     }
 
+    @PostMapping(path = "/deleteGroup")
+    public void deleteGroup(HttpServletRequest request, @RequestParam String id) {
+        companyAdministratorService.deleteGroupById(request, id);
+    }
+
     @GetMapping(path = "/users")
-    public PageImpl<UserRepresentation> findAllUsersByGroup(HttpServletRequest request, @RequestParam int page, @RequestParam int size) {
-        return companyAdministratorService.findAllUsersByGroup(request, page, size);
+    public List<UserRepresentation> findAllUsersByGroup(HttpServletRequest request, @RequestParam int page, @RequestParam int size) {
+        return companyAdministratorService.findAllUsersByGroup(request, PageRequest.of(page, size));
     }
 }

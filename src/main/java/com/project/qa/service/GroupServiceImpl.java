@@ -1,21 +1,19 @@
 package com.project.qa.service;
 
 import com.project.qa.config.KeycloakConfig;
-import com.project.qa.enums.Roles;
 import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.admin.client.resource.GroupsResource;
-import org.keycloak.admin.client.resource.RoleMappingResource;
 import org.keycloak.representations.idm.GroupRepresentation;
-import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
-import java.util.Collections;
+import java.awt.print.Pageable;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -86,6 +84,11 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    public List<UserRepresentation> findAllGroupMembersPageable(HttpServletRequest request, String groupId, PageRequest page) {
+        return getGroupsResource(request).group(groupId).members(page.getPageNumber(), page.getPageSize());
+    }
+
+    @Override
     public String addGroup(HttpServletRequest request, String name) {
         GroupRepresentation groupRepresentation = new GroupRepresentation();
         groupRepresentation.setName(name);
@@ -102,5 +105,16 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public GroupResource findGroupResourceById(HttpServletRequest request, String groupId) {
         return getGroupsResource(request).group(groupId);
+    }
+
+    @Override
+    public void deleteGroupById(HttpServletRequest request, String groupId) {
+        keycloakConfig.getRealm(request).groups().group(groupId).remove();
+    }
+
+    @Override
+    public void deleteGroupByName(HttpServletRequest request, String name) {
+        GroupRepresentation group = findGroupByName(request, name);
+        keycloakConfig.getRealm(request).groups().group(group.getId()).remove();
     }
 }

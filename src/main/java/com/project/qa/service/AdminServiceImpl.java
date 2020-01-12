@@ -1,5 +1,6 @@
 package com.project.qa.service;
 
+import com.project.qa.model.CustomUser;
 import org.apache.http.HttpException;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.GroupRepresentation;
@@ -10,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Map;
 
 
 @Service
@@ -18,17 +18,20 @@ public class AdminServiceImpl implements AdminService {
 
     private final UserService userService;
     private final GroupService groupService;
+    private final RoleService roleService;
 
     @Autowired
-    public AdminServiceImpl(UserService userService, GroupService groupService) {
+    public AdminServiceImpl(UserService userService, GroupService groupService, RoleService roleService) {
         this.userService = userService;
         this.groupService = groupService;
+        this.roleService = roleService;
     }
 
     @Override
-    public String addUser(HttpServletRequest request, Map<String, Object> user) throws HttpException {
-        //return userService.addUser(request, user);
-        return null;
+    public String addUser(HttpServletRequest request, CustomUser customUser) throws HttpException {
+        GroupRepresentation groupRepresentation = groupService.findGroupByName(request, customUser.getGroup());
+        RoleRepresentation roleRepresentation = roleService.findRoleByName(request, customUser.getRole());
+        return userService.addUser(request, customUser.getUserRepresentation(),groupRepresentation,roleRepresentation);
     }
 
     @Override
@@ -43,7 +46,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public UserRepresentation findUser(HttpServletRequest request, String search) {
-        return userService.findUser(request,"bog");
+        return userService.findUser(request, "bog");
     }
 
     @Override

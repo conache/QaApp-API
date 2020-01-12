@@ -11,10 +11,13 @@ import static java.util.Arrays.asList;
 public class UserUtils {
 
     public final static List<String> defaultRequiredActions = asList(VERIFY_EMAIL.name(), UPDATE_PASSWORD.toString());
+    public final static String ROLE = "role";
+    public final static String GROUP = "group";
 
- /*   public static String userRole(String role){
+
+   /* public static String userRole(String roleName){
         for (Roles role : Roles.values()) {
-
+            if(roleName.equals())
         }
     }*/
 }

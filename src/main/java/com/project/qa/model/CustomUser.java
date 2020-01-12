@@ -2,7 +2,7 @@ package com.project.qa.model;
 
 import org.keycloak.representations.idm.UserRepresentation;
 
-public class KeycloakUser {
+public class CustomUser {
 
     private UserRepresentation userRepresentation;
     private String role;

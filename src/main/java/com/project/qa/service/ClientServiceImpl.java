@@ -22,13 +22,17 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public String findClientIdByName(HttpServletRequest request, String name) {
+        ClientRepresentation clientRepresentation = findClientRepresentation(request, name);
+        return clientRepresentation.getId();
+    }
+
+    @Override
+    public ClientRepresentation findClientRepresentation(HttpServletRequest request, String name) {
         List<ClientRepresentation> clientRepresentations = keycloakConfig.getRealm(request).clients().findAll();
-        ClientRepresentation clientRepresentation = clientRepresentations
+        return clientRepresentations
                 .stream()
                 .filter(el -> name.equals(el.getClientId()))
                 .findFirst()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Client " + name + " not found"));
-
-        return clientRepresentation.getId();
     }
 }

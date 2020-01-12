@@ -1,5 +1,6 @@
 package com.project.qa.service;
 
+import com.project.qa.model.CustomUser;
 import org.apache.http.HttpException;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.GroupRepresentation;
@@ -8,11 +9,10 @@ import org.keycloak.representations.idm.UserRepresentation;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Map;
 
 public interface AdminService {
 
-    String addUser(HttpServletRequest request, Map<String, Object> user) throws HttpException;
+    String addUser(HttpServletRequest request, CustomUser customUser) throws HttpException;
 
     void setUserRole(HttpServletRequest request, UserResource storedUser, String role);
 
