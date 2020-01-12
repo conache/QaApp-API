@@ -59,8 +59,8 @@ public class UserServiceImpl implements UserService {
 
         user.setRequiredActions(defaultRequiredActions);
         user.setEnabled(true);
-
-       // user.setClientRoles(Arrays.asList(ROLE_USER.name()));
+        // user.setGroups();
+        // user.setClientRoles(Arrays.asList(ROLE_USER.name()));
 
         UsersResource userResource = keycloakConfig.getRealm(request).users();
         Response response = userResource.create(user);
@@ -107,6 +107,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public GroupRepresentation findCurrentUserGroup(HttpServletRequest request) {
         UserRepresentation user = findCurrentUser(request);
+        //todo nu gaseste grupuri...trebuie facut altfel. que mizerie...CRED CA TOTUSI E OK
         List<String> userGroups = user.getGroups();
         if (userGroups.size() == 1) {
             return groupService.findGroupByName(request, userGroups.get(0));
@@ -114,8 +115,15 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
+
     @Override
     public String getUserToken(HttpServletRequest request) {
         return keycloakConfig.getUserToken(request);
+    }
+
+    public void changeUserRole(HttpServletRequest request, String userId, String role) {
+        UsersResource userResource = keycloakConfig.getRealm(request).users();
+        UserResource storedUser = userResource.get(userId);
+        roleService.setUserRole(request, storedUser, ROLE_USER.name());
     }
 }

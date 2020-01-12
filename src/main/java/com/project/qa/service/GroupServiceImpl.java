@@ -86,7 +86,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public void addGroup(HttpServletRequest request, String name) {
+    public String addGroup(HttpServletRequest request, String name) {
         GroupRepresentation groupRepresentation = new GroupRepresentation();
         groupRepresentation.setName(name);
         groupRepresentation.setRealmRoles(DEFAULT_ROLES);
@@ -95,17 +95,12 @@ public class GroupServiceImpl implements GroupService {
 
         GroupsResource groupsResource = getGroupsResource(request);
         Response response = groupsResource.add(groupRepresentation);
-        String groupId = getEntityId(response);
+        return getEntityId(response);
 
-        String clientId = clientService.findClientIdByName(request, keycloakConfig.getClient());
+    }
 
-        RoleRepresentation role = roleService.findRole(request, Roles.ROLE_USER.name());
-        List<RoleRepresentation> roles = Collections.singletonList(role);
-
-        RoleMappingResource roleMappingResource = groupsResource.group(groupId).roles();
-        roleMappingResource.realmLevel().add(roles);
-        roleMappingResource.clientLevel(clientId).add(roles);
-
-       // groupsResource.group(groupId).members().add(userService.findCurrentUser(request));
+    @Override
+    public GroupResource findGroupResourceById(HttpServletRequest request, String groupId) {
+        return getGroupsResource(request).group(groupId);
     }
 }

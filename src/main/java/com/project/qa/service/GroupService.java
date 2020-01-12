@@ -1,5 +1,6 @@
 package com.project.qa.service;
 
+import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 
@@ -17,5 +18,7 @@ public interface GroupService {
 
     List<UserRepresentation> findAllGroupMembers(HttpServletRequest request, String groupId);
 
-    void addGroup(HttpServletRequest request, String name);
+    String addGroup(HttpServletRequest request, String name);
+
+    GroupResource findGroupResourceById(HttpServletRequest request, String groupId);
 }

@@ -39,7 +39,6 @@ import java.util.Arrays;
 
 @KeycloakConfiguration
 @EnableConfigurationProperties(KeycloakSpringBootProperties.class)
-@EnableWebSecurity
 @ComponentScan(basePackageClasses = KeycloakSecurityComponents.class)
 public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
 
@@ -72,6 +71,7 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
                 .antMatchers("/products/**").hasRole("USER")
                 .antMatchers("/admin/**").hasRole("USER")
                 .antMatchers("/user/**").hasRole("USER")
+                .antMatchers("/company/**").hasRole("USER")
                 .anyRequest().permitAll();
     }
 
@@ -128,16 +128,16 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
         return new KeycloakRestTemplate(keycloakClientRequestFactory);
     }
 
-    @Bean
-    CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*"));
-        configuration.setAllowedMethods(Arrays.asList("*"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-
-    }
+//    @Bean
+//    CorsConfigurationSource corsConfigurationSource() {
+//        CorsConfiguration configuration = new CorsConfiguration();
+//        configuration.setAllowedOrigins(Arrays.asList("*"));
+//        configuration.setAllowedMethods(Arrays.asList("*"));
+//        configuration.setAllowedHeaders(Arrays.asList("*"));
+//
+//
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/**", configuration);
+//        return source;
+//    }
 }

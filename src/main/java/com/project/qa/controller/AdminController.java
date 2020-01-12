@@ -23,10 +23,10 @@ public class AdminController {
     }
 
 
-    @GetMapping(path = "/users")
-    public List<UserRepresentation> users(HttpServletRequest request) {
-        return adminService.findAllUsers(request);
-    }
+//    @GetMapping(path = "/users")
+//    public List<UserRepresentation> users(HttpServletRequest request) {
+//        return adminService.findAllUsers(request);
+//    }
 
     @GetMapping(path = "/findUser")
     public UserRepresentation findUser(HttpServletRequest request, @RequestParam String username) {
