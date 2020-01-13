@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 
 import static com.project.qa.utils.KeycloakUtils.getEntityId;
 import static com.project.qa.utils.RoleUtils.DEFAULT_ROLES;
+import static java.lang.Math.min;
 import static java.util.Collections.singletonMap;
 
 @Service
@@ -75,8 +76,9 @@ public class GroupServiceImpl implements GroupService {
         List<UserRepresentation> users = getGroupsResource(request).group(groupId).members();
         Map<String, Object> response = new HashMap<>();
 
-        response.put("totalCount", users.size());
-        response.put("users", users.subList(firstIndex, lastIndex));
+        int totalUsers = users.size();
+        response.put("totalCount", totalUsers);
+        response.put("users", users.subList(firstIndex, min(lastIndex, totalUsers)));
         return response;
     }
 
