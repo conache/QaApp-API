@@ -31,7 +31,7 @@ public class AdminServiceImpl implements AdminService {
     public String addUser(HttpServletRequest request, CustomUser customUser) throws HttpException {
         GroupRepresentation groupRepresentation = groupService.findGroupByName(request, customUser.getGroupName());
         RoleRepresentation roleRepresentation = roleService.findRoleByName(request, customUser.getRoleName());
-        return userService.addUser(request, customUser.getUserRepresentation(), groupRepresentation, roleRepresentation);
+        return userService.addUser(request, customUser, groupRepresentation, roleRepresentation);
     }
 
     @Override

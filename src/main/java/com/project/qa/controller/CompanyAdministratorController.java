@@ -39,7 +39,7 @@ public class CompanyAdministratorController {
         companyAdministratorService.addGroup(request, name);
     }
 
-    @PostMapping(path = "/deleteGroup")
+    @DeleteMapping(path = "/deleteGroup")
     public void deleteGroup(HttpServletRequest request, @RequestParam String id) {
         companyAdministratorService.deleteGroupById(request, id);
     }
@@ -49,8 +49,8 @@ public class CompanyAdministratorController {
         return companyAdministratorService.findAllUsersByGroup(request, PageRequest.of(page, size));
     }
 
-    @GetMapping(path = "/deleteUser")
-    public Response deleteGroupWithUsers(HttpServletRequest request, String userId) {
+    @DeleteMapping(path = "/deleteUser")
+    public Response deleteGroupWithUsers(HttpServletRequest request, @RequestParam String userId) {
         return companyAdministratorService.deleteUserFromGroup(request, userId);
     }
 

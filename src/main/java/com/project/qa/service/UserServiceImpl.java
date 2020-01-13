@@ -1,6 +1,7 @@
 package com.project.qa.service;
 
 import com.project.qa.config.KeycloakConfig;
+import com.project.qa.model.CustomUser;
 import com.project.qa.utils.UserUtils;
 import org.apache.http.HttpException;
 import org.keycloak.admin.client.resource.UserResource;
@@ -128,12 +129,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String addUser(HttpServletRequest request, UserRepresentation user, GroupRepresentation groupRepresentation, RoleRepresentation roleRepresentation) throws HttpException {
+    public String addUser(HttpServletRequest request, CustomUser customUser, GroupRepresentation groupRepresentation, RoleRepresentation roleRepresentation) {
+        UserRepresentation user = customUser.getUserRepresentation();
         user.setRequiredActions(defaultRequiredActions);
         user.setEnabled(true);
 
         addUserAttribute(user, GROUP, singletonList(groupRepresentation.getName()));
         addUserAttribute(user, ROLE, singletonList(roleRepresentation.getName()));
+        addUserAttribute(user, JOB, singletonList(customUser.getJobName()));
 
         UsersResource usersResource = keycloakConfig.getRealm(request).users();
         Response response = usersResource.create(user);

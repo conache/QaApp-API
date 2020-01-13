@@ -19,6 +19,7 @@ public class UserUtils {
     public final static List<String> defaultRequiredActions = asList(VERIFY_EMAIL.name(), UPDATE_PASSWORD.toString());
     public final static String ROLE = "role";
     public final static String GROUP = "group";
+    public final static String JOB = "job";
 
 
     public static void addUserAttribute(UserRepresentation user, String attributeKey, List<String> attributeValue) {
