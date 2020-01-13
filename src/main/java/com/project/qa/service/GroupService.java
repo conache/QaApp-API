@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 
 public interface GroupService {
     List<GroupRepresentation> findGroups(HttpServletRequest request);
@@ -19,7 +20,7 @@ public interface GroupService {
 
     List<UserRepresentation> findAllGroupMembers(HttpServletRequest request, String groupId);
 
-    List<UserRepresentation> findAllGroupMembersPageable(HttpServletRequest request, String groupId, PageRequest page);
+    Map<String, Object> findAllGroupMembersPageable(HttpServletRequest request, String groupId, PageRequest page);
 
     String addGroup(HttpServletRequest request, String name);
 

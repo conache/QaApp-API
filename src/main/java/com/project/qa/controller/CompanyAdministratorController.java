@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
-import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/company")
@@ -45,7 +45,7 @@ public class CompanyAdministratorController {
     }
 
     @GetMapping(path = "/users")
-    public List<UserRepresentation> findAllUsersByGroup(HttpServletRequest request, @RequestParam int page, @RequestParam int size) {
+    public Map<String, Object> findAllUsersByGroup(HttpServletRequest request, @RequestParam int page, @RequestParam int size) {
         return companyAdministratorService.findAllUsersByGroup(request, PageRequest.of(page, size));
     }
 
@@ -55,7 +55,7 @@ public class CompanyAdministratorController {
     }
 
     @GetMapping(path = "/findUser")
-    public UserRepresentation findUserById(HttpServletRequest request,@RequestParam String userId){
-        return companyAdministratorService.findUserById(request,userId);
+    public UserRepresentation findUserById(HttpServletRequest request, @RequestParam String userId) {
+        return companyAdministratorService.findUserById(request, userId);
     }
 }

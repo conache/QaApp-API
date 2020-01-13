@@ -5,11 +5,11 @@ import org.springframework.data.domain.PageRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
-import java.util.List;
+import java.util.Map;
 
 public interface CompanyAdministratorService {
 
-    List<UserRepresentation> findAllUsersByGroup(HttpServletRequest request, PageRequest page);
+    Map<String, Object> findAllUsersByGroup(HttpServletRequest request, PageRequest page);
 
     void addGroup(HttpServletRequest request, String name);
 

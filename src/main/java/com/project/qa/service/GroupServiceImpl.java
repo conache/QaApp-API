@@ -13,7 +13,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.project.qa.utils.KeycloakUtils.getEntityId;
@@ -66,8 +68,16 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public List<UserRepresentation> findAllGroupMembersPageable(HttpServletRequest request, String groupId, PageRequest page) {
-        return getGroupsResource(request).group(groupId).members(page.getPageNumber(), page.getPageSize());
+    public Map<String, Object> findAllGroupMembersPageable(HttpServletRequest request, String groupId, PageRequest page) {
+
+        int firstIndex = page.getPageNumber() * page.getPageSize();
+        int lastIndex = firstIndex + page.getPageSize() - 1;
+        List<UserRepresentation> users = getGroupsResource(request).group(groupId).members();
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("totalCount", users.size());
+        response.put("users", users.subList(firstIndex, lastIndex));
+        return response;
     }
 
     @Override
