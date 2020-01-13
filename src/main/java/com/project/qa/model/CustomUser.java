@@ -6,7 +6,6 @@ public class CustomUser {
 
     private UserRepresentation userRepresentation;
     private String roleName;
-    private String groupName;
     private String jobName;
 
     public UserRepresentation getUserRepresentation() {
@@ -23,14 +22,6 @@ public class CustomUser {
 
     public void setRoleName(String roleName) {
         this.roleName = roleName;
-    }
-
-    public String getGroupName() {
-        return groupName;
-    }
-
-    public void setGroupName(String groupName) {
-        this.groupName = groupName;
     }
 
     public String getJobName() {

@@ -1,6 +1,7 @@
 package com.project.qa.service;
 
 import com.project.qa.model.CustomUser;
+import com.project.qa.utils.UserUtils;
 import org.apache.http.HttpException;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.GroupRepresentation;
@@ -11,6 +12,9 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+
+import static com.project.qa.utils.UserUtils.GROUP;
+import static com.project.qa.utils.UserUtils.getUserAttribute;
 
 
 @Service
@@ -29,7 +33,9 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public String addUser(HttpServletRequest request, CustomUser customUser) throws HttpException {
-        GroupRepresentation groupRepresentation = groupService.findGroupByName(request, customUser.getGroupName());
+        UserRepresentation currentUser = userService.findCurrentUser(request);
+
+        GroupRepresentation groupRepresentation = groupService.findGroupByName(request, getUserAttribute(currentUser, GROUP).get(0));
         RoleRepresentation roleRepresentation = roleService.findRoleByName(request, customUser.getRoleName());
         return userService.addUser(request, customUser, groupRepresentation, roleRepresentation);
     }
