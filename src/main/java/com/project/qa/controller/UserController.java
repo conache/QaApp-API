@@ -34,7 +34,7 @@ public class UserController {
         return userService.getUserToken(request);
     }
 
-    @PostMapping("/edit")
+    @PutMapping("/edit")
     public void editUser(HttpServletRequest request, @RequestBody UserRepresentation userRepresentation) {
         userService.editUser(request, userRepresentation);
     }

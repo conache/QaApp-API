@@ -1,8 +1,10 @@
 package com.project.qa.service;
 
 import com.project.qa.config.KeycloakConfig;
+import com.project.qa.utils.UserUtils;
 import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.admin.client.resource.RoleMappingResource;
+import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -15,8 +17,7 @@ import javax.ws.rs.core.Response;
 import java.util.Map;
 
 import static com.project.qa.enums.Roles.ROLE_USER;
-import static com.project.qa.utils.UserUtils.GROUP;
-import static com.project.qa.utils.UserUtils.getUserAttribute;
+import static com.project.qa.utils.UserUtils.*;
 import static java.util.Collections.singletonList;
 
 @Service
@@ -90,5 +91,15 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
     @Override
     public UserRepresentation findUserById(HttpServletRequest request, String userId) {
         return userService.findUserById(request, userId);
+    }
+
+    @Override
+    public void editUser(HttpServletRequest request, UserRepresentation userRepresentation) {
+        userService.editUser(request, userRepresentation);
+        String roleName = getUserAttribute(userRepresentation, ROLE).get(0);
+        RoleRepresentation role = roleService.findRoleByName(request, roleName);
+
+        UserResource userResource = userService.findUserResource(request, userRepresentation);
+        roleService.setUserRole(request, userResource, role);
     }
 }

@@ -58,4 +58,9 @@ public class CompanyAdministratorController {
     public UserRepresentation findUserById(HttpServletRequest request, @RequestParam String userId) {
         return companyAdministratorService.findUserById(request, userId);
     }
+
+    @PutMapping(path = "/editUser")
+    public void editUser(HttpServletRequest request, @RequestBody UserRepresentation userRepresentation) {
+        companyAdministratorService.editUser(request, userRepresentation);
+    }
 }

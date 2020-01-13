@@ -4,6 +4,7 @@ import com.project.qa.config.KeycloakConfig;
 import com.project.qa.model.CustomUser;
 import com.project.qa.utils.UserUtils;
 import org.apache.http.HttpException;
+import org.keycloak.admin.client.resource.RoleResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.GroupRepresentation;
@@ -171,6 +172,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public void editUser(HttpServletRequest request, UserRepresentation userRepresentation) {
         UserResource userResource = keycloakConfig.getRealm(request).users().get(userRepresentation.getId());
-        userResource.update(userRepresentation);
+        List<String> roles = getUserAttribute(userRepresentation, ROLE);
+        String roleName =roles.get(0);
+
+            userResource.update(userRepresentation);
     }
+
 }

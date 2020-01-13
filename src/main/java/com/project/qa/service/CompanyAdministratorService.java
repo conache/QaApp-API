@@ -20,4 +20,6 @@ public interface CompanyAdministratorService {
     Response deleteUserFromGroup(HttpServletRequest request, String userId);
 
     UserRepresentation findUserById(HttpServletRequest request, String userId);
+
+    void editUser(HttpServletRequest request, UserRepresentation userRepresentation);
 }
