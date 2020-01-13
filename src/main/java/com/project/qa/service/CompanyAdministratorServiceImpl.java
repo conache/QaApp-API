@@ -13,8 +13,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.Response;
 import java.util.List;
 
+import static com.project.qa.enums.Roles.ROLE_COMPANY_ADMINISTRATOR;
+import static com.project.qa.utils.UserUtils.GROUP;
+import static com.project.qa.utils.UserUtils.getUserAttribute;
 import static java.util.Collections.singletonList;
 
 @Service
@@ -37,10 +41,6 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
 
     @Override
     public List<UserRepresentation> findAllUsersByGroup(HttpServletRequest request, PageRequest page) {
-    /*    List<UserRepresentation> list = keycloakConfig.getRealm(request).users().list();
-        list.forEach(el -> userService.setUserGroup(request, el.getId(), "Muncitorii"));
-     */
-        //TODO uncomment this lines
         GroupRepresentation groupRepresentation = userService.findCurrentUserGroup(request);
         return groupService.findAllGroupMembersPageable(request, groupRepresentation.getId(), page);
     }
@@ -61,7 +61,9 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
         UserRepresentation currentUser = userService.findCurrentUser(request);
         UserResource userResource = userService.findUserResource(request, currentUser);
         group.members().add(currentUser);
-        roleService.setUserRole(request, userResource, Roles.ROLE_COMPANY_ADMINISTRATOR.name());
+
+        RoleRepresentation roleRepresentation = roleService.findRoleByName(request, ROLE_COMPANY_ADMINISTRATOR.name());
+        roleService.setUserRole(request, userResource, roleRepresentation);
         keycloakConfig.getRealm(request).users().get(currentUser.getId()).joinGroup(groupId);
     }
 
@@ -73,5 +75,18 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
     @Override
     public void deleteGroupByName(HttpServletRequest request, String name) {
         groupService.deleteGroupByName(request, name);
+    }
+
+    @Override
+    public Response deleteUserFromGroup(HttpServletRequest request, String userId) {
+        UserRepresentation currentUser = userService.findCurrentUser(request);
+        String group = getUserAttribute(currentUser, GROUP).get(0);
+        GroupRepresentation groupByName = groupService.findGroupByName(request, group);
+        return userService.deleteUser(request, userId, groupByName.getId());
+    }
+
+    @Override
+    public UserRepresentation findUserById(HttpServletRequest request, String userId) {
+        return userService.findUserById(request, userId);
     }
 }

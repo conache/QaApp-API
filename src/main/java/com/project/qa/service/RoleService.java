@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 public interface RoleService {
-    void setUserRole(HttpServletRequest request, UserResource storedUser, String role);
+    void setUserRole(HttpServletRequest request, UserResource storedUser, RoleRepresentation role);
 
     List<RoleRepresentation> findAllRoles(HttpServletRequest request);
 

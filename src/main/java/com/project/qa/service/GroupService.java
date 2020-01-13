@@ -15,7 +15,7 @@ public interface GroupService {
 
     GroupRepresentation findGroupByName(HttpServletRequest request, String groupName);
 
-    void deleteGroup(HttpServletRequest request, String name);
+    GroupResource getGroupResource(HttpServletRequest request, String id);
 
     List<UserRepresentation> findAllGroupMembers(HttpServletRequest request, String groupId);
 

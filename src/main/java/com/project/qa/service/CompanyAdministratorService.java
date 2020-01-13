@@ -16,4 +16,8 @@ public interface CompanyAdministratorService {
     void deleteGroupById(HttpServletRequest request, String name);
 
     void deleteGroupByName(HttpServletRequest request, String name);
+
+    Response deleteUserFromGroup(HttpServletRequest request, String userId);
+
+    UserRepresentation findUserById(HttpServletRequest request, String userId);
 }

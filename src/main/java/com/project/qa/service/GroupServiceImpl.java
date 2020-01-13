@@ -13,7 +13,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
-import java.awt.print.Pageable;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,14 +24,10 @@ import static java.util.Collections.singletonMap;
 public class GroupServiceImpl implements GroupService {
 
     private final KeycloakConfig keycloakConfig;
-    private final RoleService roleService;
-    private final ClientService clientService;
 
     @Autowired
-    public GroupServiceImpl(KeycloakConfig keycloakConfig, RoleService roleService, ClientService clientService) {
+    public GroupServiceImpl(KeycloakConfig keycloakConfig) {
         this.keycloakConfig = keycloakConfig;
-        this.roleService = roleService;
-        this.clientService = clientService;
     }
 
     private GroupsResource getGroupsResource(HttpServletRequest request) {
@@ -60,23 +55,10 @@ public class GroupServiceImpl implements GroupService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Group " + name + " not found"));
     }
 
-    public GroupResource getGroupResource(HttpServletRequest request, String name) {
-        GroupRepresentation groupRepresentation = findGroupByName(request, name);
-
-        //TODO...cred ca trebuie sa fac cu null object
-//        return groupRepresentation.
-        return null;
-    }
-
     @Override
-    public void deleteGroup(HttpServletRequest request, String name) {
-        GroupRepresentation group = findGroupByName(request, name);
+    public GroupResource getGroupResource(HttpServletRequest request, String id) {
+        return getGroupsResource(request).group(id);
     }
-
-    //    public GroupResource findGroupResourceByName(HttpServletRequest request, String name) {
-//        GroupsResource groupsResource = getGroupsResource(request);
-//
-//    }
 
     @Override
     public List<UserRepresentation> findAllGroupMembers(HttpServletRequest request, String groupId) {

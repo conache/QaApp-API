@@ -4,9 +4,7 @@ import com.project.qa.service.UserService;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -34,5 +32,10 @@ public class UserController {
     @GetMapping(path = "/token")
     public String getUserToken(HttpServletRequest request) {
         return userService.getUserToken(request);
+    }
+
+    @PostMapping("/edit")
+    public void editUser(HttpServletRequest request, @RequestBody UserRepresentation userRepresentation) {
+        userService.editUser(request, userRepresentation);
     }
 }

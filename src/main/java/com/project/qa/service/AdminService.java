@@ -29,4 +29,6 @@ public interface AdminService {
     List<GroupRepresentation> findGroups(HttpServletRequest request);
 
     GroupRepresentation findGroup(HttpServletRequest request, String group);
+
+    void deleteGroupWithUsers(HttpServletRequest request, String groupId);
 }

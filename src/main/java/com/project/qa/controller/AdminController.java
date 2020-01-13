@@ -23,10 +23,10 @@ public class AdminController {
     }
 
 
-//    @GetMapping(path = "/users")
-//    public List<UserRepresentation> users(HttpServletRequest request) {
-//        return adminService.findAllUsers(request);
-//    }
+/*    @GetMapping(path = "/users")
+    public List<UserRepresentation> users(HttpServletRequest request) {
+        return adminService.findAllUsers(request);
+    }
 
     @GetMapping(path = "/findUser")
     public UserRepresentation findUser(HttpServletRequest request, @RequestParam String username) {
@@ -41,7 +41,7 @@ public class AdminController {
     @GetMapping(path = "/group")
     public GroupRepresentation findGroup(HttpServletRequest request, @RequestParam String groupName) {
         return adminService.findGroup(request, groupName);
-    }
+    }*/
 
     @GetMapping(path = "/groups")
     public List<GroupRepresentation> findGroups(HttpServletRequest request) {

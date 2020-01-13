@@ -10,18 +10,16 @@ import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import static com.project.qa.enums.Roles.ROLE_USER;
-import static com.project.qa.utils.UserUtils.defaultRequiredActions;
+import static com.project.qa.utils.KeycloakUtils.getEntityId;
+import static com.project.qa.utils.UserUtils.*;
 import static java.util.Collections.singletonList;
-import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.*;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Service
@@ -50,6 +48,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserRepresentation findUserById(HttpServletRequest request, String userId) {
+        return keycloakConfig.getRealm(request).users().get(userId).toRepresentation();
+    }
+
+    @Override
     public UserResource findUserResource(HttpServletRequest request, String username) {
         UserRepresentation user = findUser(request, username);
         return keycloakConfig.getRealm(request).users().get(user.getId());
@@ -71,7 +74,6 @@ public class UserServiceImpl implements UserService {
         }
         return users.get(0);
     }
-
 
     @Override
     public List<String> findUserRoles(HttpServletRequest request, String username) {
@@ -105,47 +107,43 @@ public class UserServiceImpl implements UserService {
     public GroupRepresentation findCurrentUserGroup(HttpServletRequest request) {
         UserRepresentation user = findCurrentUser(request);
 
-        List<String> userGroups = user.getAttributes().get(UserUtils.GROUP);
+        List<String> userGroups = getUserAttribute(user, GROUP);
         if (userGroups.size() == 1) {
             return groupService.findGroupByName(request, userGroups.get(0));
         }
-        return null;
+        throw new ResponseStatusException(NOT_FOUND, "User group not found");
     }
-
 
     @Override
     public String getUserToken(HttpServletRequest request) {
         return keycloakConfig.getUserToken(request);
     }
 
-   /* public void addUserRole(HttpServletRequest request, String userId, String role) {
-        UsersResource userResource = keycloakConfig.getRealm(request).users();
-        UserResource storedUser = userResource.get(userId);
-        roleService.setUserRole(request, storedUser, );
-    }*/
-
     @Override
-    public Response deleteUser(HttpServletRequest request, String userId) {
-        return keycloakConfig.getRealm(request).users().delete(userId);
+    public Response deleteUser(HttpServletRequest request, String userId, String groupId) {
+        UsersResource usersResource = keycloakConfig.getRealm(request).users();
+        UserResource user = usersResource.get(userId);
+        user.leaveGroup(groupId);
+        return usersResource.delete(userId);
     }
 
     @Override
     public String addUser(HttpServletRequest request, UserRepresentation user, GroupRepresentation groupRepresentation, RoleRepresentation roleRepresentation) throws HttpException {
         user.setRequiredActions(defaultRequiredActions);
         user.setEnabled(true);
-        user.setGroups(singletonList(groupRepresentation.getName()));
-        user.setRealmRoles(singletonList(ROLE_USER.name()));
+
+        addUserAttribute(user, GROUP, singletonList(groupRepresentation.getName()));
+        addUserAttribute(user, ROLE, singletonList(roleRepresentation.getName()));
 
         UsersResource usersResource = keycloakConfig.getRealm(request).users();
         Response response = usersResource.create(user);
         if (response.getStatus() != CREATED.value()) {
-            throw new HttpException(response.getStatusInfo().getReasonPhrase());
+            throw new ResponseStatusException(valueOf(response.getStatus()), response.getStatusInfo().getReasonPhrase());
         }
 
-        String userId = response.getLocation().getPath().replaceAll(".*/([^/]+)$", "$1");
+        String userId = getEntityId(response);
         UserResource userResource = usersResource.get(userId);
-        roleService.setUserRole(request, userResource, ROLE_USER.name());
-        // setDefaultUserPassword(userResource);
+        roleService.setUserRole(request, userResource, roleRepresentation);
         userResource.joinGroup(groupRepresentation.getId());
 
         return userId;
@@ -157,7 +155,7 @@ public class UserServiceImpl implements UserService {
 
         UserResource userResource = keycloakConfig.getRealm(request).users().get(userId);
         UserRepresentation userRepresentation = userResource.toRepresentation();
-        addUserAttributes(userRepresentation, UserUtils.GROUP, singletonList(groupName));
+        addUserAttribute(userRepresentation, UserUtils.GROUP, singletonList(groupName));
         userResource.update(userRepresentation);
 
         List<GroupRepresentation> userGroups = userResource.groups();
@@ -167,12 +165,9 @@ public class UserServiceImpl implements UserService {
         userResource.joinGroup(groupRepresentation.getId());
     }
 
-    public void addUserAttributes(UserRepresentation user, String attributeKey, List<String> attributeValue) {
-        Map<String, List<String>> userAttributes = user.getAttributes();
-        if (CollectionUtils.isEmpty(userAttributes)) {
-            userAttributes = new HashMap<>();
-        }
-        userAttributes.put(attributeKey, attributeValue);
-        user.setAttributes(userAttributes);
+    @Override
+    public void editUser(HttpServletRequest request, UserRepresentation userRepresentation) {
+        UserResource userResource = keycloakConfig.getRealm(request).users().get(userRepresentation.getId());
+        userResource.update(userRepresentation);
     }
 }

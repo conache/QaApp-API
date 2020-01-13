@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,8 +37,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public void setUserRole(HttpServletRequest request, UserResource storedUser, String role) {
-        RoleRepresentation roleByName = findRoleByName(request, role);
+    public void setUserRole(HttpServletRequest request, UserResource storedUser, RoleRepresentation roleByName) {
         storedUser.roles().realmLevel()
                 .add(singletonList(roleByName));
 

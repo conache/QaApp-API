@@ -5,8 +5,8 @@ import org.keycloak.representations.idm.UserRepresentation;
 public class CustomUser {
 
     private UserRepresentation userRepresentation;
-    private String role;
-    private String group;
+    private String roleName;
+    private String groupName;
 
     public UserRepresentation getUserRepresentation() {
         return userRepresentation;
@@ -16,19 +16,19 @@ public class CustomUser {
         this.userRepresentation = userRepresentation;
     }
 
-    public String getRole() {
-        return role;
+    public String getRoleName() {
+        return roleName;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
     }
 
-    public String getGroup() {
-        return group;
+    public String getGroupName() {
+        return groupName;
     }
 
-    public void setGroup(String group) {
-        this.group = group;
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 }

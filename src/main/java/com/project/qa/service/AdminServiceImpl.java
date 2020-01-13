@@ -29,9 +29,9 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public String addUser(HttpServletRequest request, CustomUser customUser) throws HttpException {
-        GroupRepresentation groupRepresentation = groupService.findGroupByName(request, customUser.getGroup());
-        RoleRepresentation roleRepresentation = roleService.findRoleByName(request, customUser.getRole());
-        return userService.addUser(request, customUser.getUserRepresentation(),groupRepresentation,roleRepresentation);
+        GroupRepresentation groupRepresentation = groupService.findGroupByName(request, customUser.getGroupName());
+        RoleRepresentation roleRepresentation = roleService.findRoleByName(request, customUser.getRoleName());
+        return userService.addUser(request, customUser.getUserRepresentation(), groupRepresentation, roleRepresentation);
     }
 
     @Override
@@ -74,4 +74,10 @@ public class AdminServiceImpl implements AdminService {
         return groupService.findGroupByName(request, group);
     }
 
+    @Override
+    public void deleteGroupWithUsers(HttpServletRequest request, String groupId) {
+        List<UserRepresentation> users = groupService.findAllGroupMembers(request, groupId);
+        users.forEach(el -> userService.deleteUser(request, el.getId(), groupId));
+        groupService.deleteGroupById(request, groupId);
+    }
 }
