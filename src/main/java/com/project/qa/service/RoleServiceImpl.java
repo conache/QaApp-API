@@ -41,10 +41,8 @@ public class RoleServiceImpl implements RoleService {
         storedUser.roles().realmLevel()
                 .add(singletonList(roleByName));
 
-        ClientsResource clients = keycloakConfig.getRealm(request).clients();
         ClientRepresentation clientRep = clientService.findClientRepresentation(request, keycloakConfig.getClient());
-        RoleRepresentation clientRoleRep = clients.get(clientRep.getId()).roles().get(roleByName.getName()).toRepresentation();
-        storedUser.roles().clientLevel(clientRep.getId()).add(singletonList(clientRoleRep));
+        storedUser.roles().clientLevel(clientRep.getId()).add(singletonList(roleByName));
     }
 
     @Override

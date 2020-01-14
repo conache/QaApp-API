@@ -171,11 +171,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void editUser(HttpServletRequest request, UserRepresentation userRepresentation) {
-        UserResource userResource = keycloakConfig.getRealm(request).users().get(userRepresentation.getId());
-        List<String> roles = getUserAttribute(userRepresentation, ROLE);
-        String roleName =roles.get(0);
-
-            userResource.update(userRepresentation);
+        keycloakConfig.getRealm(request).users().get(userRepresentation.getId()).update(userRepresentation);
     }
-
 }
