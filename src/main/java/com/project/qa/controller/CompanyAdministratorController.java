@@ -68,7 +68,6 @@ public class CompanyAdministratorController {
         companyAdministratorService.editUser(request, userRepresentation);
     }
 
-
     @PostMapping(value = "/uploadCsv", consumes = "text/csv")
     public void uploadSimple(@RequestBody InputStream body) throws IOException {
         companyAdministratorService.saveAllUsers(CsvUtils.read(UserRepresentation.class, body));

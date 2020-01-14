@@ -1,6 +1,7 @@
 package com.project.qa.service;
 
 import com.project.qa.config.KeycloakConfig;
+import org.keycloak.admin.client.resource.RoleScopeResource;
 import org.keycloak.admin.client.resource.RolesResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.ClientRepresentation;
@@ -52,17 +53,18 @@ public class RoleServiceImpl implements RoleService {
         RoleRepresentation realmRole = findRealmRoleByName(request, roleName);
         storedUser.roles().realmLevel().add(singletonList(realmRole));
 
-        List<RoleRepresentation> clientRoles = storedUser.roles().clientLevel(clientRep.getId()).listEffective();
+        removeClientUserRoles(storedUser, clientRep.getId());
+        List<RoleRepresentation> clientRoles = storedUser.roles().clientLevel(clientRep.getId()).listAvailable();
         RoleRepresentation userRoleClient = getUserRoleForClient(roleName, clientRoles);
         storedUser.roles().clientLevel(clientRep.getId()).add(singletonList(userRoleClient));
     }
 
     private RoleRepresentation getUserRoleForClient(String roleName, List<RoleRepresentation> clientRoles) {
         return clientRoles
-                    .stream()
-                    .filter(el -> roleName.equals(el.getName()))
-                    .findFirst()
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User client role" + roleName + " not found"));
+                .stream()
+                .filter(el -> roleName.equals(el.getName()))
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User client role " + roleName + " not found"));
     }
 
     @Override
@@ -75,5 +77,9 @@ public class RoleServiceImpl implements RoleService {
                 .collect(Collectors.toList());
     }
 
-
+    public void removeClientUserRoles(UserResource userResource, String clientId) {
+        RoleScopeResource roleScopeResource = userResource.roles().clientLevel(clientId);
+        List<RoleRepresentation> clientRoles = roleScopeResource.listEffective();
+        roleScopeResource.remove(clientRoles);
+    }
 }
