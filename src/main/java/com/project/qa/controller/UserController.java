@@ -1,5 +1,7 @@
 package com.project.qa.controller;
 
+import com.project.qa.model.Tag;
+import com.project.qa.service.TagService;
 import com.project.qa.service.UserService;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -13,10 +15,12 @@ import javax.servlet.http.HttpServletRequest;
 public class UserController {
 
     public final UserService userService;
+    public final TagService tagService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, TagService tagService) {
         this.userService = userService;
+        this.tagService = tagService;
     }
 
     @GetMapping(path = "/currentUser")
@@ -38,4 +42,14 @@ public class UserController {
     public void editUser(HttpServletRequest request, @RequestBody UserRepresentation userRepresentation) {
         userService.editUser(request, userRepresentation);
     }*/
+
+    @PostMapping("/addTag")
+    public Integer addTag(@RequestBody Tag tag) {
+        return tagService.addTag(tag);
+    }
+
+    @GetMapping("/findTag")
+    public Tag findTagById(@RequestParam Integer tagId){
+        return tagService.findTagById(tagId);
+    }
 }

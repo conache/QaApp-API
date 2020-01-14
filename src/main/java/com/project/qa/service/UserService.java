@@ -1,6 +1,7 @@
 package com.project.qa.service;
 
 import com.project.qa.model.CustomUser;
+import com.project.qa.model.Tag;
 import org.apache.http.HttpException;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.GroupRepresentation;
@@ -34,9 +35,10 @@ public interface UserService {
 
     Response deleteUser(HttpServletRequest request, String userId, String groupId);
 
-    String addUser(HttpServletRequest request, CustomUser customUser, GroupRepresentation groupRepresentation, RoleRepresentation roleRepresentation) throws HttpException;
+    String addUser(HttpServletRequest request, CustomUser customUser, GroupRepresentation groupRepresentation) throws HttpException;
 
     void setUserGroup(HttpServletRequest request, String userId, String groupName);
 
     void editUser(HttpServletRequest request, UserRepresentation userRepresentation);
+
 }

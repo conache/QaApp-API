@@ -1,7 +1,6 @@
 package com.project.qa.service;
 
 import com.project.qa.config.KeycloakConfig;
-import com.project.qa.utils.UserUtils;
 import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.admin.client.resource.RoleMappingResource;
 import org.keycloak.admin.client.resource.UserResource;
@@ -14,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
+import java.util.List;
 import java.util.Map;
 
 import static com.project.qa.enums.Roles.ROLE_USER;
@@ -45,6 +45,11 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
     }
 
     @Override
+    public UserRepresentation findUserById(HttpServletRequest request, String userId) {
+        return userService.findUserById(request, userId);
+    }
+
+    @Override
     public void addGroup(HttpServletRequest request, String groupName) {
         String groupId = groupService.addGroup(request, groupName);
         GroupResource group = groupService.findGroupResourceById(request, groupId);
@@ -54,14 +59,11 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
         UserRepresentation currentUser = userService.findCurrentUser(request);
         group.members().add(currentUser);
 
-     /*   UserResource userResource = userService.findUserResource(request, currentUser);
-        RoleRepresentation roleRepresentation = roleService.findRoleByName(request, ROLE_COMPANY_ADMINISTRATOR.name());
-        roleService.setUserRole(request, userResource, roleRepresentation);*/
         keycloakConfig.getRealm(request).users().get(currentUser.getId()).joinGroup(groupId);
     }
 
     private void addRolesToGroup(HttpServletRequest request, GroupResource group) {
-        RoleRepresentation role = roleService.findRoleByName(request, ROLE_USER.name());
+        RoleRepresentation role = roleService.findRealmRoleByName(request, ROLE_USER.name());
 
         RoleMappingResource roleMappingResource = group.roles();
         roleMappingResource.realmLevel().add(singletonList(role));
@@ -88,18 +90,17 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
         return userService.deleteUser(request, userId, groupByName.getId());
     }
 
-    @Override
-    public UserRepresentation findUserById(HttpServletRequest request, String userId) {
-        return userService.findUserById(request, userId);
-    }
 
     @Override
     public void editUser(HttpServletRequest request, UserRepresentation userRepresentation) {
         userService.editUser(request, userRepresentation);
         String roleName = getUserAttribute(userRepresentation, ROLE).get(0);
-        RoleRepresentation role = roleService.findRoleByName(request, roleName);
 
         UserResource userResource = userService.findUserResource(request, userRepresentation);
-        roleService.setUserRole(request, userResource, role);
+        roleService.setUserRole(request, userResource, roleName);
+    }
+    @Override
+    public void saveAllUsers(List<UserRepresentation> read) {
+//        userService.addUser(re)
     }
 }

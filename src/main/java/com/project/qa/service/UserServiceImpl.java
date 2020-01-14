@@ -3,12 +3,9 @@ package com.project.qa.service;
 import com.project.qa.config.KeycloakConfig;
 import com.project.qa.model.CustomUser;
 import com.project.qa.utils.UserUtils;
-import org.apache.http.HttpException;
-import org.keycloak.admin.client.resource.RoleResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.GroupRepresentation;
-import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -82,7 +79,7 @@ public class UserServiceImpl implements UserService {
         UserRepresentation user = findUser(request, username);
         UserResource userResource = loadUser(request, user);
 
-        return roleService.findUserRoles(userResource);
+        return roleService.findUserRealmRoles(userResource);
     }
 
     private UserResource loadUser(HttpServletRequest request, UserRepresentation user) {
@@ -130,13 +127,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String addUser(HttpServletRequest request, CustomUser customUser, GroupRepresentation groupRepresentation, RoleRepresentation roleRepresentation) {
+    public String addUser(HttpServletRequest request, CustomUser customUser, GroupRepresentation groupRepresentation) {
         UserRepresentation user = customUser.getUserRepresentation();
         user.setRequiredActions(defaultRequiredActions);
         user.setEnabled(true);
 
         addUserAttribute(user, GROUP, singletonList(groupRepresentation.getName()));
-        addUserAttribute(user, ROLE, singletonList(roleRepresentation.getName()));
+        addUserAttribute(user, ROLE, singletonList(customUser.getRoleName()));
         addUserAttribute(user, JOB, singletonList(customUser.getJobName()));
 
         UsersResource usersResource = keycloakConfig.getRealm(request).users();
@@ -147,7 +144,7 @@ public class UserServiceImpl implements UserService {
 
         String userId = getEntityId(response);
         UserResource userResource = usersResource.get(userId);
-        roleService.setUserRole(request, userResource, roleRepresentation);
+        roleService.setUserRole(request, userResource, customUser.getRoleName());
         userResource.joinGroup(groupRepresentation.getId());
 
         return userId;

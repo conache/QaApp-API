@@ -16,7 +16,6 @@ import javax.ws.rs.core.Response;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.project.qa.utils.KeycloakUtils.getEntityId;
 import static com.project.qa.utils.RoleUtils.DEFAULT_ROLES;
@@ -38,14 +37,13 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public List<String> findGroupsNames(HttpServletRequest request) {
-        return findGroups(request)
-                .stream().map(GroupRepresentation::getName).collect(Collectors.toList());
+    public List<GroupRepresentation> findGroups(HttpServletRequest request) {
+        return getGroupsResource(request).groups();
     }
 
     @Override
-    public List<GroupRepresentation> findGroups(HttpServletRequest request) {
-        return getGroupsResource(request).groups();
+    public GroupResource findGroupResourceById(HttpServletRequest request, String groupId) {
+        return getGroupsResource(request).group(groupId);
     }
 
     @Override
@@ -59,24 +57,18 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public GroupResource getGroupResource(HttpServletRequest request, String id) {
-        return getGroupsResource(request).group(id);
-    }
-
-    @Override
     public List<UserRepresentation> findAllGroupMembers(HttpServletRequest request, String groupId) {
-        return getGroupsResource(request).group(groupId).members();
+        return findGroupResourceById(request, groupId).members();
     }
 
     @Override
     public Map<String, Object> findAllGroupMembersPageable(HttpServletRequest request, String groupId, PageRequest page) {
-
         int firstIndex = page.getPageNumber() * page.getPageSize();
         int lastIndex = firstIndex + page.getPageSize() - 1;
-        List<UserRepresentation> users = getGroupsResource(request).group(groupId).members();
-        Map<String, Object> response = new HashMap<>();
-
+        List<UserRepresentation> users = findAllGroupMembers(request, groupId);
         int totalUsers = users.size();
+
+        Map<String, Object> response = new HashMap<>();
         response.put("totalCount", totalUsers);
         response.put("users", users.subList(firstIndex, min(lastIndex, totalUsers)));
         return response;
@@ -89,26 +81,19 @@ public class GroupServiceImpl implements GroupService {
         groupRepresentation.setRealmRoles(DEFAULT_ROLES);
         groupRepresentation.setClientRoles(singletonMap(keycloakConfig.getClient(), DEFAULT_ROLES));
 
-
         GroupsResource groupsResource = getGroupsResource(request);
         Response response = groupsResource.add(groupRepresentation);
         return getEntityId(response);
-
-    }
-
-    @Override
-    public GroupResource findGroupResourceById(HttpServletRequest request, String groupId) {
-        return getGroupsResource(request).group(groupId);
     }
 
     @Override
     public void deleteGroupById(HttpServletRequest request, String groupId) {
-        keycloakConfig.getRealm(request).groups().group(groupId).remove();
+        findGroupResourceById(request, groupId).remove();
     }
 
     @Override
-    public void deleteGroupByName(HttpServletRequest request, String name) {
-        GroupRepresentation group = findGroupByName(request, name);
-        keycloakConfig.getRealm(request).groups().group(group.getId()).remove();
+    public void deleteGroupByName(HttpServletRequest request, String groupName) {
+        GroupRepresentation group = findGroupByName(request, groupName);
+        findGroupResourceById(request, group.getId()).remove();
     }
 }

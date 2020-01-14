@@ -7,11 +7,11 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 public interface RoleService {
-    void setUserRole(HttpServletRequest request, UserResource storedUser, RoleRepresentation role);
+    void setUserRole(HttpServletRequest request, UserResource storedUser, String roleName);
 
     List<RoleRepresentation> findAllRoles(HttpServletRequest request);
 
-    RoleRepresentation findRoleByName(HttpServletRequest request, String roleName);
+    RoleRepresentation findRealmRoleByName(HttpServletRequest request, String roleName);
 
-    List<String> findUserRoles(UserResource user);
+    List<String> findUserRealmRoles(UserResource user);
 }

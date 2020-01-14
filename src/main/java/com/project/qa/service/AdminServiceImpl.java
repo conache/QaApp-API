@@ -1,9 +1,7 @@
 package com.project.qa.service;
 
 import com.project.qa.model.CustomUser;
-import com.project.qa.utils.UserUtils;
 import org.apache.http.HttpException;
-import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -36,48 +34,12 @@ public class AdminServiceImpl implements AdminService {
         UserRepresentation currentUser = userService.findCurrentUser(request);
 
         GroupRepresentation groupRepresentation = groupService.findGroupByName(request, getUserAttribute(currentUser, GROUP).get(0));
-        RoleRepresentation roleRepresentation = roleService.findRoleByName(request, customUser.getRoleName());
-        return userService.addUser(request, customUser, groupRepresentation, roleRepresentation);
-    }
-
-    @Override
-    public void setUserRole(HttpServletRequest request, UserResource storedUser, String role) {
-
-    }
-
-    @Override
-    public List<UserRepresentation> findAllUsers(HttpServletRequest request) {
-        return userService.findAllUsers(request);
-    }
-
-    @Override
-    public UserRepresentation findUser(HttpServletRequest request, String search) {
-        return userService.findUser(request, "bog");
-    }
-
-    @Override
-    public List<RoleRepresentation> findAllRoles(HttpServletRequest request) {
-        return null;
-    }
-
-    @Override
-    public RoleRepresentation findRole(HttpServletRequest request, String roleName) {
-        return null;
-    }
-
-    @Override
-    public List<String> findUserRoles(HttpServletRequest request, String username) {
-        return null;
+        return userService.addUser(request, customUser, groupRepresentation);
     }
 
     @Override
     public List<GroupRepresentation> findGroups(HttpServletRequest request) {
         return groupService.findGroups(request);
-    }
-
-    @Override
-    public GroupRepresentation findGroup(HttpServletRequest request, String group) {
-        return groupService.findGroupByName(request, group);
     }
 
     @Override

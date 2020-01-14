@@ -12,19 +12,15 @@ import java.util.Map;
 public interface GroupService {
     List<GroupRepresentation> findGroups(HttpServletRequest request);
 
-    List<String> findGroupsNames(HttpServletRequest request);
-
     GroupRepresentation findGroupByName(HttpServletRequest request, String groupName);
 
-    GroupResource getGroupResource(HttpServletRequest request, String id);
-
     List<UserRepresentation> findAllGroupMembers(HttpServletRequest request, String groupId);
+
+    GroupResource findGroupResourceById(HttpServletRequest request, String groupId);
 
     Map<String, Object> findAllGroupMembersPageable(HttpServletRequest request, String groupId, PageRequest page);
 
     String addGroup(HttpServletRequest request, String name);
-
-    GroupResource findGroupResourceById(HttpServletRequest request, String groupId);
 
     void deleteGroupById(HttpServletRequest request, String groupId);
 

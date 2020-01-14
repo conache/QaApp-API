@@ -5,6 +5,7 @@ import org.springframework.data.domain.PageRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
+import java.util.List;
 import java.util.Map;
 
 public interface CompanyAdministratorService {
@@ -22,4 +23,6 @@ public interface CompanyAdministratorService {
     UserRepresentation findUserById(HttpServletRequest request, String userId);
 
     void editUser(HttpServletRequest request, UserRepresentation userRepresentation);
+
+    void saveAllUsers(List<UserRepresentation> read);
 }
