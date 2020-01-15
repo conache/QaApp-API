@@ -21,6 +21,7 @@ import static com.project.qa.utils.KeycloakUtils.getEntityId;
 import static com.project.qa.utils.RoleUtils.DEFAULT_ROLES;
 import static java.lang.Math.min;
 import static java.util.Collections.singletonMap;
+import static org.springframework.http.HttpStatus.CREATED;
 
 @Service
 public class GroupServiceImpl implements GroupService {
@@ -83,6 +84,9 @@ public class GroupServiceImpl implements GroupService {
 
         GroupsResource groupsResource = getGroupsResource(request);
         Response response = groupsResource.add(groupRepresentation);
+        if (response.getStatus() != CREATED.value()) {
+            throw new ResponseStatusException(HttpStatus.valueOf(response.getStatus()), response.toString());
+        }
         return getEntityId(response);
     }
 
