@@ -18,7 +18,8 @@ public interface UserService {
 
     UserRepresentation findUserById(HttpServletRequest request, String userId);
 
-    UserResource findUserResource(HttpServletRequest request, String username);
+
+    UserResource findUserResource(HttpServletRequest request);
 
     UserResource findUserResource(HttpServletRequest request, UserRepresentation userRepresentation);
 

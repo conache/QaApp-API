@@ -5,6 +5,7 @@ import com.project.qa.model.Tag;
 import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.admin.client.resource.RoleMappingResource;
 import org.keycloak.admin.client.resource.UserResource;
+import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -19,6 +20,7 @@ import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Map;
 
+import static com.project.qa.enums.Roles.ROLE_COMPANY_ADMINISTRATOR;
 import static com.project.qa.enums.Roles.ROLE_USER;
 import static com.project.qa.utils.UserUtils.*;
 import static java.util.Collections.singletonList;
@@ -61,9 +63,14 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
 
         addRolesToGroup(request, group);
 
-        //TODO
-//        UserResource userResource = userService.findU
-        UserRepresentation currentUser = userService.findCurrentUser(request);
+        UserResource userResource = userService.findUserResource(request);
+
+        UserRepresentation currentUser = userResource.toRepresentation();
+        addUserAttribute(currentUser, GROUP, singletonList(groupName));
+        addUserAttribute(currentUser, ROLE, singletonList(ROLE_COMPANY_ADMINISTRATOR.name()));
+
+        userResource.update(currentUser);
+
         group.members().add(currentUser);
 
         keycloakConfig.getRealm(request).users().get(currentUser.getId()).joinGroup(groupId);

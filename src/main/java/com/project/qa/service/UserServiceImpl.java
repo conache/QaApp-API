@@ -57,9 +57,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResource findUserResource(HttpServletRequest request, String username) {
-        UserRepresentation user = findUser(request, username);
-        return keycloakConfig.getRealm(request).users().get(user.getId());
+    public UserResource findUserResource(HttpServletRequest request) {
+        String currentUserId = keycloakConfig.getCurrentUserId(request);
+        return keycloakConfig.getRealm(request).users().get(currentUserId);
     }
 
     @Override
@@ -181,7 +181,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<Tag>findActiveTagsPageable(HttpServletRequest request, Pageable pageable) {
+    public Page<Tag> findActiveTagsPageable(HttpServletRequest request, Pageable pageable) {
         UserRepresentation currentUser = findCurrentUser(request);
         List<String> groups = getUserAttribute(currentUser, GROUP);
         return tagService.findAllByGroupIdAndActive(groups.get(0), true, pageable);
