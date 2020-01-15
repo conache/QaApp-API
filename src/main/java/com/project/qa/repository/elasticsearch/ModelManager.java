@@ -25,6 +25,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.join.query.ParentIdQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.SortOrder;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -216,7 +217,7 @@ public class ModelManager<T extends ModelBase> {
 
         ParentIdQueryBuilder queryBuilder = new ParentIdQueryBuilder("answer",model.getModelId());
         Answer answer = new Answer.AnswerBuilder().build();
-        SearchRequest searchRequest = new SearchRequest().source(SearchSourceBuilder.searchSource().query(queryBuilder).sort(answer.getSortBy())).indices(model.getIndex().toString());
+        SearchRequest searchRequest = new SearchRequest().source(SearchSourceBuilder.searchSource().query(queryBuilder).sort(answer.getSortBy(),SortOrder.DESC)).indices(model.getIndex().toString());
         try {
             model.setQuestionsAnswers(GetAnswers(searchRequest));
 
@@ -230,7 +231,7 @@ public class ModelManager<T extends ModelBase> {
         Question model = new Question.QuestionBuilder().build();
         Answer answer = new Answer.AnswerBuilder().build();
         ParentIdQueryBuilder queryBuilder = new ParentIdQueryBuilder("answer",id);
-        SearchRequest searchRequest = new SearchRequest().source(SearchSourceBuilder.searchSource().query(queryBuilder).size(size).from(from).sort(answer.getSortBy())).indices(model.getIndex().toString());
+        SearchRequest searchRequest = new SearchRequest().source(SearchSourceBuilder.searchSource().query(queryBuilder).size(size).from(from).sort(answer.getSortBy(),SortOrder.DESC)).indices(model.getIndex().toString());
         try {
             return GetAnswers(searchRequest);
         } catch (IOException e) {
@@ -263,7 +264,7 @@ public class ModelManager<T extends ModelBase> {
                 query((boolQueryBuilder)).
                 size(size).
                 from(from).
-                sort(model.getSortBy())).
+                sort(model.getSortBy(), SortOrder.DESC)).
                 indices(model.getIndex().toString());
         try {
             SearchResponse searchResponse = esClient.search(searchRequest, RequestOptions.DEFAULT);
