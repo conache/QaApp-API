@@ -187,4 +187,13 @@ public class UserServiceImpl implements UserService {
         return tagService.findAllByGroupIdAndActive(groups.get(0), true, pageable);
 
     }
+
+    @Override
+    public Integer addTag(HttpServletRequest request, Tag tag) {
+        UserRepresentation currentUser = findCurrentUser(request);
+        List<String> groups = getUserAttribute(currentUser, GROUP);
+        tag.setGroupName(groups.get(0));
+        tag.setActive(false);
+        return tagService.addTag(tag);
+    }
 }

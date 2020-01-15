@@ -46,4 +46,6 @@ public interface UserService {
     void editUser(HttpServletRequest request, UserRepresentation userRepresentation);
 
     Page<Tag> findActiveTagsPageable(HttpServletRequest request, Pageable pageable);
+
+    Integer addTag(HttpServletRequest request, Tag tag);
 }
