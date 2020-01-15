@@ -140,6 +140,7 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
         UserRepresentation currentUser = userService.findCurrentUser(request);
         List<String> groups = getUserAttribute(currentUser, GROUP);
         tag.setGroupName(groups.get(0));
+        tag.setActive(true);
         return tagService.addTag(tag);
     }
 }
