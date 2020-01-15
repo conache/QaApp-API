@@ -4,7 +4,6 @@ import com.project.qa.model.elasticserach.Question;
 import com.project.qa.service.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,7 +36,7 @@ public class QuestionController {
     }
 
     @PostMapping("/add")
-    public String addQuestion(HttpServletRequest request, Question question) {
+    public String addQuestion(HttpServletRequest request, @RequestBody Question question) {
         return questionService.addQuestion(request, question);
     }
 }
