@@ -36,7 +36,7 @@ public class QuestionController {
         return null;
     }
 
-    @PostMapping("add")
+    @PostMapping("/add")
     public String addQuestion(HttpServletRequest request, Question question) {
         return questionService.addQuestion(request, question);
     }
