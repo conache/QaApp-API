@@ -9,7 +9,7 @@ import java.util.HashMap;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Answer extends ModelBase {
 
-    private int userId;
+    private String userId;
     private String answerText;
     private int score;
     private boolean isCorrectAnswer;
@@ -17,10 +17,10 @@ public class Answer extends ModelBase {
     private String questionId;
     private String parentId;
 
-    public int getUserId() {
+    public String getUserId() {
         return userId;
     }
-    public void setUserId(int userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
     public String getAnswerText() {
@@ -55,7 +55,7 @@ public class Answer extends ModelBase {
     //TODO: Check if automapper is working without the empty constructor
     public Answer(){}
 
-    public Answer(int userId, String answerText, int score, boolean isCorrectAnswer, Date publishDate, String questionId) {
+    public Answer(String userId, String answerText, int score, boolean isCorrectAnswer, Date publishDate, String questionId) {
 
         this.userId = userId;
         this.answerText = answerText;
@@ -81,14 +81,14 @@ public class Answer extends ModelBase {
     }
 
     public static class AnswerBuilder {
-        private int userId = 0;
+        private String userId = "";
         private String answerText = "";
         private int score = 0;
         private boolean isCorrectAnswer = false;
         private Date publishDate;
         private String questionId = "";
 
-        public AnswerBuilder setUserId(int userId) {
+        public AnswerBuilder setUserId(String userId) {
             this.userId = userId;
             return this;
         }

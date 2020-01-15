@@ -11,7 +11,8 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Question extends ModelBase {
 
-    private int questionAuthorId;
+    private String questionAuthorId;
+    private String groupId;
     private int score;
     private String questionTitle;
     private String questionText;
@@ -20,11 +21,11 @@ public class Question extends ModelBase {
     private List<Answer> questionsAnswers;
     private List<String> questionTags;
 
-    public int getQuestionAuthorId() {
+    public String getQuestionAuthorId() {
         return questionAuthorId;
     }
 
-    public void setQuestionAuthorId(int questionAuthorId) {
+    public void setQuestionAuthorId(String questionAuthorId) {
         this.questionAuthorId = questionAuthorId;
     }
 
@@ -77,8 +78,9 @@ public class Question extends ModelBase {
     //TODO: Check if automapper is working without the empty constructor
     public Question() {}
 
-    public Question(int questionAuthorId, int score, String questionTitle, String questionText, Date questionPublishDate, List<Answer> questionsAnswers, List<String> questionTags) {
+    public Question(String questionAuthorId, String groupId, int score, String questionTitle, String questionText, Date questionPublishDate, List<Answer> questionsAnswers, List<String> questionTags) {
         this.questionAuthorId = questionAuthorId;
+        this.groupId = groupId;
         this.score = score;
         this.questionTitle = questionTitle;
         this.questionText = questionText;
@@ -97,10 +99,19 @@ public class Question extends ModelBase {
         return "question";
     }
 
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    }
+
 
     // Builder
     public static class QuestionBuilder {
-        private int questionAuthorId;
+        private String questionAuthorId;
+        private String groupId;
         private int score;
         private String questionTitle;
         private String questionText;
@@ -108,8 +119,12 @@ public class Question extends ModelBase {
         private List<Answer> questionsAnswers;
         private List<String> questionTags;
 
-        public QuestionBuilder setQuestionAuthorId(int questionAuthorId) {
+        public QuestionBuilder setQuestionAuthorId(String questionAuthorId) {
             this.questionAuthorId = questionAuthorId;
+            return this;
+        }
+        public QuestionBuilder groupId(String groupId) {
+            this.groupId = groupId;
             return this;
         }
 
@@ -145,7 +160,7 @@ public class Question extends ModelBase {
 
         public Question build()
         {
-            return new Question(questionAuthorId, score, questionTitle, questionText, questionPublishDate, questionsAnswers, questionTags);
+            return new Question(questionAuthorId, groupId, score, questionTitle, questionText, questionPublishDate, questionsAnswers, questionTags);
 
         }
     }
