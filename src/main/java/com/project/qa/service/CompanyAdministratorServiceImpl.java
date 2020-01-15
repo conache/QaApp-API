@@ -4,6 +4,7 @@ import com.project.qa.config.KeycloakConfig;
 import com.project.qa.model.Tag;
 import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.admin.client.resource.RoleMappingResource;
+import org.keycloak.admin.client.resource.RoleResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
@@ -82,7 +83,8 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
         roleMappingResource.realmLevel().add(singletonList(role));
 
         String clientId = clientService.findClientIdByName(request, keycloakConfig.getClient());
-        roleMappingResource.clientLevel(clientId).add(singletonList(role));
+        RoleResource clientRole = keycloakConfig.getRealm(request).clients().get(clientId).roles().get(ROLE_USER.name());
+        roleMappingResource.clientLevel(clientId).add(singletonList(clientRole.toRepresentation()));
     }
 
     @Override
