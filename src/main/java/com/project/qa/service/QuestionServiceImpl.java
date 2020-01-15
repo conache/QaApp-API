@@ -8,6 +8,7 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -44,8 +45,9 @@ public class QuestionServiceImpl implements QuestionService {
     public Page<Question> findAllGroupQuestions(HttpServletRequest request, Pageable pageable) {
         UserRepresentation userRepresentation = userService.findCurrentUser(request);
         List<String> userGroups = UserUtils.getUserAttribute(userRepresentation, GROUP);
-//        modelManager.
-        return null;
+        int pageSize = pageable.getPageSize();
+        int pageNumber = pageable.getPageNumber();
+        return new PageImpl<>(modelManager.getAll(pageSize, pageSize *(pageNumber - 1), userGroups.get(0)));
     }
 
     @Override

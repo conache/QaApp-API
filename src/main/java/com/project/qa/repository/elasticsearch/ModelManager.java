@@ -14,7 +14,6 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -82,7 +81,7 @@ public class ModelManager<T extends ModelBase> {
             ObjectMapper oMapper = new ObjectMapper();
             Reader reader = new StringReader(getResponse.getSourceAsString());
             T toReturn = oMapper.readValue(reader, this.type);
-            toReturn.setId(getResponse.getId());
+            toReturn.setModelId(getResponse.getId());
             return toReturn;
 
         } catch (IOException e) {
@@ -92,19 +91,10 @@ public class ModelManager<T extends ModelBase> {
     }
 
 
-    public List<T> getAll() {
-        SearchRequest searchRequest = new SearchRequest()
-                .searchType(SearchType.DFS_QUERY_THEN_FETCH)
-                .source(SearchSourceBuilder.searchSource()
-                        .query(QueryBuilders.matchAllQuery()))
-                .indices(supplier.get().getIndex().toString());
-        try {
-            SearchResponse searchResponse = esClient.search(searchRequest, RequestOptions.DEFAULT);
-            return getModelsFromHits(searchResponse.getHits().getHits());
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return null;
-        }
+    public List<T> getAll(int size, int from, String groupName) {
+
+        QueryBuilder  boolQueryBuilder = new BoolQueryBuilder().filter(QueryBuilders.termsQuery("groupName.keyword", groupName));
+        return getModelsFromFilterRequest(boolQueryBuilder, size, from);
     }
 
     public String index(T t) {
@@ -130,7 +120,7 @@ public class ModelManager<T extends ModelBase> {
     public String update(T model) {
         UpdateRequest updateRequest = new UpdateRequest().
                 index(supplier.get().getIndex().toString()).
-                id(model.getId()).
+                id(model.getModelId()).
                 doc(writeModelAsMap(model));
 
         try {
@@ -145,7 +135,7 @@ public class ModelManager<T extends ModelBase> {
     public String update(T model, String route) {
         UpdateRequest updateRequest = new UpdateRequest().
                 index(supplier.get().getIndex().toString()).
-                id(model.getId()).
+                id(model.getModelId()).
                 doc(writeModelAsMap(model)).
                 routing(route);
 
@@ -180,26 +170,26 @@ public class ModelManager<T extends ModelBase> {
     public List<T> findByField(String field, Object value, int size, int from, String groupName)  {
         field += ".keyword";
         QueryBuilder  boolQueryBuilder = new BoolQueryBuilder().filter(QueryBuilders.termQuery(field,value.toString())).must(QueryBuilders.termsQuery("groupName.keyword", groupName));
-        return getModelsFromFilterRequest(boolQueryBuilder,size,from,groupName);
+        return getModelsFromFilterRequest(boolQueryBuilder,size,from);
     }
 
     public List<T> filterByField(String field, List<String> terms, int size, int from, String groupName) {
 
         field += ".keyword";
         QueryBuilder  boolQueryBuilder = new BoolQueryBuilder().filter(QueryBuilders.termsQuery(field,terms)).must(QueryBuilders.termsQuery("groupName.keyword", groupName));
-        return getModelsFromFilterRequest(boolQueryBuilder, size, from,groupName);
+        return getModelsFromFilterRequest(boolQueryBuilder, size, from);
 
     }
 
     public List<T> matchLikeThis(String field, String value, int size, int from, String groupName)  {
 
         QueryBuilder  boolQueryBuilder = QueryBuilders.boolQuery().must(QueryBuilders.matchQuery(field,value.toString())).must(QueryBuilders.termsQuery("groupName.keyword", groupName));
-        return getModelsFromFilterRequest(boolQueryBuilder, size, from,groupName);
+        return getModelsFromFilterRequest(boolQueryBuilder, size, from);
     }
 
 
     public void delete(T model){
-        delete(model.getId());
+        delete(model.getModelId());
     }
 
     public void delete(String id) {
@@ -224,7 +214,7 @@ public class ModelManager<T extends ModelBase> {
 
     public void loadAnswers(Question model) {
 
-        ParentIdQueryBuilder queryBuilder = new ParentIdQueryBuilder("answer",model.getId());
+        ParentIdQueryBuilder queryBuilder = new ParentIdQueryBuilder("answer",model.getModelId());
         Answer answer = new Answer.AnswerBuilder().build();
         SearchRequest searchRequest = new SearchRequest().source(SearchSourceBuilder.searchSource().query(queryBuilder).sort(answer.getSortBy())).indices(model.getIndex().toString());
         try {
@@ -259,13 +249,13 @@ public class ModelManager<T extends ModelBase> {
             String json = hit.getSourceAsString();
             Reader reader = new StringReader(json);
             Answer toAppend = oMapper.readValue(reader, Answer.class);
-            toAppend.setId(hit.getId());
+            toAppend.setModelId(hit.getId());
             answers.add(toAppend);
         }
         return answers;
     }
 
-    private List<T> getModelsFromFilterRequest(QueryBuilder boolQueryBuilder, int size, int from, String GroupName) {
+    private List<T> getModelsFromFilterRequest(QueryBuilder boolQueryBuilder, int size, int from) {
 
         T model = supplier.get();
         SearchRequest searchRequest = new SearchRequest().source(SearchSourceBuilder.
@@ -300,7 +290,7 @@ public class ModelManager<T extends ModelBase> {
             String json = hit.getSourceAsString();
             Reader reader = new StringReader(json);
             T toAppend = objectMapper.readValue(reader, this.type);
-            toAppend.setId(hit.getId());
+            toAppend.setModelId(hit.getId());
             toRerun.add(toAppend);
         }
         return toRerun;

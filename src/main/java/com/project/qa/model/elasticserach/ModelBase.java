@@ -5,16 +5,15 @@ import com.project.qa.enums.elasticsearch.Index;
 
 public abstract class ModelBase {
 
-    @JsonIgnore
-    String id;
+    String modelId;
     @JsonIgnore
     private final Index index;
 
-    public String getId() {
-        return id;
+    public String getModelId() {
+        return modelId;
     }
-    public void setId(String id) {
-        this.id = id;
+    public void setModelId(String modelId) {
+        this.modelId = modelId;
     }
     public String getType()
     {

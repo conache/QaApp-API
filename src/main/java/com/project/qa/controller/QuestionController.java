@@ -4,6 +4,7 @@ import com.project.qa.model.elasticserach.Question;
 import com.project.qa.service.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -30,9 +31,9 @@ public class QuestionController {
     }
 
     @GetMapping("/findAll")
-    public Page<Question> findAllGroupQuestions(HttpServletRequest request) {
-//        return questionService.
-        return null;
+    public Page<Question> findAllGroupQuestions(HttpServletRequest request, Pageable pageable) {
+        return questionService.findAllGroupQuestions(request, pageable);
+
     }
 
     @PostMapping("/add")
