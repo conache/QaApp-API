@@ -5,8 +5,9 @@ import com.project.qa.model.Tag;
 import org.apache.http.HttpException;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.GroupRepresentation;
-import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
@@ -20,6 +21,8 @@ public interface UserService {
     UserResource findUserResource(HttpServletRequest request, String username);
 
     UserResource findUserResource(HttpServletRequest request, UserRepresentation userRepresentation);
+
+    UserResource findUserResourceById(HttpServletRequest request, String userId);
 
     UserRepresentation findUser(HttpServletRequest request, String username);
 
@@ -41,4 +44,5 @@ public interface UserService {
 
     void editUser(HttpServletRequest request, UserRepresentation userRepresentation);
 
+    Page<Tag> findActiveTagsPageable(HttpServletRequest request, Pageable pageable);
 }

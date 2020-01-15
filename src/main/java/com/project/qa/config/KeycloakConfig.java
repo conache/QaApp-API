@@ -35,9 +35,9 @@ public class KeycloakConfig {
                 .build();
     }
 
-    public String getCurrentUsername(HttpServletRequest request) {
+    public String getCurrentUserId(HttpServletRequest request) {
         KeycloakSecurityContext context = (KeycloakSecurityContext) request.getAttribute(KeycloakSecurityContext.class.getName());
-        return context.getToken().getPreferredUsername();
+        return context.getToken().getSubject();
     }
 
     public String getUserToken(HttpServletRequest request) {

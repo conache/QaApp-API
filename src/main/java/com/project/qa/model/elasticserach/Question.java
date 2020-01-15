@@ -65,7 +65,9 @@ public class Question extends ModelBase {
         return questionsAnswers;
     }
 
-    public void setQuestionsAnswers(List<Answer> questionsAnswers) {this.questionsAnswers = questionsAnswers;  }
+    public void setQuestionsAnswers(List<Answer> questionsAnswers) {
+        this.questionsAnswers = questionsAnswers;
+    }
 
     public List<String> getQuestionTags() {
         return questionTags;
@@ -76,7 +78,8 @@ public class Question extends ModelBase {
     }
 
     //TODO: Check if automapper is working without the empty constructor
-    public Question() {}
+    public Question() {
+    }
 
     public Question(String questionAuthorId, String groupId, int score, String questionTitle, String questionText, Date questionPublishDate, List<Answer> questionsAnswers, List<String> questionTags) {
         this.questionAuthorId = questionAuthorId;
@@ -108,7 +111,6 @@ public class Question extends ModelBase {
     }
 
 
-    // Builder
     public static class QuestionBuilder {
         private String questionAuthorId;
         private String groupId;
@@ -123,6 +125,7 @@ public class Question extends ModelBase {
             this.questionAuthorId = questionAuthorId;
             return this;
         }
+
         public QuestionBuilder groupId(String groupId) {
             this.groupId = groupId;
             return this;
@@ -158,11 +161,8 @@ public class Question extends ModelBase {
             return this;
         }
 
-        public Question build()
-        {
+        public Question build() {
             return new Question(questionAuthorId, groupId, score, questionTitle, questionText, questionPublishDate, questionsAnswers, questionTags);
-
         }
     }
-
 }

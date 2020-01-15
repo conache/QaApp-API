@@ -2,8 +2,9 @@ package com.project.qa.service;
 
 import com.project.qa.model.Tag;
 import com.project.qa.repository.TagRepository;
-import org.apache.http.client.HttpResponseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -32,5 +33,25 @@ public class TagServiceImpl implements TagService {
     public Tag findTagById(Integer tagId) {
         Optional<Tag> byId = repository.findById(tagId);
         return byId.orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "User doesn't have attributes"));
+    }
+
+    @Override
+    public Page<Tag> findAllByGroupName(String groupName, Pageable pageable) {
+        return repository.findAllByGroupName(groupName, pageable);
+    }
+
+    @Override
+    public Page<Tag> findAllByGroupIdAndActive(String groupName, boolean active, Pageable pageable) {
+        return repository.findAllByGroupNameAndActive(groupName, active, pageable);
+    }
+
+    @Override
+    public Page<Tag> findAllByGroupIdAndQuestionId(String groupName, String questionId, Pageable pageable) {
+        return repository.findAllByGroupNameAndQuestionId(groupName, questionId, pageable);
+    }
+
+    @Override
+    public void deleteTagById(Tag tag) {
+        repository.delete(tag);
     }
 }

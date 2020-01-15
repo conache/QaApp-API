@@ -6,6 +6,9 @@ import com.project.qa.service.UserService;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -49,7 +52,12 @@ public class UserController {
     }
 
     @GetMapping("/findTag")
-    public Tag findTagById(@RequestParam Integer tagId){
+    public Tag findTagById(@RequestParam Integer tagId) {
         return tagService.findTagById(tagId);
+    }
+
+    @GetMapping("/tags")
+    public Page<Tag> findAllPageable(HttpServletRequest request, final Pageable pageable) {
+        return userService.findActiveTagsPageable(request, pageable);
     }
 }

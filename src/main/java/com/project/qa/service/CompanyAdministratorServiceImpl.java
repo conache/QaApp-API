@@ -1,6 +1,7 @@
 package com.project.qa.service;
 
 import com.project.qa.config.KeycloakConfig;
+import com.project.qa.model.Tag;
 import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.admin.client.resource.RoleMappingResource;
 import org.keycloak.admin.client.resource.UserResource;
@@ -8,7 +9,9 @@ import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,14 +31,16 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
     private final UserService userService;
     private final GroupService groupService;
     private final RoleService roleService;
+    private final TagService tagService;
 
     @Autowired
-    public CompanyAdministratorServiceImpl(KeycloakConfig keycloakConfig, ClientService clientService, UserService userService, GroupService groupService, RoleService roleService) {
+    public CompanyAdministratorServiceImpl(KeycloakConfig keycloakConfig, ClientService clientService, UserService userService, GroupService groupService, RoleService roleService, TagService tagService) {
         this.keycloakConfig = keycloakConfig;
         this.clientService = clientService;
         this.userService = userService;
         this.groupService = groupService;
         this.roleService = roleService;
+        this.tagService = tagService;
     }
 
     @Override
@@ -99,8 +104,16 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
         UserResource userResource = userService.findUserResource(request, userRepresentation);
         roleService.setUserRole(request, userResource, roleName);
     }
+
     @Override
     public void saveAllUsers(List<UserRepresentation> read) {
 //        userService.addUser(re)
+    }
+
+    @Override
+    public Page<Tag> findAllTagsPageable(HttpServletRequest request, Pageable pageable) {
+        UserRepresentation currentUser = userService.findCurrentUser(request);
+        List<String> groups = getUserAttribute(currentUser, GROUP);
+        return tagService.findAllByGroupName(groups.get(0), pageable);
     }
 }

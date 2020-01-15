@@ -1,6 +1,7 @@
 package com.project.qa.controller;
 
 import com.project.qa.model.CustomUser;
+import com.project.qa.model.Tag;
 import com.project.qa.service.AdminService;
 import com.project.qa.service.CompanyAdministratorService;
 import com.project.qa.service.GroupService;
@@ -8,7 +9,9 @@ import com.project.qa.utils.CsvUtils;
 import org.apache.http.HttpException;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -76,6 +79,11 @@ public class CompanyAdministratorController {
     @PostMapping(value = "/uploadCsv", consumes = "multipart/form-data")
     public void uploadMultipart(@RequestParam("file") MultipartFile file) throws IOException {
         companyAdministratorService.saveAllUsers(CsvUtils.read(UserRepresentation.class, file.getInputStream()));
+    }
+
+    @GetMapping("/tags")
+    public Page<Tag> findAllPageable(HttpServletRequest request, final Pageable pageable) {
+        return companyAdministratorService.findAllTagsPageable(request, pageable);
     }
 
 }

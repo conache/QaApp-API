@@ -1,4 +1,4 @@
-package com.project.qa.amazonaws.http;
+package com.project.qa.config.aws;
 
 /*
  * Copyright 2012-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.

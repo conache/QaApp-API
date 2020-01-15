@@ -11,7 +11,7 @@ public class Tag {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    @Column(name = "name")
+    @Column(name = "tag_name")
     private String name;
 
     @Column(name = "description")
@@ -20,8 +20,11 @@ public class Tag {
     @Column(name = "active")
     private boolean active;
 
-    @Column(name = "groupid")
-    private String groupId;
+    @Column(name = "group_name")
+    private String groupName;
+
+    @Column(name = "question_id")
+    private String questionId;
 
     public Integer getId() {
         return id;
@@ -55,11 +58,19 @@ public class Tag {
         this.active = active;
     }
 
-    public String getGroupId() {
-        return groupId;
+    public String getGroupName() {
+        return groupName;
     }
 
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    public String getQuestionId() {
+        return questionId;
+    }
+
+    public void setQuestionId(String questionId) {
+        this.questionId = questionId;
     }
 }

@@ -2,12 +2,15 @@ package com.project.qa.service;
 
 import com.project.qa.config.KeycloakConfig;
 import com.project.qa.model.CustomUser;
+import com.project.qa.model.Tag;
 import com.project.qa.utils.UserUtils;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -27,12 +30,14 @@ public class UserServiceImpl implements UserService {
     private final KeycloakConfig keycloakConfig;
     private final RoleService roleService;
     private final GroupService groupService;
+    private final TagService tagService;
 
     @Autowired
-    public UserServiceImpl(KeycloakConfig keycloakConfig, RoleService roleService, GroupService groupService) {
+    public UserServiceImpl(KeycloakConfig keycloakConfig, RoleService roleService, GroupService groupService, TagService tagService) {
         this.keycloakConfig = keycloakConfig;
         this.roleService = roleService;
         this.groupService = groupService;
+        this.tagService = tagService;
     }
 
     @Override
@@ -42,8 +47,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserRepresentation findCurrentUser(HttpServletRequest request) {
-        String username = keycloakConfig.getCurrentUsername(request);
-        return findUser(request, username);
+        String id = keycloakConfig.getCurrentUserId(request);
+        return findUserById(request, id);
     }
 
     @Override
@@ -60,6 +65,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResource findUserResource(HttpServletRequest request, UserRepresentation userRepresentation) {
         return keycloakConfig.getRealm(request).users().get(userRepresentation.getId());
+    }
+
+    @Override
+    public UserResource findUserResourceById(HttpServletRequest request, String userId) {
+        return keycloakConfig.getRealm(request).users().get(userId);
     }
 
     @Override
@@ -90,7 +100,6 @@ public class UserServiceImpl implements UserService {
     public void addUserGroup(HttpServletRequest request, UserResource storedUser, GroupRepresentation group) {
         storedUser.groups().add(group);
     }
-
 
 
     /*private void setDefaultUserPassword(UserResource storedUser) {
@@ -169,5 +178,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public void editUser(HttpServletRequest request, UserRepresentation userRepresentation) {
         keycloakConfig.getRealm(request).users().get(userRepresentation.getId()).update(userRepresentation);
+    }
+
+    @Override
+    public Page<Tag>findActiveTagsPageable(HttpServletRequest request, Pageable pageable) {
+        UserRepresentation currentUser = findCurrentUser(request);
+        List<String> groups = getUserAttribute(currentUser, GROUP);
+        return tagService.findAllByGroupIdAndActive(groups.get(0), true, pageable);
+
     }
 }

@@ -51,6 +51,8 @@ public class RoleServiceImpl implements RoleService {
         ClientRepresentation clientRep = clientService.findClientRepresentation(request, keycloakConfig.getClient());
 
         RoleRepresentation realmRole = findRealmRoleByName(request, roleName);
+        List<RoleRepresentation> userRealmRoles = storedUser.roles().realmLevel().listEffective();
+        storedUser.roles().realmLevel().remove(userRealmRoles);
         storedUser.roles().realmLevel().add(singletonList(realmRole));
 
         removeClientUserRoles(storedUser, clientRep.getId());

@@ -1,7 +1,10 @@
 package com.project.qa.service;
 
+import com.project.qa.model.Tag;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
@@ -25,4 +28,6 @@ public interface CompanyAdministratorService {
     void editUser(HttpServletRequest request, UserRepresentation userRepresentation);
 
     void saveAllUsers(List<UserRepresentation> read);
+
+    Page<Tag> findAllTagsPageable(HttpServletRequest request, Pageable pageable);
 }
