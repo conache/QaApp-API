@@ -42,7 +42,7 @@ public class CompanyAdministratorController {
     }
 
     @PostMapping(path = "/addGroup")
-    public void addGroup(HttpServletRequest request, @RequestBody String name) {
+    public void addGroup(HttpServletRequest request, @RequestParam String name) {
         companyAdministratorService.addGroup(request, name);
     }
 

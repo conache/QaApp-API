@@ -12,6 +12,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+
+import static com.project.qa.utils.UserUtils.GROUP;
+import static com.project.qa.utils.UserUtils.getUserAttribute;
 
 @RestController
 @RequestMapping(path = "/user")
@@ -47,8 +51,8 @@ public class UserController {
     }*/
 
     @PostMapping("/addTag")
-    public Integer addTag(@RequestBody Tag tag) {
-        return tagService.addTag(tag);
+    public Integer addTag(HttpServletRequest request, @RequestBody Tag tag) {
+        return userService.addTag(request, tag);
     }
 
     @GetMapping("/findTag")
