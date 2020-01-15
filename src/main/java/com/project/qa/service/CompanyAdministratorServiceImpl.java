@@ -5,7 +5,6 @@ import com.project.qa.model.Tag;
 import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.admin.client.resource.RoleMappingResource;
 import org.keycloak.admin.client.resource.UserResource;
-import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -134,5 +133,13 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
     @Override
     public void editTag(Tag tag) {
         tagService.addTag(tag);
+    }
+
+    @Override
+    public Integer addTag(HttpServletRequest request, Tag tag) {
+        UserRepresentation currentUser = userService.findCurrentUser(request);
+        List<String> groups = getUserAttribute(currentUser, GROUP);
+        tag.setGroupName(groups.get(0));
+        return tagService.addTag(tag);
     }
 }

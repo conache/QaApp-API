@@ -92,7 +92,12 @@ public class CompanyAdministratorController {
     }
 
     @PutMapping("/editTag")
-    public void editTag(@RequestParam Tag tag) {
+    public void editTag(@RequestBody Tag tag) {
         companyAdministratorService.editTag(tag);
+    }
+
+    @PostMapping("/addTag")
+    public Integer addTag(HttpServletRequest request, @RequestBody Tag tag) {
+        return companyAdministratorService.addTag(request, tag);
     }
 }

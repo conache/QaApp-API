@@ -34,4 +34,6 @@ public interface CompanyAdministratorService {
     void deleteProposedTagById(Integer tagId);
 
     void editTag(Tag tag);
+
+    Integer addTag(HttpServletRequest request, Tag tag);
 }
