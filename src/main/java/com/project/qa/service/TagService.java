@@ -17,5 +17,5 @@ public interface TagService {
 
     Page<Tag> findAllByGroupIdAndQuestionId(String groupId, String questionId,Pageable pageable);
 
-    void deleteTagById(Tag tag);
+    void deleteTagById(Integer tagId);
 }

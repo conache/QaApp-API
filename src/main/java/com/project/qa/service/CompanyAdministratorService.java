@@ -29,5 +29,7 @@ public interface CompanyAdministratorService {
 
     void saveAllUsers(List<UserRepresentation> read);
 
-    Page<Tag> findAllTagsPageable(HttpServletRequest request, Pageable pageable);
+    Page<Tag> findProposedTags(HttpServletRequest request, Pageable pageable);
+
+    void deleteProposedTagById(Integer tagId);
 }

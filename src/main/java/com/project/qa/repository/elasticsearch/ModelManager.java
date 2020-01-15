@@ -26,9 +26,6 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.join.query.ParentIdQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -39,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-@Service
 public class ModelManager<T extends ModelBase> {
 
     private Supplier<T> supplier;
@@ -52,18 +48,19 @@ public class ModelManager<T extends ModelBase> {
         return this.type;
     }
 
-    private ObjectMapper objectMapper;
+    private ObjectMapper objectMapper = new ObjectMapper();
 
-    @Autowired
-    public ModelManager(@Qualifier("esHighLevelClient") RestHighLevelClient esClient, ObjectMapper objectMapper) {
-        this.esClient = esClient;
-        this.objectMapper = objectMapper;
-    }
 
-    public ModelManager(Supplier<T> supplier) {
+    /*
+        public ModelManager(@Qualifier("esHighLevelClient") RestHighLevelClient esClient, ObjectMapper objectMapper) {
+            ModelManager.esClient = esClient;
+            this.objectMapper = objectMapper;
+        }
+    */
+    public ModelManager(Supplier<T> supplier, RestHighLevelClient esClient) {
         this.supplier = supplier;
         type = (Class<T>) supplier.get().getClass();
-        // esClient = new AWSElasticsearchSettings();.elasticsearchClient();
+        this.esClient = esClient;
     }
 
     public T getByID(String id) {
@@ -226,7 +223,8 @@ public class ModelManager<T extends ModelBase> {
 
     public Map<String, Object> writeModelAsMap(T t) {
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, true);
-        return objectMapper.convertValue(t, new TypeReference<HashMap<String, Object>>() {});
+        return objectMapper.convertValue(t, new TypeReference<HashMap<String, Object>>() {
+        });
     }
 }
 

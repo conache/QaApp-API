@@ -61,6 +61,8 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
 
         addRolesToGroup(request, group);
 
+        //TODO
+//        UserResource userResource = userService.findU
         UserRepresentation currentUser = userService.findCurrentUser(request);
         group.members().add(currentUser);
 
@@ -111,9 +113,14 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
     }
 
     @Override
-    public Page<Tag> findAllTagsPageable(HttpServletRequest request, Pageable pageable) {
+    public Page<Tag> findProposedTags(HttpServletRequest request, Pageable pageable) {
         UserRepresentation currentUser = userService.findCurrentUser(request);
         List<String> groups = getUserAttribute(currentUser, GROUP);
-        return tagService.findAllByGroupName(groups.get(0), pageable);
+        return tagService.findAllByGroupIdAndActive(groups.get(0), false, pageable);
+    }
+
+    @Override
+    public void deleteProposedTagById(Integer tagId) {
+        tagService.deleteTagById(tagId);
     }
 }

@@ -12,7 +12,7 @@ import java.util.List;
 public class Question extends ModelBase {
 
     private String questionAuthorId;
-    private String groupId;
+    private String groupName;
     private int score;
     private String questionTitle;
     private String questionText;
@@ -81,9 +81,9 @@ public class Question extends ModelBase {
     public Question() {
     }
 
-    public Question(String questionAuthorId, String groupId, int score, String questionTitle, String questionText, Date questionPublishDate, List<Answer> questionsAnswers, List<String> questionTags) {
+    public Question(String questionAuthorId, String groupName, int score, String questionTitle, String questionText, Date questionPublishDate, List<Answer> questionsAnswers, List<String> questionTags) {
         this.questionAuthorId = questionAuthorId;
-        this.groupId = groupId;
+        this.groupName = groupName;
         this.score = score;
         this.questionTitle = questionTitle;
         this.questionText = questionText;
@@ -102,12 +102,12 @@ public class Question extends ModelBase {
         return "question";
     }
 
-    public String getGroupId() {
-        return groupId;
+    public String getGroupName() {
+        return groupName;
     }
 
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 
 

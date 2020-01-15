@@ -82,8 +82,13 @@ public class CompanyAdministratorController {
     }
 
     @GetMapping("/tags")
-    public Page<Tag> findAllPageable(HttpServletRequest request, final Pageable pageable) {
-        return companyAdministratorService.findAllTagsPageable(request, pageable);
+    public Page<Tag> findProposedTags(HttpServletRequest request, final Pageable pageable) {
+        return companyAdministratorService.findProposedTags(request, pageable);
+    }
+
+    @DeleteMapping("/deleteTag")
+    public void deleteTagById(@RequestParam Integer tagId){
+        companyAdministratorService.deleteProposedTagById(tagId);
     }
 
 }
