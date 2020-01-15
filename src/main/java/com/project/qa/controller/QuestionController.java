@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
-@Controller
-@RequestMapping(name = "/question")
+@RestController
+@RequestMapping(path = "/question")
 public class QuestionController {
 
     public final QuestionService questionService;
@@ -36,7 +36,7 @@ public class QuestionController {
         return null;
     }
 
-    @PostMapping("/add")
+    @PostMapping("/addQ")
     public String addQuestion(HttpServletRequest request, Question question) {
         return questionService.addQuestion(request, question);
     }
