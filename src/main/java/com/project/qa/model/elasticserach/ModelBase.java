@@ -30,4 +30,6 @@ public abstract class ModelBase {
     public abstract Index getIndex();
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public abstract Object getJoinField() throws Exception;
+    public abstract String getSortBy();
+
 }

@@ -78,6 +78,11 @@ public class Answer extends ModelBase {
         this.questionId = questionId;
     }
 
+    @Override
+    public String getSortBy() {
+        return "publishDate";
+    }
+
     //TODO: Check if automapper is working without the empty constructor
     public Answer() {
     }

@@ -77,6 +77,7 @@ public class Question extends ModelBase {
         this.questionTags = questionTags;
     }
 
+
     //TODO: Check if automapper is working without the empty constructor
     public Question() {
     }
@@ -100,6 +101,11 @@ public class Question extends ModelBase {
     @Override
     public String getJoinField() {
         return "question";
+    }
+
+    @Override
+    public String getSortBy() {
+        return "questionPublishDate";
     }
 
     public String getGroupName() {

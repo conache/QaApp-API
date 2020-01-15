@@ -37,11 +37,7 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public void deleteQuestionById(String questionId) {
-        try {
-            modelManager.delete(questionId);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        modelManager.delete(questionId);
     }
 
     @Override
