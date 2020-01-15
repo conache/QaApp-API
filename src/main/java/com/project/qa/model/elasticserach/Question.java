@@ -95,7 +95,7 @@ public class Question extends ModelBase {
 
     @Override
     public Index getIndex() {
-        return Index.QA;
+        return Index.qa;
     }
 
     @Override
