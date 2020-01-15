@@ -32,4 +32,6 @@ public interface CompanyAdministratorService {
     Page<Tag> findProposedTags(HttpServletRequest request, Pageable pageable);
 
     void deleteProposedTagById(Integer tagId);
+
+    void editTag(Tag tag);
 }

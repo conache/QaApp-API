@@ -5,10 +5,7 @@ import com.project.qa.service.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -32,9 +29,15 @@ public class QuestionController {
     public void deleteById(@RequestParam String questionId) {
         questionService.deleteQuestionById(questionId);
     }
+
     @GetMapping("/findAll")
-    public Page<Question> findAllGroupQuestions(HttpServletRequest request){
+    public Page<Question> findAllGroupQuestions(HttpServletRequest request) {
 //        return questionService.
         return null;
+    }
+
+    @PostMapping("add")
+    public String addQuestion(HttpServletRequest request, Question question) {
+        return questionService.addQuestion(request, question);
     }
 }

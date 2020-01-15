@@ -12,4 +12,6 @@ public interface QuestionService {
     void deleteQuestionById(String questionId);
 
     Page<Question> findAllGroupQuestions(HttpServletRequest request, Pageable pageable);
+
+    String addQuestion(HttpServletRequest request, Question question);
 }

@@ -123,4 +123,9 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
     public void deleteProposedTagById(Integer tagId) {
         tagService.deleteTagById(tagId);
     }
+
+    @Override
+    public void editTag(Tag tag) {
+        tagService.addTag(tag);
+    }
 }

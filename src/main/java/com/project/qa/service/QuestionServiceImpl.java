@@ -12,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 import static com.project.qa.utils.UserUtils.GROUP;
@@ -35,7 +37,11 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public void deleteQuestionById(String questionId) {
-
+        try {
+            modelManager.delete(questionId);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -46,4 +52,13 @@ public class QuestionServiceImpl implements QuestionService {
         return null;
     }
 
+    @Override
+    public String addQuestion(HttpServletRequest request, Question question) {
+        UserRepresentation userRepresentation = userService.findCurrentUser(request);
+        List<String> userGroups = UserUtils.getUserAttribute(userRepresentation, GROUP);
+        question.setGroupName(userGroups.get(0));
+        question.setQuestionAuthorId(userRepresentation.getId());
+        question.setQuestionPublishDate(new Date());
+        return modelManager.index(question);
+    }
 }
