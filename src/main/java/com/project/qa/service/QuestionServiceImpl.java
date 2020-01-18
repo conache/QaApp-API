@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.task.DelegatingSecurityContextAsyncTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,11 +25,13 @@ public class QuestionServiceImpl implements QuestionService {
 
     private final ModelManager<Question> modelManager;
     private final UserService userService;
+    private final HttpServletRequest request;
 
     @Autowired
-    public QuestionServiceImpl(@Qualifier("esHighLevelClient") RestHighLevelClient esClient, UserService userService) {
+    public QuestionServiceImpl(@Qualifier("esHighLevelClient") RestHighLevelClient esClient, UserService userService, HttpServletRequest request) {
         this.modelManager = new ModelManager<>(Question::new, esClient);
         this.userService = userService;
+        this.request = request;
     }
 
     @Override
@@ -42,7 +45,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public Page<Question> findAllGroupQuestions(HttpServletRequest request, Pageable pageable) {
+    public Page<Question> findAllGroupQuestions(Pageable pageable) {
         UserRepresentation userRepresentation = userService.findCurrentUser(request);
         List<String> userGroups = UserUtils.getUserAttribute(userRepresentation, GROUP);
         int pageSize = pageable.getPageSize();
@@ -51,7 +54,20 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public String addQuestion(HttpServletRequest request, Question question) {
+    public Page<Question> filterAllGroupQuestions(Pageable pageable, List<String> tags, String sortBy) {
+        UserRepresentation userRepresentation = userService.findCurrentUser(request);
+        List<String> userGroups = UserUtils.getUserAttribute(userRepresentation, GROUP);
+        int pageSize = pageable.getPageSize();
+        int pageNumber = pageable.getPageNumber();
+        if(tags != null && tags.size() != 0)
+            return new PageImpl<>(modelManager.filterByField("questionTags", tags,pageSize, pageSize *(pageNumber - 1), userGroups.get(0), sortBy));
+
+        return new PageImpl<>(modelManager.getAll(pageSize, pageSize *(pageNumber - 1), userGroups.get(0), sortBy));
+    }
+
+
+    @Override
+    public String addQuestion(Question question) {
         UserRepresentation userRepresentation = userService.findCurrentUser(request);
         List<String> userGroups = UserUtils.getUserAttribute(userRepresentation, GROUP);
         question.setGroupName(userGroups.get(0));
