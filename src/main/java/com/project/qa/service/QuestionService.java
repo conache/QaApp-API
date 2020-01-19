@@ -14,8 +14,7 @@ public interface QuestionService {
     void deleteQuestionById(String questionId);
 
     Pair<List<Question>,Long> findAllGroupQuestions(Pageable pageable);
-
     Pair<List<Question>,Long> filterAllGroupQuestions(Pageable pageable, List<String> tags, String sortBy);
-
+    List<Question> search(String text, int maxSize);
     String addQuestion(Question question);
 }

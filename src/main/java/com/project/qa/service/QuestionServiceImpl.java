@@ -67,6 +67,13 @@ public class QuestionServiceImpl implements QuestionService {
         return  modelManager.getAll(pageSize, pageSize *(pageNumber - 1), userGroups.get(0), sortBy);
     }
 
+    @Override
+    public List<Question> search(String text, int maxSize) {
+        UserRepresentation userRepresentation = userService.findCurrentUser(request);
+        List<String> userGroups = UserUtils.getUserAttribute(userRepresentation, GROUP);
+        return modelManager.matchLikeThis("questionTitle", text, maxSize, 0, userGroups.get(0)).getValue0();
+    }
+
 
     @Override
     public String addQuestion(Question question) {
