@@ -64,4 +64,9 @@ public class UserController {
     public Page<Tag> findAllPageable(HttpServletRequest request, final Pageable pageable) {
         return userService.findActiveTagsPageable(request, pageable);
     }
+
+    @GetMapping("/allTags")
+    public List<Tag> findAllPageable(HttpServletRequest request) {
+        return userService.findActiveTags(request);
+    }
 }

@@ -17,5 +17,7 @@ public interface TagService {
 
     Page<Tag> findAllByGroupIdAndQuestionId(String groupId, String questionId,Pageable pageable);
 
+    List<Tag> findAllByGroupIdAndActive(String groupName, boolean active);
+
     void deleteTagById(Integer tagId);
 }
