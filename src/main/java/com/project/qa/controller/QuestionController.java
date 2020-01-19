@@ -38,11 +38,6 @@ public class QuestionController {
     }
 
     @GetMapping("/findAll")
-    public  Pair<List<Question>,Long> findAllGroupQuestions(Pageable pageable) {
-        return questionService.findAllGroupQuestions(pageable);
-    }
-
-    @GetMapping("/applyFilter")
     public  Pair<List<Question>,Long> filterQuestions(Pageable page, @RequestParam(required = false) ArrayList<String> tags, @RequestParam(required = false, defaultValue = "questionPublishDate") String sortBy) {
         return questionService.filterAllGroupQuestions(page, tags, sortBy);
     }
