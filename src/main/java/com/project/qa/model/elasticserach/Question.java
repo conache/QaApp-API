@@ -12,6 +12,7 @@ import java.util.List;
 public class Question extends ModelBase {
 
     private String questionAuthorId;
+    private String questionAuthorName;
     private String groupName;
     private int score;
     private String questionTitle;
@@ -123,6 +124,14 @@ public class Question extends ModelBase {
 
     public void setNoAnswers(int noAnswers) {
         this.noAnswers = noAnswers;
+    }
+
+    public String getQuestionAuthorName() {
+        return questionAuthorName;
+    }
+
+    public void setQuestionAuthorName(String questionAuthorName) {
+        this.questionAuthorName = questionAuthorName;
     }
 
 

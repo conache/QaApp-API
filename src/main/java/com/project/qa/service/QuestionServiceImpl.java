@@ -81,6 +81,7 @@ public class QuestionServiceImpl implements QuestionService {
         List<String> userGroups = UserUtils.getUserAttribute(userRepresentation, GROUP);
         question.setGroupName(userGroups.get(0));
         question.setQuestionAuthorId(userRepresentation.getId());
+        question.setQuestionAuthorName(userRepresentation.getFirstName() + " " + userRepresentation.getLastName());
         question.setQuestionPublishDate(new Date());
         return modelManager.index(question);
     }

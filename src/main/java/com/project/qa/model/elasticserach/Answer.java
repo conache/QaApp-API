@@ -114,6 +114,7 @@ public class Answer extends ModelBase {
 
     public static class AnswerBuilder {
         private String userId = "";
+        private String userName = "";
         private String answerText = "";
         private int score = 0;
         private boolean isCorrectAnswer = false;
@@ -152,6 +153,14 @@ public class Answer extends ModelBase {
 
         public Answer build() {
             return new Answer(userId, answerText, score, isCorrectAnswer, publishDate, questionId);
+        }
+
+        public String getUserName() {
+            return userName;
+        }
+
+        public void setUserName(String userName) {
+            this.userName = userName;
         }
     }
 }
