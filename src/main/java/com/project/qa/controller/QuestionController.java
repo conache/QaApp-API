@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
-
+import org.javatuples.Pair;
 import javax.lang.model.type.ArrayType;
 import javax.servlet.http.HttpServletRequest;
 import java.awt.*;
@@ -38,12 +38,12 @@ public class QuestionController {
     }
 
     @GetMapping("/findAll")
-    public Page<Question> findAllGroupQuestions(Pageable pageable) {
+    public  Pair<List<Question>,Long> findAllGroupQuestions(Pageable pageable) {
         return questionService.findAllGroupQuestions(pageable);
     }
 
     @GetMapping("/applyFilter")
-    public Page<Question> filterQuestions(Pageable page, @RequestParam(required = false) ArrayList<String> tags, @RequestParam(required = false, defaultValue = "questionPublishDate") String sortBy) {
+    public  Pair<List<Question>,Long> filterQuestions(Pageable page, @RequestParam(required = false) ArrayList<String> tags, @RequestParam(required = false, defaultValue = "questionPublishDate") String sortBy) {
         return questionService.filterAllGroupQuestions(page, tags, sortBy);
     }
 
@@ -55,5 +55,6 @@ public class QuestionController {
     @ResponseBody
     public String addFoo(@RequestParam(name = "id") String fooId, @RequestParam String name) {
         return "ID: " + fooId + " Name: " + name;
+
     }
 }

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.project.qa.model.elasticserach.Answer;
 import com.project.qa.model.elasticserach.ModelBase;
 import com.project.qa.model.elasticserach.Question;
+import org.javatuples.Pair;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetRequest;
@@ -18,6 +19,8 @@ import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.core.CountRequest;
+import org.elasticsearch.client.core.CountResponse;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MoreLikeThisQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -49,14 +52,6 @@ public class ModelManager<T extends ModelBase> {
     }
 
     private ObjectMapper objectMapper = new ObjectMapper();
-
-
-    /*
-        public ModelManager(@Qualifier("esHighLevelClient") RestHighLevelClient esClient, ObjectMapper objectMapper) {
-            ModelManager.esClient = esClient;
-            this.objectMapper = objectMapper;
-        }
-    */
     public ModelManager(Supplier<T> supplier, RestHighLevelClient esClient) {
         this.supplier = supplier;
         type = (Class<T>) supplier.get().getClass();
@@ -92,12 +87,12 @@ public class ModelManager<T extends ModelBase> {
     }
 
 
-    public List<T> getAll(int size, int from, String groupName) {
+    public Pair<List<T>, Long> getAll(int size, int from, String groupName) {
 
         return  getAll(size, from, groupName, supplier.get().getSortBy());
     }
 
-    public List<T> getAll(int size, int from, String groupName, String sortBy) {
+    public Pair<List<T>, Long>  getAll(int size, int from, String groupName, String sortBy) {
 
         QueryBuilder  boolQueryBuilder = new BoolQueryBuilder().filter(QueryBuilders.termsQuery("groupName.keyword", groupName));
         return getModelsFromFilterRequest(boolQueryBuilder, size, from, sortBy);
@@ -172,20 +167,20 @@ public class ModelManager<T extends ModelBase> {
         }
     }
 
-    public List<T> findByField(String field, Object value, int size, int from, String groupName){
+    public Pair<List<T>, Long>findByField(String field, Object value, int size, int from, String groupName){
         return  findByField(field, value, size, from, groupName, supplier.get().getSortBy());
     }
-    public List<T> findByField(String field, Object value, int size, int from, String groupName, String sortBy)  {
+    public Pair<List<T>, Long> findByField(String field, Object value, int size, int from, String groupName, String sortBy)  {
         field += ".keyword";
         QueryBuilder  boolQueryBuilder = new BoolQueryBuilder().filter(QueryBuilders.termQuery(field,value.toString())).must(QueryBuilders.termsQuery("groupName.keyword", groupName));
         return getModelsFromFilterRequest(boolQueryBuilder,size,from, sortBy);
     }
 
-    public List<T> filterByField(String field, List<String> terms, int size, int from, String groupName) {
+    public Pair<List<T>, Long> filterByField(String field, List<String> terms, int size, int from, String groupName) {
 
         return filterByField(field, terms, size, from, groupName, supplier.get().getSortBy());
     }
-    public List<T> filterByField(String field, List<String> terms, int size, int from, String groupName, String sortBy) {
+    public Pair<List<T>, Long> filterByField(String field, List<String> terms, int size, int from, String groupName, String sortBy) {
 
         field += ".keyword";
         QueryBuilder  boolQueryBuilder = new BoolQueryBuilder().filter(QueryBuilders.termsQuery(field,terms)).must(QueryBuilders.termsQuery("groupName.keyword", groupName));
@@ -193,7 +188,7 @@ public class ModelManager<T extends ModelBase> {
 
     }
 
-    public List<T> matchLikeThis(String field, String value, int size, int from, String groupName){
+    public Pair<List<T>, Long> matchLikeThis(String field, String value, int size, int from, String groupName){
         QueryBuilder  boolQueryBuilder = QueryBuilders.boolQuery().must(QueryBuilders.matchQuery(field,value.toString())).must(QueryBuilders.termsQuery("groupName.keyword", groupName));
         return getModelsFromFilterRequest(boolQueryBuilder, size, from, supplier.get().getSortBy());
     }
@@ -201,7 +196,6 @@ public class ModelManager<T extends ModelBase> {
     public void delete(T model){
         delete(model.getModelId());
     }
-
     public void delete(String id) {
         DeleteRequest deleteRequest = new DeleteRequest().id(id).index(this.supplier.get().getIndex().toString());
         try {
@@ -211,7 +205,6 @@ public class ModelManager<T extends ModelBase> {
             e.printStackTrace();
         }
     }
-
     public void delete(String id, String route) {
         DeleteRequest deleteRequest = new DeleteRequest().id(id).index(this.supplier.get().getIndex().toString()).routing(route);
         try {
@@ -234,7 +227,6 @@ public class ModelManager<T extends ModelBase> {
             e.printStackTrace();
         }
     }
-
     public List<Answer> getAnswersForQuestion(String id, int size, int from) {
 
         Question model = new Question.QuestionBuilder().build();
@@ -248,7 +240,6 @@ public class ModelManager<T extends ModelBase> {
             return null;
         }
     }
-
     private List<Answer> GetAnswers(SearchRequest searchRequest) throws IOException {
 
         SearchResponse searchResponse = esClient.search(searchRequest, RequestOptions.DEFAULT);
@@ -265,9 +256,15 @@ public class ModelManager<T extends ModelBase> {
         return answers;
     }
 
-    private List<T> getModelsFromFilterRequest(QueryBuilder boolQueryBuilder, int size, int from, String sortBy) {
-
+    private Pair<List<T>, Long> getModelsFromFilterRequest(QueryBuilder boolQueryBuilder, int size, int from, String sortBy) {
         T model = supplier.get();
+
+
+        CountRequest countRequest = new CountRequest().source(SearchSourceBuilder.
+                                                              searchSource().
+                                                              query(boolQueryBuilder)).
+                                                              indices(model.getIndex().toString());
+
         SearchRequest searchRequest = new SearchRequest().source(SearchSourceBuilder.
                 searchSource().
                 query((boolQueryBuilder)).
@@ -277,17 +274,20 @@ public class ModelManager<T extends ModelBase> {
                 indices(model.getIndex().toString());
         try {
             SearchResponse searchResponse = esClient.search(searchRequest, RequestOptions.DEFAULT);
-            return getModelsFromHits(searchResponse.getHits().getHits());
+            List<T> models =  getModelsFromHits(searchResponse.getHits().getHits());
+
+            CountResponse countResponse = esClient.count(countRequest, RequestOptions.DEFAULT);
+
+            return new Pair<>(models, countResponse.getCount());
+
         } catch (IOException ex) {
             ex.printStackTrace();
             return null;
         }
     }
-
     private List<T> getModelsFromHits(SearchHit[] hits) throws IOException {
         return getModelsFromHits(hits, 0);
     }
-
     private List<T> getModelsFromHits(SearchHit[] hits, double minScore) throws IOException {
 
         ArrayList<T> toRerun = new ArrayList<>();
@@ -304,7 +304,6 @@ public class ModelManager<T extends ModelBase> {
         }
         return toRerun;
     }
-
     public Map<String, Object> writeModelAsMap(T t) {
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, true);
         return objectMapper.convertValue(t, new TypeReference<HashMap<String, Object>>() {

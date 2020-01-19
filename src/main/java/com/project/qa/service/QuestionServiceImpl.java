@@ -3,6 +3,7 @@ package com.project.qa.service;
 import com.project.qa.model.elasticserach.Question;
 import com.project.qa.repository.elasticsearch.ModelManager;
 import com.project.qa.utils.UserUtils;
+import org.javatuples.Pair;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,24 +46,25 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public Page<Question> findAllGroupQuestions(Pageable pageable) {
+    public  Pair<List<Question>,Long> findAllGroupQuestions(Pageable pageable) {
         UserRepresentation userRepresentation = userService.findCurrentUser(request);
         List<String> userGroups = UserUtils.getUserAttribute(userRepresentation, GROUP);
         int pageSize = pageable.getPageSize();
         int pageNumber = pageable.getPageNumber();
-        return new PageImpl<>(modelManager.getAll(pageSize, pageSize *(pageNumber - 1), userGroups.get(0)));
+        return modelManager.getAll(pageSize, pageSize *(pageNumber - 1), userGroups.get(0));
+
     }
 
     @Override
-    public Page<Question> filterAllGroupQuestions(Pageable pageable, List<String> tags, String sortBy) {
+    public  Pair<List<Question>,Long> filterAllGroupQuestions(Pageable pageable, List<String> tags, String sortBy) {
         UserRepresentation userRepresentation = userService.findCurrentUser(request);
         List<String> userGroups = UserUtils.getUserAttribute(userRepresentation, GROUP);
         int pageSize = pageable.getPageSize();
         int pageNumber = pageable.getPageNumber();
         if(tags != null && tags.size() != 0)
-            return new PageImpl<>(modelManager.filterByField("questionTags", tags,pageSize, pageSize *(pageNumber - 1), userGroups.get(0), sortBy));
+            return modelManager.filterByField("questionTags", tags,pageSize, pageSize *(pageNumber - 1), userGroups.get(0), sortBy);
 
-        return new PageImpl<>(modelManager.getAll(pageSize, pageSize *(pageNumber - 1), userGroups.get(0), sortBy));
+        return  modelManager.getAll(pageSize, pageSize *(pageNumber - 1), userGroups.get(0), sortBy);
     }
 
 

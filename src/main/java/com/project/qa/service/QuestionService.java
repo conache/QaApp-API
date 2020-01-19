@@ -1,6 +1,7 @@
 package com.project.qa.service;
 
 import com.project.qa.model.elasticserach.Question;
+import org.javatuples.Pair;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -12,9 +13,9 @@ public interface QuestionService {
 
     void deleteQuestionById(String questionId);
 
-    Page<Question> findAllGroupQuestions(Pageable pageable);
+    Pair<List<Question>,Long> findAllGroupQuestions(Pageable pageable);
 
-    Page<Question> filterAllGroupQuestions(Pageable pageable, List<String> tags, String sortBy);
+    Pair<List<Question>,Long> filterAllGroupQuestions(Pageable pageable, List<String> tags, String sortBy);
 
     String addQuestion(Question question);
 }
