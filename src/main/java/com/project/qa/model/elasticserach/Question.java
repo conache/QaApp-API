@@ -17,6 +17,7 @@ public class Question extends ModelBase {
     private String questionTitle;
     private String questionText;
     private Date questionPublishDate;
+    private int noAnswers;
     @JsonIgnore
     private List<Answer> questionsAnswers;
     private List<String> questionTags;
@@ -114,6 +115,14 @@ public class Question extends ModelBase {
 
     public void setGroupName(String groupName) {
         this.groupName = groupName;
+    }
+
+    public int getNoAnswers() {
+        return noAnswers;
+    }
+
+    public void setNoAnswers(int noAnswers) {
+        this.noAnswers = noAnswers;
     }
 
 
