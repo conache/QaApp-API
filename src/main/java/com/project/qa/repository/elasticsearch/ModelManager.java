@@ -187,7 +187,6 @@ public class ModelManager<T extends ModelBase> {
         return getModelsFromFilterRequest(boolQueryBuilder, size, from, sortBy);
 
     }
-
     public Pair<List<T>, Long> matchLikeThis(String field, String value, int size, int from, String groupName){
         QueryBuilder  boolQueryBuilder = QueryBuilders.boolQuery().must(QueryBuilders.matchQuery(field,value.toString())).must(QueryBuilders.termsQuery("groupName.keyword", groupName));
         return getModelsFromFilterRequest(boolQueryBuilder, size, from, supplier.get().getSortBy());
@@ -227,14 +226,30 @@ public class ModelManager<T extends ModelBase> {
             e.printStackTrace();
         }
     }
-    public List<Answer> getAnswersForQuestion(String id, int size, int from) {
+    public Pair<List<Answer>, Long> getAnswersForQuestion(String id, int size, int from, String sortBy) {
 
         Question model = new Question.QuestionBuilder().build();
         Answer answer = new Answer.AnswerBuilder().build();
         ParentIdQueryBuilder queryBuilder = new ParentIdQueryBuilder("answer",id);
-        SearchRequest searchRequest = new SearchRequest().source(SearchSourceBuilder.searchSource().query(queryBuilder).size(size).from(from).sort(answer.getSortBy(),SortOrder.DESC)).indices(model.getIndex().toString());
+
+
+        CountRequest countRequest = new CountRequest().source(SearchSourceBuilder.
+                searchSource().
+                query(queryBuilder)).
+                indices(model.getIndex().toString());
+
+
+        CountResponse countResponse;
         try {
-            return GetAnswers(searchRequest);
+            countResponse = esClient.count(countRequest, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            return null;
+        }
+
+        SearchRequest searchRequest = new SearchRequest().source(SearchSourceBuilder.searchSource().query(queryBuilder).size(size).from(from).sort(sortBy,SortOrder.DESC)).indices(model.getIndex().toString());
+
+        try {
+            return new Pair<>(GetAnswers(searchRequest), countResponse.getCount());
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -264,6 +279,7 @@ public class ModelManager<T extends ModelBase> {
                                                               searchSource().
                                                               query(boolQueryBuilder)).
                                                               indices(model.getIndex().toString());
+
 
         SearchRequest searchRequest = new SearchRequest().source(SearchSourceBuilder.
                 searchSource().
