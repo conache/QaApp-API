@@ -5,7 +5,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import org.javatuples.Pair;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -21,9 +20,15 @@ public class AnswerController {
 
 
     @GetMapping("/getAnswers")
-    public Pair<List<Answer>, Long> getAnswersForQuestion(Pageable page, @RequestParam(required = false) String questionID, @RequestParam(required = false, defaultValue = "publishDate") String sortBy)
+    public Pair<List<Answer>, Long> getAnswersForQuestion(Pageable page, @RequestParam String questionId, @RequestParam(required = false, defaultValue = "publishDate") String sortBy)
     {
-        return answerService.GetAnswersForQuestion(questionID, page, sortBy);
+        return answerService.getAnswersForQuestion(questionId, page, sortBy);
+    }
+
+    @PostMapping("/addAnswer")
+    public String getAnswersForQuestion(@RequestBody Answer answer)
+    {
+        return answerService.addAnswer(answer);
     }
 
 }

@@ -9,5 +9,6 @@ import java.util.List;
 
 public interface AnswerService {
 
-    Pair<List<Answer>,Long> GetAnswersForQuestion(String questionId, Pageable pageable, String sortBy);
+    Pair<List<Answer>,Long> getAnswersForQuestion(String questionId, Pageable pageable, String sortBy);
+    String addAnswer(Answer answer);
 }

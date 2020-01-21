@@ -15,7 +15,7 @@ public abstract class ModelBase {
     public void setModelId(String modelId) {
         this.modelId = modelId;
     }
-    public String getType()
+    public String getModelType()
     {
         return  this.getClass().getName();
     }

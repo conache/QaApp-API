@@ -20,6 +20,7 @@ public class Answer extends ModelBase {
     private boolean isCorrectAnswer;
     private Date publishDate;
     private String questionId;
+    private String userName;
     private String parentId;
 
     public String getUserId() {
@@ -110,6 +111,14 @@ public class Answer extends ModelBase {
         map.put("name", "answer");
         map.put("parent", questionId);
         return map;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public static class AnswerBuilder {

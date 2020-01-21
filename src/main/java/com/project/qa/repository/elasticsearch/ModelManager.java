@@ -93,8 +93,11 @@ public class ModelManager<T extends ModelBase> {
     }
 
     public Pair<List<T>, Long>  getAll(int size, int from, String groupName, String sortBy) {
+//        ArrayList<QueryBuilder> queryBuilders = new ArrayList<>();
+//        queryBuilders.add(QueryBuilders.termsQuery("groupName.keyword", groupName));
+//        queryBuilders.add(QueryBuilders.termQuery("type.keyword", this.supplier.getClass().getName()));
 
-        QueryBuilder  boolQueryBuilder = new BoolQueryBuilder().filter(QueryBuilders.termsQuery("groupName.keyword", groupName));
+        QueryBuilder  boolQueryBuilder = new BoolQueryBuilder().must(QueryBuilders.termsQuery("groupName.keyword", groupName)).must(QueryBuilders.termQuery("modelType.keyword", this.supplier.get().getModelType()));
         return getModelsFromFilterRequest(boolQueryBuilder, size, from, sortBy);
     }
 
@@ -183,12 +186,12 @@ public class ModelManager<T extends ModelBase> {
     public Pair<List<T>, Long> filterByField(String field, List<String> terms, int size, int from, String groupName, String sortBy) {
 
         field += ".keyword";
-        QueryBuilder  boolQueryBuilder = new BoolQueryBuilder().filter(QueryBuilders.termsQuery(field,terms)).must(QueryBuilders.termsQuery("groupName.keyword", groupName));
+        QueryBuilder  boolQueryBuilder = new BoolQueryBuilder().filter(QueryBuilders.termsQuery(field,terms)).must(QueryBuilders.termsQuery("groupName.keyword", groupName)).must(QueryBuilders.termQuery("modelType.keyword", this.supplier.get().getModelType()));
         return getModelsFromFilterRequest(boolQueryBuilder, size, from, sortBy);
 
     }
     public Pair<List<T>, Long> matchLikeThis(String field, String value, int size, int from, String groupName){
-        QueryBuilder  boolQueryBuilder = QueryBuilders.boolQuery().must(QueryBuilders.matchQuery(field,value.toString())).must(QueryBuilders.termsQuery("groupName.keyword", groupName));
+        QueryBuilder  boolQueryBuilder = QueryBuilders.boolQuery().must(QueryBuilders.matchQuery(field,value.toString())).must(QueryBuilders.termsQuery("groupName.keyword", groupName)).must(QueryBuilders.termQuery("modelType.keyword", this.supplier.get().getModelType()));
         return getModelsFromFilterRequest(boolQueryBuilder, size, from, supplier.get().getSortBy());
     }
 
