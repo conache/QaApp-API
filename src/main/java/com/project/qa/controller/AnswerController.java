@@ -32,10 +32,17 @@ public class AnswerController {
     }
 
     @PutMapping("/vote")
-    public void getAnswersForQuestion(@RequestParam String answerId, @RequestParam String questionId, @RequestParam boolean isUpVote)
+    public void addVote(@RequestParam String answerId, @RequestParam String questionId, @RequestParam boolean isUpVote)
     {
         answerService.addVote(answerId,questionId,isUpVote);
     }
+
+    @PostMapping("/update")
+    public void updateAnswer(@RequestBody Answer answer)
+    {
+        answerService.updateAnswer(answer);
+    }
+
 
 
 }

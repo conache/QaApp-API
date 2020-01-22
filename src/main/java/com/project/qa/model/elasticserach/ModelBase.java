@@ -11,8 +11,25 @@ public abstract class ModelBase {
     @JsonIgnore
     private final Index index;
     private int score;
-    private ArrayList<String> upVotes;
-    private ArrayList<String> downVotes;
+
+    public ArrayList<String> getUpVotes() {
+        return upVotes;
+    }
+
+    public void setUpVotes(ArrayList<String> upVotes) {
+        this.upVotes = upVotes;
+    }
+
+    public ArrayList<String> getDownVotes() {
+        return downVotes;
+    }
+
+    public void setDownVotes(ArrayList<String> downVotes) {
+        this.downVotes = downVotes;
+    }
+
+    protected ArrayList<String> upVotes;
+    protected ArrayList<String> downVotes;
 
 
     public String getModelId() {

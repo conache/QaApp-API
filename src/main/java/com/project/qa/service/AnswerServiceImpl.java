@@ -5,6 +5,7 @@ import com.project.qa.model.elasticserach.Question;
 import com.project.qa.repository.elasticsearch.ModelManager;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.javatuples.Pair;
+import org.joda.time.DateTime;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -69,5 +70,20 @@ public class AnswerServiceImpl implements AnswerService{
             answer.downVote(userRepresentation.getId());
         }
         answerManager.update(answer,questionId);
+    }
+
+    @Override
+    public void updateAnswer(Answer answer) {
+
+        Answer originalAnswer = answerManager.getByID(answer.getModelId(),answer.getParentId());
+        answer.setDownVotes(originalAnswer.getDownVotes());
+        answer.setUpVotes(originalAnswer.getUpVotes());
+        answer.setScore(originalAnswer.getScore());
+        answer.setUserName(originalAnswer.getUserName());
+        answer.setUserId(originalAnswer.getUserId());
+        answer.setPublishDate(DateTime.now().toDate());
+        answer.setCorrectAnswer(originalAnswer.isCorrectAnswer());
+        answerManager.update(answer,answer.getParentId());
+
     }
 }
