@@ -54,4 +54,20 @@ public class AnswerServiceImpl implements AnswerService{
         }
         return  answerId;
     }
+
+    @Override
+    public void addVote(String answerId, String questionId, boolean isUpVote) {
+
+        Answer answer = answerManager.getByID(answerId,questionId);
+        UserRepresentation userRepresentation = userService.findCurrentUser(request);
+        if(isUpVote)
+        {
+            answer.upVote(userRepresentation.getId());
+        }
+        else
+        {
+            answer.downVote(userRepresentation.getId());
+        }
+        answerManager.update(answer,questionId);
+    }
 }

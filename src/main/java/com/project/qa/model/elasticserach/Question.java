@@ -14,7 +14,6 @@ public class Question extends ModelBase {
     private String questionAuthorId;
     private String questionAuthorName;
     private String groupName;
-    private int score;
     private String questionTitle;
     private String questionText;
     private Date questionPublishDate;
@@ -29,14 +28,6 @@ public class Question extends ModelBase {
 
     public void setQuestionAuthorId(String questionAuthorId) {
         this.questionAuthorId = questionAuthorId;
-    }
-
-    public int getScore() {
-        return score;
-    }
-
-    public void setScore(int score) {
-        this.score = score;
     }
 
     public String getQuestionTitle() {
@@ -84,10 +75,10 @@ public class Question extends ModelBase {
     public Question() {
     }
 
-    public Question(String questionAuthorId, String groupName, int score, String questionTitle, String questionText, Date questionPublishDate, List<Answer> questionsAnswers, List<String> questionTags) {
+    public Question(String questionAuthorId, String groupName, String questionTitle, String questionText, Date questionPublishDate, List<Answer> questionsAnswers, List<String> questionTags) {
         this.questionAuthorId = questionAuthorId;
         this.groupName = groupName;
-        this.score = score;
+
         this.questionTitle = questionTitle;
         this.questionText = questionText;
         this.questionPublishDate = questionPublishDate;
@@ -138,7 +129,6 @@ public class Question extends ModelBase {
     public static class QuestionBuilder {
         private String questionAuthorId;
         private String groupId;
-        private int score;
         private String questionTitle;
         private String questionText;
         private Date questionPublishDate;
@@ -155,10 +145,6 @@ public class Question extends ModelBase {
             return this;
         }
 
-        public QuestionBuilder setScore(int score) {
-            this.score = score;
-            return this;
-        }
 
         public QuestionBuilder setQuestionTitle(String questionTitle) {
             this.questionTitle = questionTitle;
@@ -186,7 +172,7 @@ public class Question extends ModelBase {
         }
 
         public Question build() {
-            return new Question(questionAuthorId, groupId, score, questionTitle, questionText, questionPublishDate, questionsAnswers, questionTags);
+            return new Question(questionAuthorId, groupId, questionTitle, questionText, questionPublishDate, questionsAnswers, questionTags);
         }
     }
 }

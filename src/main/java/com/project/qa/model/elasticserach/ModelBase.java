@@ -3,11 +3,17 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.project.qa.enums.elasticsearch.Index;
 
+import java.util.ArrayList;
+
 public abstract class ModelBase {
 
     String modelId;
     @JsonIgnore
     private final Index index;
+    private int score;
+    private ArrayList<String> upVotes;
+    private ArrayList<String> downVotes;
+
 
     public String getModelId() {
         return modelId;
@@ -19,16 +25,47 @@ public abstract class ModelBase {
     {
         return  this.getClass().getName();
     }
-
-    public ModelBase() {
-        this.index = getIndex();
+    public int getScore() {
+        return score;
     }
 
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public void upVote(String userId)
+    {
+        upVotes.add(userId);
+        downVotes.remove(userId);
+        score = upVotes.size() - downVotes.size();
+    }
+
+    public void downVote(String userId)
+    {
+        downVotes.add(userId);
+        upVotes.remove(userId);
+        score = upVotes.size() - downVotes.size();
+    }
+
+    public void clearVotes()
+    {
+        upVotes.clear();
+        downVotes.clear();
+    }
+
+    public ModelBase() {
+
+        this.index = getIndex();
+        score = 0;
+        upVotes = new ArrayList<>();
+        downVotes = new ArrayList<>();
+    }
 
     //Must return the index associated with the model
     public abstract Index getIndex();
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public abstract Object getJoinField() throws Exception;
     public abstract String getSortBy();
+
 
 }
