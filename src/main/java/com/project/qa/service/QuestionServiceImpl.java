@@ -1,10 +1,14 @@
 package com.project.qa.service;
 
+import com.project.qa.enums.elasticsearch.VoteStatus;
+import com.project.qa.model.elasticserach.Answer;
 import com.project.qa.model.elasticserach.Question;
+import com.project.qa.model.elasticserach.QuestionAsResponse;
 import com.project.qa.repository.elasticsearch.ModelManager;
 import com.project.qa.utils.UserUtils;
 import org.javatuples.Pair;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.joda.time.DateTime;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -36,8 +40,19 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public Question findQuestionById(String questionId) {
-        return modelManager.getByID(questionId);
+    public QuestionAsResponse findQuestionById(String questionId) {
+        Question question =  modelManager.getByID(questionId);
+        UserRepresentation userRepresentation = userService.findCurrentUser(request);
+        VoteStatus status = VoteStatus.NoVote;
+        if(question.getUpVotes().contains(userRepresentation.getId()))
+        {
+            status = VoteStatus.UpVote;
+        }
+        if(question.getDownVotes().contains(userRepresentation.getId()))
+        {
+            status = VoteStatus.DownVote;
+        }
+        return new QuestionAsResponse(question, status);
     }
 
     @Override
@@ -74,7 +89,6 @@ public class QuestionServiceImpl implements QuestionService {
         return modelManager.matchLikeThis("questionTitle", text, maxSize, 0, userGroups.get(0)).getValue0();
     }
 
-
     @Override
     public String addQuestion(Question question) {
         UserRepresentation userRepresentation = userService.findCurrentUser(request);
@@ -85,4 +99,34 @@ public class QuestionServiceImpl implements QuestionService {
         question.setQuestionPublishDate(new Date());
         return modelManager.index(question);
     }
+
+    @Override
+    public void voteQuestion(String questionId, boolean isUpVote) {
+
+        Question question = modelManager.getByID(questionId);
+        UserRepresentation userRepresentation = userService.findCurrentUser(request);
+        if(isUpVote)
+        {
+            question.upVote(userRepresentation.getId());
+        }
+        else
+        {
+            question.downVote(userRepresentation.getId());
+        }
+        modelManager.update(question);
+    }
+
+    @Override
+    public void updateQuestion(Question question) {
+
+        Question originalQuestion = modelManager.getByID(question.getModelId());
+        question.setDownVotes(originalQuestion.getDownVotes());
+        question.setUpVotes(originalQuestion.getUpVotes());
+        question.setScore(originalQuestion.getScore());
+        question.setQuestionAuthorName(originalQuestion.getQuestionAuthorName());
+        question.setQuestionAuthorId(originalQuestion.getQuestionAuthorId());
+        question.setQuestionPublishDate(DateTime.now().toDate());
+        modelManager.update(question);
+    }
+
 }

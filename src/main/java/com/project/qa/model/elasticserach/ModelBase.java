@@ -50,15 +50,13 @@ public abstract class ModelBase {
         this.score = score;
     }
 
-    public void upVote(String userId)
-    {
+    public void upVote(String userId) {
         upVotes.add(userId);
         downVotes.remove(userId);
         score = upVotes.size() - downVotes.size();
     }
 
-    public void downVote(String userId)
-    {
+    public void downVote(String userId) {
         downVotes.add(userId);
         upVotes.remove(userId);
         score = upVotes.size() - downVotes.size();
