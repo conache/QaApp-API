@@ -44,6 +44,12 @@ public class AnswerController {
         answerService.updateAnswer(answer);
     }
 
+    @DeleteMapping("/update")
+    public void deleteAnswer(@RequestParam String answerId, @RequestParam String questionId)
+    {
+        answerService.deleteAnswer(answerId, questionId);
+    }
+
 
 
 }

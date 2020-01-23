@@ -106,4 +106,9 @@ public class AnswerServiceImpl implements AnswerService{
         answerManager.update(answer,answer.getParentId());
 
     }
+
+    @Override
+    public void deleteAnswer(String answerId, String questionId) {
+        answerManager.delete(answerId, questionId);
+    }
 }

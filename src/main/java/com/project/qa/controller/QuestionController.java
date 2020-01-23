@@ -48,13 +48,9 @@ public class QuestionController {
     }
 
     @GetMapping("/search")
-    public List<Question> searchQuestions(@RequestParam String text, @RequestParam(required = false, defaultValue = "5") int maxSize)
-    {
+    public List<Question> searchQuestions(@RequestParam String text, @RequestParam(required = false, defaultValue = "5") int maxSize) {
         return questionService.search(text, maxSize);
     }
-
-
-
 
     @ResponseBody
     public String addFoo(@RequestParam(name = "id") String fooId, @RequestParam String name) {
