@@ -10,7 +10,7 @@ public abstract class ModelBase {
     String modelId;
     @JsonIgnore
     private final Index index;
-    private int score;
+    protected int score;
 
     public ArrayList<String> getUpVotes() {
         return upVotes;

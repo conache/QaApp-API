@@ -79,12 +79,14 @@ public class Answer extends ModelBase {
     public Answer() {
     }
 
-    public Answer(String userId, String answerText,  boolean isCorrectAnswer, Date publishDate, String questionId) {
+    public Answer(String userId, String answerText,  boolean isCorrectAnswer, Date publishDate, String questionId, String userName, int score) {
         this.userId = userId;
         this.answerText = answerText;
         this.isCorrectAnswer = isCorrectAnswer;
         this.publishDate = publishDate;
         this.questionId = questionId;
+        this.score = score;
+        this.userName = userName;
     }
 
     @Override
@@ -146,7 +148,7 @@ public class Answer extends ModelBase {
         }
 
         public Answer build() {
-            return new Answer(userId, answerText, isCorrectAnswer, publishDate, questionId);
+            return new Answer(userId, answerText, isCorrectAnswer, publishDate, questionId, "",0);
         }
 
         public String getUserName() {

@@ -1,5 +1,6 @@
 package com.project.qa.controller;
 import com.project.qa.model.elasticserach.Answer;
+import com.project.qa.model.elasticserach.AnswerAsResponse;
 import com.project.qa.service.AnswerService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ public class AnswerController {
 
 
     @GetMapping("/getAnswers")
-    public Pair<List<Answer>, Long> getAnswersForQuestion(Pageable page, @RequestParam String questionId, @RequestParam(required = false, defaultValue = "publishDate") String sortBy)
+    public Pair<List<AnswerAsResponse>, Long> getAnswersForQuestion(Pageable page, @RequestParam String questionId, @RequestParam(required = false, defaultValue = "publishDate") String sortBy)
     {
         return answerService.getAnswersForQuestion(questionId, page, sortBy);
     }

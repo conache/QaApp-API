@@ -1,6 +1,8 @@
 package com.project.qa.service;
 
+import com.project.qa.enums.elasticsearch.VoteStatus;
 import com.project.qa.model.elasticserach.Answer;
+import com.project.qa.model.elasticserach.AnswerAsResponse;
 import com.project.qa.model.elasticserach.Question;
 import com.project.qa.repository.elasticsearch.ModelManager;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -13,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -33,10 +36,27 @@ public class AnswerServiceImpl implements AnswerService{
     }
 
     @Override
-    public Pair<List<Answer>,Long> getAnswersForQuestion(String questionId, Pageable pageable, String sortBy) {
+    public Pair<List<AnswerAsResponse>,Long> getAnswersForQuestion(String questionId, Pageable pageable, String sortBy) {
+
+        UserRepresentation userRepresentation = userService.findCurrentUser(request);
         int pageSize = pageable.getPageSize();
         int pageNumber = pageable.getPageNumber();
-        return answerManager.getAnswersForQuestion(questionId, pageSize, pageSize *(pageNumber - 1), sortBy);
+        Pair<List<Answer>, Long> qResult =  answerManager.getAnswersForQuestion(questionId, pageSize, pageSize *(pageNumber - 1), sortBy);
+        List<AnswerAsResponse> answers = new ArrayList<>();
+        for (Answer answer: qResult.getValue0()) {
+            VoteStatus status = VoteStatus.NoVote;
+            if(answer.getUpVotes().contains(userRepresentation.getId()))
+            {
+                status = VoteStatus.UpVote;
+            }
+            if(answer.getDownVotes().contains(userRepresentation.getId()))
+            {
+                status = VoteStatus.DownVote;
+            }
+            answers.add(new AnswerAsResponse(answer, status));
+        }
+        return  new Pair<>(answers,qResult.getValue1());
+
     }
 
     @Override
