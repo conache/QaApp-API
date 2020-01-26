@@ -1,11 +1,15 @@
 package com.project.qa.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.qa.enums.elasticsearch.VoteStatus;
+import com.project.qa.model.Tag;
 import com.project.qa.model.elasticserach.Answer;
 import com.project.qa.model.elasticserach.Question;
 import com.project.qa.model.elasticserach.QuestionAsResponse;
+import com.project.qa.repository.TagRepository;
 import com.project.qa.repository.elasticsearch.ModelManager;
 import com.project.qa.utils.UserUtils;
+import com.sun.mail.util.QEncoderStream;
 import org.javatuples.Pair;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.joda.time.DateTime;
@@ -16,10 +20,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import static com.project.qa.utils.UserUtils.GROUP;
+import static com.project.qa.utils.UserUtils.getUserAttribute;
 
 @Service
 public class QuestionServiceImpl implements QuestionService {
@@ -28,13 +38,15 @@ public class QuestionServiceImpl implements QuestionService {
     private final ModelManager<Answer> answerManager;
     private final UserService userService;
     private final HttpServletRequest request;
+    private final TagService tagService;
 
     @Autowired
-    public QuestionServiceImpl(@Qualifier("esHighLevelClient") RestHighLevelClient esClient, UserService userService, HttpServletRequest request) {
+    public QuestionServiceImpl(@Qualifier("esHighLevelClient") RestHighLevelClient esClient, UserService userService, HttpServletRequest request, TagService tagService) {
         this.questionManager = new ModelManager<>(Question::new, esClient);
         this.answerManager = new ModelManager<>(Answer::new, esClient);
         this.userService = userService;
         this.request = request;
+        this.tagService = tagService;
     }
 
     @Override
@@ -97,14 +109,39 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public String addQuestion(Question question) {
+    public String addQuestion(Map<String, Object> questionRequest) {
         UserRepresentation userRepresentation = userService.findCurrentUser(request);
         List<String> userGroups = UserUtils.getUserAttribute(userRepresentation, GROUP);
+        ObjectMapper oMapper = new ObjectMapper();
+        Question question = null;
+        question = oMapper.convertValue(questionRequest, Question.class);
         question.setGroupName(userGroups.get(0));
         question.setQuestionAuthorId(userRepresentation.getId());
         question.setQuestionAuthorName(userRepresentation.getFirstName() + " " + userRepresentation.getLastName());
         question.setQuestionPublishDate(new Date());
-        return questionManager.index(question);
+        String questionId = questionManager.index(question);
+
+        UserRepresentation currentUser = userService.findCurrentUser(request);
+        List<String> groups = getUserAttribute(currentUser, GROUP);
+
+
+        if(questionRequest.get("proposedTags") != null)
+        {
+            List<String> proposedTags = (List<String>)questionRequest.get("proposedTags");
+            for (String tagText : proposedTags) {
+
+                Tag tag = new Tag();
+                tag.setActive(false);
+                tag.setName(tagText);
+                tag.setQuestionId(questionId);
+                tag.setGroupName(groups.get(0));
+                tagService.addTag(tag);
+            }
+        }
+
+
+
+        return questionId;
     }
 
     @Override
@@ -133,6 +170,20 @@ public class QuestionServiceImpl implements QuestionService {
         question.setQuestionAuthorName(originalQuestion.getQuestionAuthorName());
         question.setQuestionAuthorId(originalQuestion.getQuestionAuthorId());
         question.setQuestionPublishDate(DateTime.now().toDate());
+        questionManager.update(question);
+    }
+
+    @Override
+    public void appendTagToQuestion(Integer tagId) {
+
+        Tag tag = tagService.findTagById(tagId);
+        Question question = questionManager.getByID(tag.getQuestionId());
+        List<String> tags = question.getQuestionTags();
+        if(tags == null || question.getQuestionTags().size() == 0)
+        {
+            question.setQuestionTags(new ArrayList<>());
+        }
+        question.getQuestionTags().add(tag.getName());
         questionManager.update(question);
     }
 

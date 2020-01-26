@@ -2,6 +2,7 @@ package com.project.qa.service;
 
 import com.project.qa.config.KeycloakConfig;
 import com.project.qa.model.Tag;
+import com.project.qa.repository.TagRepository;
 import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.admin.client.resource.RoleMappingResource;
 import org.keycloak.admin.client.resource.RoleResource;
@@ -34,15 +35,17 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
     private final GroupService groupService;
     private final RoleService roleService;
     private final TagService tagService;
+    private final QuestionService questionService;
 
     @Autowired
-    public CompanyAdministratorServiceImpl(KeycloakConfig keycloakConfig, ClientService clientService, UserService userService, GroupService groupService, RoleService roleService, TagService tagService) {
+    public CompanyAdministratorServiceImpl(KeycloakConfig keycloakConfig, ClientService clientService, UserService userService, GroupService groupService, RoleService roleService, TagService tagService, QuestionService questionService) {
         this.keycloakConfig = keycloakConfig;
         this.clientService = clientService;
         this.userService = userService;
         this.groupService = groupService;
         this.roleService = roleService;
         this.tagService = tagService;
+        this.questionService = questionService;
     }
 
     @Override
@@ -144,5 +147,18 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
         tag.setGroupName(groups.get(0));
         tag.setActive(true);
         return tagService.addTag(tag);
+    }
+
+    @Override
+    public Integer acceptTag(HttpServletRequest request, Integer tagId) {
+        tagService.acceptTag(tagId);
+        questionService.appendTagToQuestion(tagId);
+
+        return tagId;
+    }
+
+    public Integer declineTag(HttpServletRequest request, Integer tagId) {
+        tagService.deleteTagById(tagId);
+        return tagId;
     }
 }

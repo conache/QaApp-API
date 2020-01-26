@@ -20,4 +20,5 @@ public interface TagService {
     List<Tag> findAllByGroupIdAndActive(String groupName, boolean active);
 
     void deleteTagById(Integer tagId);
+    void acceptTag(Integer tagId);
 }

@@ -36,4 +36,6 @@ public interface CompanyAdministratorService {
     void editTag(Tag tag);
 
     Integer addTag(HttpServletRequest request, Tag tag);
+    Integer acceptTag(HttpServletRequest request, Integer tagId);
+    Integer declineTag(HttpServletRequest request, Integer tagId);
 }

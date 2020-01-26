@@ -45,8 +45,8 @@ public class QuestionController {
     }
 
     @PostMapping("/add")
-    public String addQuestion(@RequestBody Question question) {
-        return questionService.addQuestion(question);
+    public String addQuestion(@RequestBody Map<String, Object> request) {
+        return questionService.addQuestion(request);
     }
 
     @GetMapping("/search")

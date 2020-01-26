@@ -60,4 +60,16 @@ public class TagServiceImpl implements TagService {
     public void deleteTagById(Integer tagId) {
         repository.deleteById(tagId);
     }
+
+    @Override
+    public void acceptTag(Integer tagId) {
+        Optional<Tag> tagOptional = repository.findById(tagId);
+        if(tagOptional.isPresent())
+        {
+            Tag tag = tagOptional.get();
+            tag.setActive(true);
+            repository.save(tag);
+        }
+
+    }
 }

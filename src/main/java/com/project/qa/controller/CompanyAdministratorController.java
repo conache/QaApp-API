@@ -100,4 +100,15 @@ public class CompanyAdministratorController {
     public Integer addTag(HttpServletRequest request, @RequestBody Tag tag) {
         return companyAdministratorService.addTag(request, tag);
     }
+
+
+    @PutMapping("/acceptTag")
+    public void acceptTag(HttpServletRequest request, @RequestParam Integer tagId) {
+        companyAdministratorService.acceptTag(request, tagId);
+    }
+
+    @PutMapping("/declineTag")
+    public void declineTag(HttpServletRequest request, @RequestParam Integer tagId) {
+        companyAdministratorService.declineTag(request, tagId);
+    }
 }
