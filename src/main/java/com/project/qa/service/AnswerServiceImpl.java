@@ -111,4 +111,24 @@ public class AnswerServiceImpl implements AnswerService{
     public void deleteAnswer(String answerId, String questionId) {
         answerManager.delete(answerId, questionId);
     }
+
+    @Override
+    public void markCorrectAnswer(String answerId, String questionId) {
+
+        Answer correctAnswer = answerManager.getByID(answerId, questionId);
+        Question question = questionManager.getByID(correctAnswer.getParentId());
+
+        answerManager.loadAnswers(question);
+
+        for (Answer answer: question.getQuestionsAnswers())
+        {
+            answer.setCorrectAnswer(false);
+            answerManager.update(answer,question.getModelId());
+        }
+
+        correctAnswer.setCorrectAnswer(true);
+        answerManager.update(correctAnswer,correctAnswer.getParentId());
+
+    }
+
 }

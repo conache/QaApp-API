@@ -15,5 +15,5 @@ public interface AnswerService {
     void addVote(String answerId, String questionId, boolean isUpVote);
     void updateAnswer(Answer answer);
     void deleteAnswer(String answerId, String questionId);
-
+    void markCorrectAnswer(String answerId, String questionId);
 }

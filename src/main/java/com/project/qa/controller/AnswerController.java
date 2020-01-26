@@ -50,6 +50,12 @@ public class AnswerController {
         answerService.deleteAnswer(answerId, questionId);
     }
 
+    @PutMapping("/MarkCorrect")
+    public void markCorrectAnswer(@RequestParam String answerId, @RequestParam String questionId)
+    {
+        answerService.markCorrectAnswer(answerId, questionId);
+    }
+
 
 
 }
