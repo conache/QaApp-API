@@ -110,6 +110,11 @@ public class AnswerServiceImpl implements AnswerService{
     @Override
     public void deleteAnswer(String answerId, String questionId) {
         answerManager.delete(answerId, questionId);
+
+        Question q = questionManager.getByID(questionId);
+        q.setNoAnswers(q.getNoAnswers() - 1);
+        questionManager.update(q);
+
     }
 
     @Override
