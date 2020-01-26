@@ -20,6 +20,6 @@ public class QuestionAsResponse extends Question {
         this.voteStatus = status;
         this.modelId = question.getModelId();
         this.score = question.getScore();
-        this.setQuestionAuthorName(getQuestionAuthorName());
+        this.setQuestionAuthorName(question.getQuestionAuthorName());
     }
 }
