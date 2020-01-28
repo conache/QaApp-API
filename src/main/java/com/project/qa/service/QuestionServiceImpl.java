@@ -95,7 +95,7 @@ public class QuestionServiceImpl implements QuestionService {
         List<String> userGroups = UserUtils.getUserAttribute(userRepresentation, GROUP);
         int pageSize = pageable.getPageSize();
         int pageNumber = pageable.getPageNumber();
-        if (isEmpty(tags)) {
+        if (!isEmpty(tags)) {
             return questionManager.filterByField("questionTags", tags, pageSize, pageSize * (pageNumber - 1), userGroups.get(0), sortBy);
         }
         return questionManager.getAll(pageSize, pageSize * (pageNumber - 1), userGroups.get(0), sortBy);
