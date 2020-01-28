@@ -3,7 +3,6 @@ package com.project.qa.service;
 import com.project.qa.model.elasticserach.Question;
 import com.project.qa.model.elasticserach.QuestionAsResponse;
 import org.javatuples.Pair;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,13 +11,16 @@ import java.util.Map;
 
 public interface QuestionService {
 
-    QuestionAsResponse findQuestionById(String questionId);
+    QuestionAsResponse findQuestionById(HttpServletRequest request,String questionId);
     void deleteQuestionById(String questionId);
-    Pair<List<Question>,Long> findAllGroupQuestions(Pageable pageable);
-    Pair<List<Question>,Long> filterAllGroupQuestions(Pageable pageable, List<String> tags, String sortBy);
-    List<Question> search(String text, int maxSize);
-    String addQuestion(Map<String, Object> questionRequest);
-    void voteQuestion(String questionId, boolean isUpVote);
+    Pair<List<Question>,Long> findAllGroupQuestions(HttpServletRequest request,Pageable pageable);
+
+    Pair<List<Question>, Long> findCurrentUserQuestions(HttpServletRequest request, Pageable pageable, String sortBy);
+
+    Pair<List<Question>,Long> filterAllGroupQuestions(HttpServletRequest request, Pageable pageable, List<String> tags, String sortBy);
+    List<Question> search(HttpServletRequest request,String text, int maxSize);
+    String addQuestion(HttpServletRequest request,Map<String, Object> questionRequest);
+    void voteQuestion(HttpServletRequest request,String questionId, boolean isUpVote);
     void updateQuestion(Question question);
     void appendTagToQuestion(Integer tagId);
 }

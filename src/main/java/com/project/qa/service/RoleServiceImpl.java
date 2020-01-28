@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.project.qa.utils.UserUtils.ROLE;
+import static com.project.qa.utils.UserUtils.addUserAttribute;
 import static java.util.Collections.singletonList;
 
 @Service
@@ -49,7 +51,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public void setUserRole(HttpServletRequest request, UserResource storedUser, String roleName) {
         ClientRepresentation clientRep = clientService.findClientRepresentation(request, keycloakConfig.getClient());
-
+        addUserAttribute(storedUser.toRepresentation(), ROLE, singletonList(roleName));
         RoleRepresentation realmRole = findRealmRoleByName(request, roleName);
         List<RoleRepresentation> userRealmRoles = storedUser.roles().realmLevel().listEffective();
         storedUser.roles().realmLevel().remove(userRealmRoles);

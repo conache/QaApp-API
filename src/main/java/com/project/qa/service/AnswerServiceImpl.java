@@ -20,82 +20,74 @@ import java.util.Date;
 import java.util.List;
 
 @Service
-public class AnswerServiceImpl implements AnswerService{
+public class AnswerServiceImpl implements AnswerService {
 
     private final ModelManager<Answer> answerManager;
     private final ModelManager<Question> questionManager;
-    private final HttpServletRequest request;
     private final UserService userService;
 
     @Autowired
-    public AnswerServiceImpl(@Qualifier("esHighLevelClient") RestHighLevelClient esClient, UserService userService, HttpServletRequest request) {
+    public AnswerServiceImpl(@Qualifier("esHighLevelClient") RestHighLevelClient esClient, UserService userService) {
         this.answerManager = new ModelManager<>(Answer::new, esClient);
         this.questionManager = new ModelManager<>(Question::new, esClient);
         this.userService = userService;
-        this.request = request;
     }
 
     @Override
-    public Pair<List<AnswerAsResponse>,Long> getAnswersForQuestion(String questionId, Pageable pageable, String sortBy) {
+    public Pair<List<AnswerAsResponse>, Long> getAnswersForQuestion(HttpServletRequest request, String questionId, Pageable pageable, String sortBy) {
 
         UserRepresentation userRepresentation = userService.findCurrentUser(request);
         int pageSize = pageable.getPageSize();
         int pageNumber = pageable.getPageNumber();
-        Pair<List<Answer>, Long> qResult =  answerManager.getAnswersForQuestion(questionId, pageSize, pageSize *(pageNumber - 1), sortBy);
+        Pair<List<Answer>, Long> qResult = answerManager.getAnswersForQuestion(questionId, pageSize, pageSize * (pageNumber - 1), sortBy);
         List<AnswerAsResponse> answers = new ArrayList<>();
-        for (Answer answer: qResult.getValue0()) {
+        for (Answer answer : qResult.getValue0()) {
             VoteStatus status = VoteStatus.NoVote;
-            if(answer.getUpVotes().contains(userRepresentation.getId()))
-            {
+            if (answer.getUpVotes().contains(userRepresentation.getId())) {
                 status = VoteStatus.UpVote;
             }
-            if(answer.getDownVotes().contains(userRepresentation.getId()))
-            {
+            if (answer.getDownVotes().contains(userRepresentation.getId())) {
                 status = VoteStatus.DownVote;
             }
             answers.add(new AnswerAsResponse(answer, status));
         }
-        return  new Pair<>(answers,qResult.getValue1());
+        return new Pair<>(answers, qResult.getValue1());
 
     }
 
     @Override
-    public String addAnswer(Answer answer) {
+    public String addAnswer(HttpServletRequest request, Answer answer) {
 
         UserRepresentation userRepresentation = userService.findCurrentUser(request);
         answer.setUserId(userRepresentation.getId());
         answer.setUserName(userRepresentation.getFirstName() + " " + userRepresentation.getLastName());
         answer.setPublishDate(new Date());
-        String answerId =  answerManager.index(answer);
-        if(answerId != null)
-        {
+        String answerId = answerManager.index(answer);
+        if (answerId != null) {
             Question q = questionManager.getByID(answer.getParentId());
             q.setNoAnswers(q.getNoAnswers() + 1);
             questionManager.update(q);
         }
-        return  answerId;
+        return answerId;
     }
 
     @Override
-    public void addVote(String answerId, String questionId, boolean isUpVote) {
+    public void addVote(HttpServletRequest request, String answerId, String questionId, boolean isUpVote) {
 
-        Answer answer = answerManager.getByID(answerId,questionId);
+        Answer answer = answerManager.getByID(answerId, questionId);
         UserRepresentation userRepresentation = userService.findCurrentUser(request);
-        if(isUpVote)
-        {
+        if (isUpVote) {
             answer.upVote(userRepresentation.getId());
-        }
-        else
-        {
+        } else {
             answer.downVote(userRepresentation.getId());
         }
-        answerManager.update(answer,questionId);
+        answerManager.update(answer, questionId);
     }
 
     @Override
     public void updateAnswer(Answer answer) {
 
-        Answer originalAnswer = answerManager.getByID(answer.getModelId(),answer.getParentId());
+        Answer originalAnswer = answerManager.getByID(answer.getModelId(), answer.getParentId());
         answer.setDownVotes(originalAnswer.getDownVotes());
         answer.setUpVotes(originalAnswer.getUpVotes());
         answer.setScore(originalAnswer.getScore());
@@ -103,7 +95,7 @@ public class AnswerServiceImpl implements AnswerService{
         answer.setUserId(originalAnswer.getUserId());
         answer.setPublishDate(DateTime.now().toDate());
         answer.setCorrectAnswer(originalAnswer.isCorrectAnswer());
-        answerManager.update(answer,answer.getParentId());
+        answerManager.update(answer, answer.getParentId());
 
     }
 
@@ -125,15 +117,13 @@ public class AnswerServiceImpl implements AnswerService{
 
         answerManager.loadAnswers(question);
 
-        for (Answer answer: question.getQuestionsAnswers())
-        {
+        for (Answer answer : question.getQuestionsAnswers()) {
             answer.setCorrectAnswer(false);
-            answerManager.update(answer,question.getModelId());
+            answerManager.update(answer, question.getModelId());
         }
 
         correctAnswer.setCorrectAnswer(true);
-        answerManager.update(correctAnswer,correctAnswer.getParentId());
+        answerManager.update(correctAnswer, correctAnswer.getParentId());
 
     }
-
 }

@@ -6,12 +6,10 @@ import com.project.qa.model.Tag;
 import com.project.qa.model.elasticserach.Answer;
 import com.project.qa.model.elasticserach.Question;
 import com.project.qa.model.elasticserach.QuestionAsResponse;
-import com.project.qa.repository.TagRepository;
 import com.project.qa.repository.elasticsearch.ModelManager;
 import com.project.qa.utils.UserUtils;
-import com.sun.mail.util.QEncoderStream;
-import org.javatuples.Pair;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.javatuples.Pair;
 import org.joda.time.DateTime;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +18,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -30,6 +25,7 @@ import java.util.Map;
 
 import static com.project.qa.utils.UserUtils.GROUP;
 import static com.project.qa.utils.UserUtils.getUserAttribute;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Service
 public class QuestionServiceImpl implements QuestionService {
@@ -37,29 +33,25 @@ public class QuestionServiceImpl implements QuestionService {
     private final ModelManager<Question> questionManager;
     private final ModelManager<Answer> answerManager;
     private final UserService userService;
-    private final HttpServletRequest request;
     private final TagService tagService;
 
     @Autowired
-    public QuestionServiceImpl(@Qualifier("esHighLevelClient") RestHighLevelClient esClient, UserService userService, HttpServletRequest request, TagService tagService) {
+    public QuestionServiceImpl(@Qualifier("esHighLevelClient") RestHighLevelClient esClient, UserService userService, TagService tagService) {
         this.questionManager = new ModelManager<>(Question::new, esClient);
         this.answerManager = new ModelManager<>(Answer::new, esClient);
         this.userService = userService;
-        this.request = request;
         this.tagService = tagService;
     }
 
     @Override
-    public QuestionAsResponse findQuestionById(String questionId) {
-        Question question =  questionManager.getByID(questionId);
+    public QuestionAsResponse findQuestionById(HttpServletRequest request, String questionId) {
+        Question question = questionManager.getByID(questionId);
         UserRepresentation userRepresentation = userService.findCurrentUser(request);
         VoteStatus status = VoteStatus.NoVote;
-        if(question.getUpVotes().contains(userRepresentation.getId()))
-        {
+        if (question.getUpVotes().contains(userRepresentation.getId())) {
             status = VoteStatus.UpVote;
         }
-        if(question.getDownVotes().contains(userRepresentation.getId()))
-        {
+        if (question.getDownVotes().contains(userRepresentation.getId())) {
             status = VoteStatus.DownVote;
         }
         return new QuestionAsResponse(question, status);
@@ -71,45 +63,53 @@ public class QuestionServiceImpl implements QuestionService {
         questionManager.loadAnswers(question);
 
         //delete associated answers
-        for (Answer answer:question.getQuestionsAnswers())
-        {
-            answerManager.delete(answer.getModelId(),questionId);
+        for (Answer answer : question.getQuestionsAnswers()) {
+            answerManager.delete(answer.getModelId(), questionId);
         }
 
         questionManager.delete(questionId);
     }
 
     @Override
-    public  Pair<List<Question>,Long> findAllGroupQuestions(Pageable pageable) {
+    public Pair<List<Question>, Long> findAllGroupQuestions(HttpServletRequest request, Pageable pageable) {
         UserRepresentation userRepresentation = userService.findCurrentUser(request);
         List<String> userGroups = UserUtils.getUserAttribute(userRepresentation, GROUP);
         int pageSize = pageable.getPageSize();
         int pageNumber = pageable.getPageNumber();
-        return questionManager.getAll(pageSize, pageSize *(pageNumber - 1), userGroups.get(0));
+        return questionManager.getAll(pageSize, pageSize * (pageNumber - 1), userGroups.get(0));
 
     }
 
     @Override
-    public  Pair<List<Question>,Long> filterAllGroupQuestions(Pageable pageable, List<String> tags, String sortBy) {
+    public Pair<List<Question>, Long> findCurrentUserQuestions(HttpServletRequest request, Pageable pageable, String sortBy) {
         UserRepresentation userRepresentation = userService.findCurrentUser(request);
         List<String> userGroups = UserUtils.getUserAttribute(userRepresentation, GROUP);
         int pageSize = pageable.getPageSize();
         int pageNumber = pageable.getPageNumber();
-        if(tags != null && tags.size() != 0)
-            return questionManager.filterByField("questionTags", tags,pageSize, pageSize *(pageNumber - 1), userGroups.get(0), sortBy);
-
-        return  questionManager.getAll(pageSize, pageSize *(pageNumber - 1), userGroups.get(0), sortBy);
+        return questionManager.findByField("questionAuthorId", userRepresentation.getId(), pageSize, pageSize * (pageNumber - 1), userGroups.get(0), sortBy);
     }
 
     @Override
-    public List<Question> search(String text, int maxSize) {
+    public Pair<List<Question>, Long> filterAllGroupQuestions(HttpServletRequest request, Pageable pageable, List<String> tags, String sortBy) {
+        UserRepresentation userRepresentation = userService.findCurrentUser(request);
+        List<String> userGroups = UserUtils.getUserAttribute(userRepresentation, GROUP);
+        int pageSize = pageable.getPageSize();
+        int pageNumber = pageable.getPageNumber();
+        if (isEmpty(tags)) {
+            return questionManager.filterByField("questionTags", tags, pageSize, pageSize * (pageNumber - 1), userGroups.get(0), sortBy);
+        }
+        return questionManager.getAll(pageSize, pageSize * (pageNumber - 1), userGroups.get(0), sortBy);
+    }
+
+    @Override
+    public List<Question> search(HttpServletRequest request, String text, int maxSize) {
         UserRepresentation userRepresentation = userService.findCurrentUser(request);
         List<String> userGroups = UserUtils.getUserAttribute(userRepresentation, GROUP);
         return questionManager.matchLikeThis("questionTitle", text, maxSize, 0, userGroups.get(0)).getValue0();
     }
 
     @Override
-    public String addQuestion(Map<String, Object> questionRequest) {
+    public String addQuestion(HttpServletRequest request, Map<String, Object> questionRequest) {
         UserRepresentation userRepresentation = userService.findCurrentUser(request);
         List<String> userGroups = UserUtils.getUserAttribute(userRepresentation, GROUP);
         ObjectMapper oMapper = new ObjectMapper();
@@ -125,9 +125,8 @@ public class QuestionServiceImpl implements QuestionService {
         List<String> groups = getUserAttribute(currentUser, GROUP);
 
 
-        if(questionRequest.get("proposedTags") != null)
-        {
-            List<String> proposedTags = (List<String>)questionRequest.get("proposedTags");
+        if (questionRequest.get("proposedTags") != null) {
+            List<String> proposedTags = (List<String>) questionRequest.get("proposedTags");
             for (String tagText : proposedTags) {
 
                 Tag tag = new Tag();
@@ -138,23 +137,17 @@ public class QuestionServiceImpl implements QuestionService {
                 tagService.addTag(tag);
             }
         }
-
-
-
         return questionId;
     }
 
     @Override
-    public void voteQuestion(String questionId, boolean isUpVote) {
+    public void voteQuestion(HttpServletRequest request, String questionId, boolean isUpVote) {
 
         Question question = questionManager.getByID(questionId);
         UserRepresentation userRepresentation = userService.findCurrentUser(request);
-        if(isUpVote)
-        {
+        if (isUpVote) {
             question.upVote(userRepresentation.getId());
-        }
-        else
-        {
+        } else {
             question.downVote(userRepresentation.getId());
         }
         questionManager.update(question);
@@ -179,8 +172,7 @@ public class QuestionServiceImpl implements QuestionService {
         Tag tag = tagService.findTagById(tagId);
         Question question = questionManager.getByID(tag.getQuestionId());
         List<String> tags = question.getQuestionTags();
-        if(tags == null || question.getQuestionTags().size() == 0)
-        {
+        if (tags == null || question.getQuestionTags().size() == 0) {
             question.setQuestionTags(new ArrayList<>());
         }
         question.getQuestionTags().add(tag.getName());

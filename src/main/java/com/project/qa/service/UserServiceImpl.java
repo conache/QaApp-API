@@ -6,6 +6,7 @@ import com.project.qa.model.Tag;
 import com.project.qa.utils.UserUtils;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
+import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,14 +103,14 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    /*private void setDefaultUserPassword(UserResource storedUser) {
+    private void setDefaultUserPassword(UserResource storedUser) {
         CredentialRepresentation passwordCred = new CredentialRepresentation();
         passwordCred.setTemporary(false);
         passwordCred.setType(CredentialRepresentation.PASSWORD);
         passwordCred.setValue("12345");
 
         storedUser.resetPassword(passwordCred);
-    }*/
+    }
 
     @Override
     public GroupRepresentation findCurrentUserGroup(HttpServletRequest request) {
@@ -142,7 +143,6 @@ public class UserServiceImpl implements UserService {
         user.setEnabled(true);
 
         addUserAttribute(user, GROUP, singletonList(groupRepresentation.getName()));
-        addUserAttribute(user, ROLE, singletonList(customUser.getRoleName()));
         addUserAttribute(user, JOB, singletonList(customUser.getJobName()));
 
         UsersResource usersResource = keycloakConfig.getRealm(request).users();
@@ -153,9 +153,9 @@ public class UserServiceImpl implements UserService {
 
         String userId = getEntityId(response);
         UserResource userResource = usersResource.get(userId);
+        userResource.executeActionsEmail(defaultRequiredActions);
         roleService.setUserRole(request, userResource, customUser.getRoleName());
         userResource.joinGroup(groupRepresentation.getId());
-
         return userId;
     }
 

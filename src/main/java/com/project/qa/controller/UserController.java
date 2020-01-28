@@ -1,21 +1,21 @@
 package com.project.qa.controller;
 
 import com.project.qa.model.Tag;
+import com.project.qa.model.elasticserach.Question;
+import com.project.qa.service.QuestionService;
 import com.project.qa.service.TagService;
 import com.project.qa.service.UserService;
+import org.javatuples.Pair;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
-
-import static com.project.qa.utils.UserUtils.GROUP;
-import static com.project.qa.utils.UserUtils.getUserAttribute;
 
 @RestController
 @RequestMapping(path = "/user")
@@ -23,11 +23,13 @@ public class UserController {
 
     public final UserService userService;
     public final TagService tagService;
+    public final QuestionService questionService;
 
     @Autowired
-    public UserController(UserService userService, TagService tagService) {
+    public UserController(UserService userService, TagService tagService, QuestionService questionService) {
         this.userService = userService;
         this.tagService = tagService;
+        this.questionService = questionService;
     }
 
     @GetMapping(path = "/currentUser")
@@ -68,5 +70,10 @@ public class UserController {
     @GetMapping("/allTags")
     public List<Tag> findAllPageable(HttpServletRequest request) {
         return userService.findActiveTags(request);
+    }
+
+    @GetMapping("/questions")
+    public Pair<List<Question>, Long> userQuestions(HttpServletRequest request, Pageable page, @RequestParam(required = false, defaultValue = "questionPublishDate") String sortBy) {
+        return questionService.findCurrentUserQuestions(request, page, sortBy);
     }
 }
