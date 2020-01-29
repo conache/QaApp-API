@@ -1,5 +1,6 @@
 package com.project.qa.repository.elasticsearch;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -337,8 +338,12 @@ public class ModelManager<T extends ModelBase> {
 
     public Map<String, Object> writeModelAsMap(T t) {
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, true);
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_DEFAULT);
         return objectMapper.convertValue(t, new TypeReference<HashMap<String, Object>>() {
         });
+
     }
 }
 

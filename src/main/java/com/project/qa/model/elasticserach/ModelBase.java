@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.project.qa.enums.elasticsearch.Index;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public abstract class ModelBase {
 
@@ -11,22 +12,22 @@ public abstract class ModelBase {
     @JsonIgnore
     private final Index index;
     protected int score;
-    protected ArrayList<String> upVotes;
-    protected ArrayList<String> downVotes;
+    protected List<String> upVotes;
+    protected List<String> downVotes;
 
-    public ArrayList<String> getUpVotes() {
+    public List<String> getUpVotes() {
         return upVotes;
     }
 
-    public void setUpVotes(ArrayList<String> upVotes) {
-        this.upVotes = upVotes;
-    }
-
-    public ArrayList<String> getDownVotes() {
+    public List<String> getDownVotes() {
         return downVotes;
     }
 
-    public void setDownVotes(ArrayList<String> downVotes) {
+    public void setUpVotes(List<String> upVotes) {
+        this.upVotes = upVotes;
+    }
+
+    public void setDownVotes(List<String> downVotes) {
         this.downVotes = downVotes;
     }
 
