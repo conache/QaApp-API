@@ -67,7 +67,17 @@ public class QuestionController {
     }
 
     @PostMapping("/addProposedQuestion")
-    public void addProposedQuestion(HttpServletRequest request, @RequestBody Map<String, Object> questionValues) {
-        questionService.addProposedQuestion(request, questionValues);
+    public String addProposedQuestion(HttpServletRequest request, @RequestBody Map<String, Object> questionValues) {
+        return questionService.addProposedQuestion(request, questionValues);
+    }
+
+    @DeleteMapping
+    public void deleteProposedQuestion(HttpServletRequest request, @RequestParam String proposedQuestionId) {
+        questionService.deleteProposedEditQuestionById(request, proposedQuestionId);
+    }
+
+    @GetMapping("/findProposed")
+    public ProposedEditQuestion findProposedQuestionById(HttpServletRequest request, @RequestParam String proposedQuestionId) {
+        return questionService.findProposedEditQuestion(request, proposedQuestionId);
     }
 }

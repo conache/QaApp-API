@@ -9,14 +9,24 @@ public class ProposedEditQuestion extends Question {
     private String proposedAuthorId;
     private Date proposedDate;
     private String proposedAuthorUsername;
+    private String parentQuestionId;
 
     public ProposedEditQuestion() {
     }
 
-    public ProposedEditQuestion(String proposedAuthorId, Date proposedDate, String proposedAuthorUsername) {
+    public ProposedEditQuestion(String proposedAuthorId, Date proposedDate, String proposedAuthorUsername, String parentQuestionId) {
         this.proposedAuthorId = proposedAuthorId;
         this.proposedDate = proposedDate;
         this.proposedAuthorUsername = proposedAuthorUsername;
+        this.parentQuestionId = parentQuestionId;
+    }
+
+    public String getParentQuestionId() {
+        return parentQuestionId;
+    }
+
+    public void setParentQuestionId(String parentQuestionId) {
+        this.parentQuestionId = parentQuestionId;
     }
 
     public String getProposedAuthorId() {

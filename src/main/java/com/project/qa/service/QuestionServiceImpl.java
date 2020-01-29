@@ -209,7 +209,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public void addProposedQuestion(HttpServletRequest request, Map<String, Object> objectMap) {
+    public String addProposedQuestion(HttpServletRequest request, Map<String, Object> objectMap) {
         UserRepresentation user = userService.findCurrentUser(request);
         List<String> userGroups = getUserAttribute(user, GROUP);
         String groupName = userGroups.get(0);
@@ -222,7 +222,28 @@ public class QuestionServiceImpl implements QuestionService {
         proposedEditQuestion.setProposedAuthorId(user.getId());
         proposedEditQuestion.setProposedAuthorUsername(user.getUsername());
         proposedEditQuestion.setProposedDate(new Date());
-        proposedQuestionManager.index(proposedEditQuestion);
+        String id = proposedQuestionManager.index(proposedEditQuestion);
         saveProposedTags(proposedEditQuestion.getModelId(), groupName, proposedTags);
+        return id;
+    }
+
+    @Override
+    public void deleteProposedEditQuestionById(HttpServletRequest request, String proposedQuestionId) {
+        proposedQuestionManager.delete(proposedQuestionId);
+    }
+
+/*
+    @Override
+    public void acceptProposedQuestion(HttpServletRequest request, String proposedQuestionId) {
+        ProposedEditQuestion proposedEditQuestion = proposedQuestionManager.getByID(proposedQuestionId);
+        proposedEditQuestion.get
+
+        proposedQuestionManager.delete(proposedQuestionId);
+    }
+ */
+
+    @Override
+    public ProposedEditQuestion findProposedEditQuestion(HttpServletRequest request, String proposedQuestionId) {
+        return proposedQuestionManager.getByID(proposedQuestionId);
     }
 }

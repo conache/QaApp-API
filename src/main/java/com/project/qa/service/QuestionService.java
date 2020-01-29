@@ -36,5 +36,9 @@ public interface QuestionService {
 
     Pair<List<ProposedEditQuestion>, Long> findAllUserProposedQuestions(HttpServletRequest request, Pageable pageable, String sortBy);
 
-    void addProposedQuestion(HttpServletRequest request, Map<String, Object> questionValues);
+    String addProposedQuestion(HttpServletRequest request, Map<String, Object> questionValues);
+
+    void deleteProposedEditQuestionById(HttpServletRequest request, String proposedQuestionId);
+
+    ProposedEditQuestion findProposedEditQuestion(HttpServletRequest request, String proposedQuestionId);
 }
