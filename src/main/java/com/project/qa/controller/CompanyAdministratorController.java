@@ -87,8 +87,8 @@ public class CompanyAdministratorController {
     }
 
     @DeleteMapping("/deleteTag")
-    public void deleteTagById(@RequestParam Integer tagId) {
-        companyAdministratorService.deleteProposedTagById(tagId);
+    public void deleteTagById(HttpServletRequest request, @RequestParam Integer tagId) {
+        companyAdministratorService.deleteProposedTagById(request, tagId);
     }
 
     @PutMapping("/editTag")

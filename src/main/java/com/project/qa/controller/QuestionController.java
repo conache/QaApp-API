@@ -1,5 +1,6 @@
 package com.project.qa.controller;
 
+import com.project.qa.model.elasticserach.ProposedEditQuestion;
 import com.project.qa.model.elasticserach.Question;
 import com.project.qa.model.elasticserach.QuestionAsResponse;
 import com.project.qa.service.QuestionService;
@@ -55,8 +56,13 @@ public class QuestionController {
         questionService.voteQuestion(request, questionId, isUpVote);
     }
 
-    @PostMapping("/update")
+    @PostMapping("/edit")
     public void updateQuestion(@RequestBody Question question) {
-        questionService.updateQuestion(question);
+        questionService.editQuestion(question);
+    }
+
+    @GetMapping("/proposedEditQuestions")
+    public Pair<List<ProposedEditQuestion>, Long> getProposedEditQuestions(HttpServletRequest request, Pageable pageable) {
+        return questionService.findAllUserProposedQuestions(request, pageable);
     }
 }

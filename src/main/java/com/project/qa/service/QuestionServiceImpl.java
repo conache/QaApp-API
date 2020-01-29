@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.qa.enums.elasticsearch.VoteStatus;
 import com.project.qa.model.Tag;
 import com.project.qa.model.elasticserach.Answer;
+import com.project.qa.model.elasticserach.ProposedEditQuestion;
 import com.project.qa.model.elasticserach.Question;
 import com.project.qa.model.elasticserach.QuestionAsResponse;
 import com.project.qa.repository.elasticsearch.ModelManager;
@@ -122,7 +123,6 @@ public class QuestionServiceImpl implements QuestionService {
 
 
         List<String> groups = getUserAttribute(userRepresentation, GROUP);
-
         if (questionRequest.get("proposedTags") != null) {
             List<String> proposedTags = (List<String>) questionRequest.get("proposedTags");
             for (String tagText : proposedTags) {
@@ -151,8 +151,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public void updateQuestion(Question question) {
-
+    public void editQuestion(Question question) {
         Question originalQuestion = questionManager.getByID(question.getModelId());
         question.setDownVotes(originalQuestion.getDownVotes());
         question.setUpVotes(originalQuestion.getUpVotes());
@@ -169,10 +168,18 @@ public class QuestionServiceImpl implements QuestionService {
         Tag tag = tagService.findTagById(tagId);
         Question question = questionManager.getByID(tag.getQuestionId());
         List<String> tags = question.getQuestionTags();
-        if (tags == null || question.getQuestionTags().size() == 0) {
-            question.setQuestionTags(new ArrayList<>());
+        if (isEmpty(tags)) {
+            tags = new ArrayList<>();
         }
-        question.getQuestionTags().add(tag.getName());
+        tags.add(tag.getName());
+        question.setQuestionTags(tags);
         questionManager.update(question);
+    }
+
+    @Override
+    public Pair<List<ProposedEditQuestion>, Long> findAllUserProposedQuestions(HttpServletRequest request, Pageable pageable) {
+        UserRepresentation user = userService.findCurrentUser(request);
+
+        return null;
     }
 }

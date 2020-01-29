@@ -1,5 +1,6 @@
 package com.project.qa.service;
 
+import com.project.qa.model.elasticserach.ProposedEditQuestion;
 import com.project.qa.model.elasticserach.Question;
 import com.project.qa.model.elasticserach.QuestionAsResponse;
 import org.javatuples.Pair;
@@ -11,16 +12,25 @@ import java.util.Map;
 
 public interface QuestionService {
 
-    QuestionAsResponse findQuestionById(HttpServletRequest request,String questionId);
+    QuestionAsResponse findQuestionById(HttpServletRequest request, String questionId);
+
     void deleteQuestionById(String questionId);
-    Pair<List<Question>,Long> findAllGroupQuestions(HttpServletRequest request,Pageable pageable);
+
+    Pair<List<Question>, Long> findAllGroupQuestions(HttpServletRequest request, Pageable pageable);
 
     Pair<List<Question>, Long> findCurrentUserQuestions(HttpServletRequest request, Pageable pageable, String sortBy);
 
-    Pair<List<Question>,Long> filterAllGroupQuestions(HttpServletRequest request, Pageable pageable, List<String> tags, String sortBy);
-    List<Question> search(HttpServletRequest request,String text, int maxSize);
-    String addQuestion(HttpServletRequest request,Map<String, Object> questionRequest);
-    void voteQuestion(HttpServletRequest request,String questionId, boolean isUpVote);
-    void updateQuestion(Question question);
+    Pair<List<Question>, Long> filterAllGroupQuestions(HttpServletRequest request, Pageable pageable, List<String> tags, String sortBy);
+
+    List<Question> search(HttpServletRequest request, String text, int maxSize);
+
+    String addQuestion(HttpServletRequest request, Map<String, Object> questionRequest);
+
+    void voteQuestion(HttpServletRequest request, String questionId, boolean isUpVote);
+
+    void editQuestion(Question question);
+
     void appendTagToQuestion(Integer tagId);
+
+    Pair<List<ProposedEditQuestion>, Long> findAllUserProposedQuestions(HttpServletRequest request, Pageable pageable);
 }

@@ -2,7 +2,9 @@ package com.project.qa.service;
 
 import com.project.qa.config.KeycloakConfig;
 import com.project.qa.model.Tag;
+import com.project.qa.model.elasticserach.Question;
 import com.project.qa.repository.TagRepository;
+import org.javatuples.Pair;
 import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.admin.client.resource.RoleMappingResource;
 import org.keycloak.admin.client.resource.RoleResource;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -131,7 +134,22 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
     }
 
     @Override
-    public void deleteProposedTagById(Integer tagId) {
+    public void deleteProposedTagById(HttpServletRequest request, Integer tagId) {
+        Tag tag = tagService.findTagById(tagId);
+        final String tagName = tag.getName();
+        int pageStart = 0;
+        int pageSize = 10000;
+        int remainingQuestionsToUpdate;
+        do {
+            Pair<List<Question>, Long> questionPair = questionService.filterAllGroupQuestions(request, PageRequest.of(pageStart, pageSize), singletonList(tagName), "questionPublishDate");
+            remainingQuestionsToUpdate = questionPair.getSize();
+            for (Question question : questionPair.getValue0()) {
+                List<String> questionTags = question.getQuestionTags();
+                questionTags.remove(tag.getName());
+                question.setQuestionTags(questionTags);
+                questionService.editQuestion(question);
+            }
+        } while (remainingQuestionsToUpdate != 0);
         tagService.deleteTagById(tagId);
     }
 
