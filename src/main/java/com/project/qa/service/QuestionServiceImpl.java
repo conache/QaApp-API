@@ -222,7 +222,7 @@ public class QuestionServiceImpl implements QuestionService {
         proposedEditQuestion.setProposedAuthorId(user.getId());
         proposedEditQuestion.setProposedAuthorUsername(user.getUsername());
         proposedEditQuestion.setProposedDate(new Date());
-        questionManager.update(proposedEditQuestion);
+        proposedQuestionManager.index(proposedEditQuestion);
         saveProposedTags(proposedEditQuestion.getModelId(), groupName, proposedTags);
     }
 }
