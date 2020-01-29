@@ -1,5 +1,6 @@
 package com.project.qa.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.qa.enums.elasticsearch.VoteStatus;
 import com.project.qa.model.Tag;
@@ -75,7 +76,7 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public Pair<List<Question>, Long> findAllGroupQuestions(HttpServletRequest request, Pageable pageable) {
         UserRepresentation userRepresentation = userService.findCurrentUser(request);
-        List<String> userGroups = UserUtils.getUserAttribute(userRepresentation, GROUP);
+        List<String> userGroups = getUserAttribute(userRepresentation, GROUP);
         int pageSize = pageable.getPageSize();
         int pageNumber = pageable.getPageNumber();
         return questionManager.getAll(pageSize, pageSize * (pageNumber - 1), userGroups.get(0));
@@ -84,7 +85,7 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public Pair<List<Question>, Long> findCurrentUserQuestions(HttpServletRequest request, Pageable pageable, String sortBy) {
         UserRepresentation userRepresentation = userService.findCurrentUser(request);
-        List<String> userGroups = UserUtils.getUserAttribute(userRepresentation, GROUP);
+        List<String> userGroups = getUserAttribute(userRepresentation, GROUP);
         int pageSize = pageable.getPageSize();
         int pageNumber = pageable.getPageNumber();
         return questionManager.findByField("questionAuthorId", userRepresentation.getId(), pageSize, pageSize * (pageNumber - 1), userGroups.get(0), sortBy);
@@ -93,7 +94,7 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public Pair<List<Question>, Long> filterAllGroupQuestions(HttpServletRequest request, Pageable pageable, List<String> tags, String sortBy) {
         UserRepresentation userRepresentation = userService.findCurrentUser(request);
-        List<String> userGroups = UserUtils.getUserAttribute(userRepresentation, GROUP);
+        List<String> userGroups = getUserAttribute(userRepresentation, GROUP);
         int pageSize = pageable.getPageSize();
         int pageNumber = pageable.getPageNumber();
         if (!isEmpty(tags)) {
@@ -105,36 +106,41 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public List<Question> search(HttpServletRequest request, String text, int maxSize) {
         UserRepresentation userRepresentation = userService.findCurrentUser(request);
-        List<String> userGroups = UserUtils.getUserAttribute(userRepresentation, GROUP);
+        List<String> userGroups = getUserAttribute(userRepresentation, GROUP);
         return questionManager.matchLikeThis("questionTitle", text, maxSize, 0, userGroups.get(0)).getValue0();
     }
 
     @Override
     public String addQuestion(HttpServletRequest request, Map<String, Object> questionRequest) {
         UserRepresentation userRepresentation = userService.findCurrentUser(request);
-        List<String> userGroups = UserUtils.getUserAttribute(userRepresentation, GROUP);
+        List<String> userGroups = getUserAttribute(userRepresentation, GROUP);
+        String groupName = userGroups.get(0);
 
         Question question = objectMapper.convertValue(questionRequest, Question.class);
-        question.setGroupName(userGroups.get(0));
+        question.setGroupName(groupName);
         question.setQuestionAuthorId(userRepresentation.getId());
         question.setQuestionAuthorName(userRepresentation.getFirstName() + " " + userRepresentation.getLastName());
         question.setQuestionPublishDate(new Date());
         String questionId = questionManager.index(question);
 
 
-        List<String> groups = getUserAttribute(userRepresentation, GROUP);
-        if (questionRequest.get("proposedTags") != null) {
-            List<String> proposedTags = (List<String>) questionRequest.get("proposedTags");
-            for (String tagText : proposedTags) {
-                Tag tag = new Tag();
-                tag.setActive(false);
-                tag.setName(tagText);
-                tag.setQuestionId(questionId);
-                tag.setGroupName(groups.get(0));
-                tagService.addTag(tag);
-            }
-        }
+        Object proposedTagsObject = questionRequest.get("proposedTags");
+        List<String> proposedTags = proposedTagsObject == null ? new ArrayList<>() : objectMapper.convertValue(proposedTagsObject, new TypeReference<List<String>>() {
+        });
+        saveProposedTags(questionId, groupName, proposedTags);
+
         return questionId;
+    }
+
+    private void saveProposedTags(String questionId, String groupName, List<String> proposedTags) {
+        for (String tagText : proposedTags) {
+            Tag tag = new Tag();
+            tag.setActive(false);
+            tag.setName(tagText);
+            tag.setQuestionId(questionId);
+            tag.setGroupName(groupName);
+            tagService.addTag(tag);
+        }
     }
 
     @Override
@@ -181,5 +187,23 @@ public class QuestionServiceImpl implements QuestionService {
         UserRepresentation user = userService.findCurrentUser(request);
 
         return null;
+    }
+
+    @Override
+    public void addProposedQuestion(HttpServletRequest request, Map<String, Object> objectMap) {
+        UserRepresentation user = userService.findCurrentUser(request);
+        List<String> userGroups = getUserAttribute(user, GROUP);
+        String groupName = userGroups.get(0);
+
+        Object questionObject = objectMap.get("question");
+        Object proposedTagsObject = objectMap.get("proposedTags");
+        ProposedEditQuestion proposedEditQuestion = questionObject == null ? new ProposedEditQuestion() : objectMapper.convertValue(questionObject, ProposedEditQuestion.class);
+        List<String> proposedTags = proposedTagsObject == null ? new ArrayList<>() : objectMapper.convertValue(proposedTagsObject, new TypeReference<List<String>>() {
+        });
+        proposedEditQuestion.setProposedAuthorId(user.getId());
+        proposedEditQuestion.setProposedAuthorUsername(user.getUsername());
+        proposedEditQuestion.setProposedDate(new Date());
+        questionManager.update(proposedEditQuestion);
+        saveProposedTags(proposedEditQuestion.getModelId(), groupName, proposedTags);
     }
 }

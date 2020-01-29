@@ -65,4 +65,9 @@ public class QuestionController {
     public Pair<List<ProposedEditQuestion>, Long> getProposedEditQuestions(HttpServletRequest request, Pageable pageable) {
         return questionService.findAllUserProposedQuestions(request, pageable);
     }
+
+    @PostMapping("/addProposedQuestion")
+    public void addProposedQuestion(HttpServletRequest request, @RequestBody Map<String,Object> questionValues) {
+        questionService.addProposedQuestion(request, questionValues);
+    }
 }

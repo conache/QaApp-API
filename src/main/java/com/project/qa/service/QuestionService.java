@@ -33,4 +33,6 @@ public interface QuestionService {
     void appendTagToQuestion(Integer tagId);
 
     Pair<List<ProposedEditQuestion>, Long> findAllUserProposedQuestions(HttpServletRequest request, Pageable pageable);
+
+    void addProposedQuestion(HttpServletRequest request, Map<String, Object> questionValues);
 }

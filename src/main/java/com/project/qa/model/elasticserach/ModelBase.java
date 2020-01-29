@@ -11,6 +11,8 @@ public abstract class ModelBase {
     @JsonIgnore
     private final Index index;
     protected int score;
+    protected ArrayList<String> upVotes;
+    protected ArrayList<String> downVotes;
 
     public ArrayList<String> getUpVotes() {
         return upVotes;
@@ -27,10 +29,6 @@ public abstract class ModelBase {
     public void setDownVotes(ArrayList<String> downVotes) {
         this.downVotes = downVotes;
     }
-
-    protected ArrayList<String> upVotes;
-    protected ArrayList<String> downVotes;
-
 
     public String getModelId() {
         return modelId;
