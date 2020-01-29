@@ -3,6 +3,7 @@ package com.project.qa.model.elasticserach;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.Date;
+import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ProposedEditQuestion extends Question {
@@ -12,6 +13,7 @@ public class ProposedEditQuestion extends Question {
     private String parentQuestionId;
 
     public ProposedEditQuestion() {
+        super();
     }
 
     public ProposedEditQuestion(String proposedAuthorId, Date proposedDate, String proposedAuthorUsername, String parentQuestionId) {
@@ -19,6 +21,10 @@ public class ProposedEditQuestion extends Question {
         this.proposedDate = proposedDate;
         this.proposedAuthorUsername = proposedAuthorUsername;
         this.parentQuestionId = parentQuestionId;
+    }
+
+    public ProposedEditQuestion(String questionAuthorId, String groupName, String questionTitle, String questionText, Date questionPublishDate, List<Answer> questionsAnswers, List<String> questionTags) {
+        super(questionAuthorId, groupName, questionTitle, questionText, questionPublishDate, questionsAnswers, questionTags);
     }
 
     public String getParentQuestionId() {
