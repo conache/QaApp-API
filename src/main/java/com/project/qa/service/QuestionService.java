@@ -28,7 +28,9 @@ public interface QuestionService {
 
     void voteQuestion(HttpServletRequest request, String questionId, boolean isUpVote);
 
-    void editQuestion(Question question);
+    void editQuestion(HttpServletRequest request, Map<String, Object> objectMap);
+
+    void editQuestion(HttpServletRequest request, Question question, List<String> tags);
 
     void appendTagToQuestion(Integer tagId);
 

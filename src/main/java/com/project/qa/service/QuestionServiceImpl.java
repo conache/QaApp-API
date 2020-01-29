@@ -9,7 +9,6 @@ import com.project.qa.model.elasticserach.ProposedEditQuestion;
 import com.project.qa.model.elasticserach.Question;
 import com.project.qa.model.elasticserach.QuestionAsResponse;
 import com.project.qa.repository.elasticsearch.ModelManager;
-import com.project.qa.utils.UserUtils;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.javatuples.Pair;
 import org.joda.time.DateTime;
@@ -157,15 +156,30 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public void editQuestion(Question question) {
-        Question originalQuestion = questionManager.getByID(question.getModelId());
-        question.setDownVotes(originalQuestion.getDownVotes());
-        question.setUpVotes(originalQuestion.getUpVotes());
-        question.setScore(originalQuestion.getScore());
-        question.setQuestionAuthorName(originalQuestion.getQuestionAuthorName());
-        question.setQuestionAuthorId(originalQuestion.getQuestionAuthorId());
-        question.setQuestionPublishDate(DateTime.now().toDate());
+    public void editQuestion(HttpServletRequest request, Map<String, Object> objectMap) {
+        UserRepresentation user = userService.findCurrentUser(request);
+        List<String> userGroups = getUserAttribute(user, GROUP);
+        String groupName = userGroups.get(0);
+
+        Object questionObject = objectMap.get("question");
+        Object proposedTagsObject = objectMap.get("proposedTags");
+        Question question = questionObject == null ? new Question() : objectMapper.convertValue(questionObject, Question.class);
+        List<String> proposedTags = proposedTagsObject == null ? new ArrayList<>() : objectMapper.convertValue(proposedTagsObject, new TypeReference<List<String>>() {
+        });
+        question.setQuestionPublishDate(new Date());
         questionManager.update(question);
+        saveProposedTags(question.getModelId(), groupName, proposedTags);
+    }
+
+    @Override
+    public void editQuestion(HttpServletRequest request, Question question, List<String> tags) {
+        UserRepresentation user = userService.findCurrentUser(request);
+        List<String> userGroups = getUserAttribute(user, GROUP);
+        String groupName = userGroups.get(0);
+
+        question.setQuestionPublishDate(new Date());
+        questionManager.update(question);
+        saveProposedTags(question.getModelId(), groupName, tags);
     }
 
     @Override

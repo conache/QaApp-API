@@ -1,9 +1,9 @@
 package com.project.qa.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.qa.config.KeycloakConfig;
 import com.project.qa.model.Tag;
 import com.project.qa.model.elasticserach.Question;
-import com.project.qa.repository.TagRepository;
 import org.javatuples.Pair;
 import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.admin.client.resource.RoleMappingResource;
@@ -20,13 +20,14 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import static com.project.qa.enums.Roles.ROLE_COMPANY_ADMINISTRATOR;
 import static com.project.qa.enums.Roles.ROLE_USER;
 import static com.project.qa.utils.UserUtils.*;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
 @Service
@@ -39,9 +40,10 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
     private final RoleService roleService;
     private final TagService tagService;
     private final QuestionService questionService;
+    private final ObjectMapper objectMapper;
 
     @Autowired
-    public CompanyAdministratorServiceImpl(KeycloakConfig keycloakConfig, ClientService clientService, UserService userService, GroupService groupService, RoleService roleService, TagService tagService, QuestionService questionService) {
+    public CompanyAdministratorServiceImpl(KeycloakConfig keycloakConfig, ClientService clientService, UserService userService, GroupService groupService, RoleService roleService, TagService tagService, QuestionService questionService, ObjectMapper objectMapper) {
         this.keycloakConfig = keycloakConfig;
         this.clientService = clientService;
         this.userService = userService;
@@ -49,6 +51,7 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
         this.roleService = roleService;
         this.tagService = tagService;
         this.questionService = questionService;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -147,7 +150,7 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
                 List<String> questionTags = question.getQuestionTags();
                 questionTags.remove(tag.getName());
                 question.setQuestionTags(questionTags);
-                questionService.editQuestion(question);
+                questionService.editQuestion(request, question, emptyList());
             }
         } while (remainingQuestionsToUpdate != 0);
         tagService.deleteTagById(tagId);

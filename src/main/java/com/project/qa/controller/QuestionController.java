@@ -57,8 +57,8 @@ public class QuestionController {
     }
 
     @PostMapping("/edit")
-    public void updateQuestion(@RequestBody Question question) {
-        questionService.editQuestion(question);
+    public void updateQuestion(HttpServletRequest request, Map<String, Object> questionValues) {
+        questionService.editQuestion(request, questionValues);
     }
 
     @GetMapping("/proposedEditQuestions")
@@ -67,7 +67,7 @@ public class QuestionController {
     }
 
     @PostMapping("/addProposedQuestion")
-    public void addProposedQuestion(HttpServletRequest request, @RequestBody Map<String,Object> questionValues) {
+    public void addProposedQuestion(HttpServletRequest request, @RequestBody Map<String, Object> questionValues) {
         questionService.addProposedQuestion(request, questionValues);
     }
 }
