@@ -34,6 +34,7 @@ public class QuestionServiceImpl implements QuestionService {
     private final ModelManager<Answer> answerManager;
     private final UserService userService;
     private final TagService tagService;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     public QuestionServiceImpl(@Qualifier("esHighLevelClient") RestHighLevelClient esClient, UserService userService, TagService tagService) {
@@ -77,7 +78,6 @@ public class QuestionServiceImpl implements QuestionService {
         int pageSize = pageable.getPageSize();
         int pageNumber = pageable.getPageNumber();
         return questionManager.getAll(pageSize, pageSize * (pageNumber - 1), userGroups.get(0));
-
     }
 
     @Override
@@ -112,23 +112,20 @@ public class QuestionServiceImpl implements QuestionService {
     public String addQuestion(HttpServletRequest request, Map<String, Object> questionRequest) {
         UserRepresentation userRepresentation = userService.findCurrentUser(request);
         List<String> userGroups = UserUtils.getUserAttribute(userRepresentation, GROUP);
-        ObjectMapper oMapper = new ObjectMapper();
-        Question question = null;
-        question = oMapper.convertValue(questionRequest, Question.class);
+
+        Question question = objectMapper.convertValue(questionRequest, Question.class);
         question.setGroupName(userGroups.get(0));
         question.setQuestionAuthorId(userRepresentation.getId());
         question.setQuestionAuthorName(userRepresentation.getFirstName() + " " + userRepresentation.getLastName());
         question.setQuestionPublishDate(new Date());
         String questionId = questionManager.index(question);
 
-        UserRepresentation currentUser = userService.findCurrentUser(request);
-        List<String> groups = getUserAttribute(currentUser, GROUP);
 
+        List<String> groups = getUserAttribute(userRepresentation, GROUP);
 
         if (questionRequest.get("proposedTags") != null) {
             List<String> proposedTags = (List<String>) questionRequest.get("proposedTags");
             for (String tagText : proposedTags) {
-
                 Tag tag = new Tag();
                 tag.setActive(false);
                 tag.setName(tagText);
@@ -142,9 +139,9 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public void voteQuestion(HttpServletRequest request, String questionId, boolean isUpVote) {
-
         Question question = questionManager.getByID(questionId);
         UserRepresentation userRepresentation = userService.findCurrentUser(request);
+
         if (isUpVote) {
             question.upVote(userRepresentation.getId());
         } else {
@@ -178,5 +175,4 @@ public class QuestionServiceImpl implements QuestionService {
         question.getQuestionTags().add(tag.getName());
         questionManager.update(question);
     }
-
 }

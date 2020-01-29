@@ -86,7 +86,6 @@ public class AnswerServiceImpl implements AnswerService {
 
     @Override
     public void updateAnswer(Answer answer) {
-
         Answer originalAnswer = answerManager.getByID(answer.getModelId(), answer.getParentId());
         answer.setDownVotes(originalAnswer.getDownVotes());
         answer.setUpVotes(originalAnswer.getUpVotes());
@@ -111,7 +110,6 @@ public class AnswerServiceImpl implements AnswerService {
 
     @Override
     public void markCorrectAnswer(String answerId, String questionId) {
-
         Answer correctAnswer = answerManager.getByID(answerId, questionId);
         Question question = questionManager.getByID(correctAnswer.getParentId());
 
@@ -121,9 +119,7 @@ public class AnswerServiceImpl implements AnswerService {
             answer.setCorrectAnswer(false);
             answerManager.update(answer, question.getModelId());
         }
-
         correctAnswer.setCorrectAnswer(true);
         answerManager.update(correctAnswer, correctAnswer.getParentId());
-
     }
 }
