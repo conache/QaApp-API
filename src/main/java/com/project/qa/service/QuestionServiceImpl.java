@@ -11,7 +11,6 @@ import com.project.qa.model.elasticserach.QuestionAsResponse;
 import com.project.qa.repository.elasticsearch.ModelManager;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.javatuples.Pair;
-import org.joda.time.DateTime;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -32,6 +31,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 public class QuestionServiceImpl implements QuestionService {
 
     private final ModelManager<Question> questionManager;
+    private final ModelManager<ProposedEditQuestion> proposedQuestionManager;
     private final ModelManager<Answer> answerManager;
     private final UserService userService;
     private final TagService tagService;
@@ -41,6 +41,7 @@ public class QuestionServiceImpl implements QuestionService {
     public QuestionServiceImpl(@Qualifier("esHighLevelClient") RestHighLevelClient esClient, UserService userService, TagService tagService) {
         this.questionManager = new ModelManager<>(Question::new, esClient);
         this.answerManager = new ModelManager<>(Answer::new, esClient);
+        this.proposedQuestionManager = new ModelManager<>(ProposedEditQuestion::new, esClient);
         this.userService = userService;
         this.tagService = tagService;
     }
@@ -197,10 +198,14 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public Pair<List<ProposedEditQuestion>, Long> findAllUserProposedQuestions(HttpServletRequest request, Pageable pageable) {
+    public Pair<List<ProposedEditQuestion>, Long> findAllUserProposedQuestions(HttpServletRequest request, Pageable pageable, String sortBy) {
         UserRepresentation user = userService.findCurrentUser(request);
+        List<String> userGroups = getUserAttribute(user, GROUP);
+        String groupName = userGroups.get(0);
+        int pageSize = pageable.getPageSize();
+        int pageNumber = pageable.getPageNumber();
 
-        return null;
+        return proposedQuestionManager.findByFieldAndExistField("questionAuthorId", user.getId(), "proposedAuthorId", pageSize, pageSize * (pageNumber - 1), groupName, sortBy);
     }
 
     @Override

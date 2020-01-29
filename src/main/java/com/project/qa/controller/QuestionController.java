@@ -57,13 +57,13 @@ public class QuestionController {
     }
 
     @PostMapping("/edit")
-    public void updateQuestion(HttpServletRequest request, @RequestBody  Map<String, Object> questionValues) {
+    public void updateQuestion(HttpServletRequest request, @RequestBody Map<String, Object> questionValues) {
         questionService.editQuestion(request, questionValues);
     }
 
-    @GetMapping("/proposedEditQuestions")
-    public Pair<List<ProposedEditQuestion>, Long> getProposedEditQuestions(HttpServletRequest request, Pageable pageable) {
-        return questionService.findAllUserProposedQuestions(request, pageable);
+    @GetMapping("/proposedQuestions")
+    public Pair<List<ProposedEditQuestion>, Long> getProposedEditQuestions(HttpServletRequest request, Pageable pageable, @RequestParam(required = false, defaultValue = "questionPublishDate") String sortBy) {
+        return questionService.findAllUserProposedQuestions(request, pageable, sortBy);
     }
 
     @PostMapping("/addProposedQuestion")

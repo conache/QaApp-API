@@ -1,12 +1,23 @@
 package com.project.qa.model.elasticserach;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.util.Date;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ProposedEditQuestion extends Question {
     private String proposedAuthorId;
     private Date proposedDate;
     private String proposedAuthorUsername;
 
+    public ProposedEditQuestion() {
+    }
+
+    public ProposedEditQuestion(String proposedAuthorId, Date proposedDate, String proposedAuthorUsername) {
+        this.proposedAuthorId = proposedAuthorId;
+        this.proposedDate = proposedDate;
+        this.proposedAuthorUsername = proposedAuthorUsername;
+    }
 
     public String getProposedAuthorId() {
         return proposedAuthorId;
