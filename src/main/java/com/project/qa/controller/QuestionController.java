@@ -57,7 +57,7 @@ public class QuestionController {
     }
 
     @PostMapping("/edit")
-    public void updateQuestion(HttpServletRequest request, Map<String, Object> questionValues) {
+    public void updateQuestion(HttpServletRequest request, @RequestBody  Map<String, Object> questionValues) {
         questionService.editQuestion(request, questionValues);
     }
 
