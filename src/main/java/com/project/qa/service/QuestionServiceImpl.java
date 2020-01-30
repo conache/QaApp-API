@@ -185,7 +185,6 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public void appendTagToQuestion(Integer tagId) {
-
         Tag tag = tagService.findTagById(tagId);
         Question question = questionManager.getByID(tag.getQuestionId());
         List<String> tags = question.getQuestionTags();
@@ -219,11 +218,13 @@ public class QuestionServiceImpl implements QuestionService {
         ProposedEditQuestion proposedEditQuestion = questionObject == null ? new ProposedEditQuestion() : objectMapper.convertValue(questionObject, ProposedEditQuestion.class);
         List<String> proposedTags = proposedTagsObject == null ? new ArrayList<>() : objectMapper.convertValue(proposedTagsObject, new TypeReference<List<String>>() {
         });
-        ProposedEditQuestion question = new ProposedEditQuestion(questionManager.getByID(proposedEditQuestion.getModelId()));
+        Question storedQuestion = questionManager.getByID(proposedEditQuestion.getModelId());
+        ProposedEditQuestion question = new ProposedEditQuestion(storedQuestion);
         question.setProposedAuthorId(user.getId());
         question.setProposedAuthorUsername(user.getUsername());
         question.setProposedDate(new Date());
         question.setQuestionText(proposedEditQuestion.getQuestionText());
+        question.setParentQuestionId(storedQuestion.getModelId());
         String id = proposedQuestionManager.index(question);
         saveProposedTags(id, groupName, proposedTags);
         return id;
@@ -234,15 +235,21 @@ public class QuestionServiceImpl implements QuestionService {
         proposedQuestionManager.delete(proposedQuestionId);
     }
 
-/*
     @Override
     public void acceptProposedQuestion(HttpServletRequest request, String proposedQuestionId) {
         ProposedEditQuestion proposedEditQuestion = proposedQuestionManager.getByID(proposedQuestionId);
-        proposedEditQuestion.get
+        Question question = questionManager.getByID(proposedEditQuestion.getParentQuestionId());
+        question.setQuestionText(proposedEditQuestion.getQuestionText());
+        String questionId = question.getModelId();
+        tagService.deleteTagsByQuestionId(questionId);
 
+        List<Tag> proposedQuestionTags = tagService.findAllByQuestionId(proposedQuestionId);
+        for (Tag tag : proposedQuestionTags) {
+            tag.setQuestionId(questionId);
+            tagService.updateTag(tag);
+        }
         proposedQuestionManager.delete(proposedQuestionId);
     }
- */
 
     @Override
     public ProposedEditQuestion findProposedEditQuestion(HttpServletRequest request, String proposedQuestionId) {

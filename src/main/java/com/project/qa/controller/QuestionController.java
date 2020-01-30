@@ -71,7 +71,7 @@ public class QuestionController {
         return questionService.addProposedQuestion(request, questionValues);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/deleteProposed")
     public void deleteProposedQuestion(HttpServletRequest request, @RequestParam String proposedQuestionId) {
         questionService.deleteProposedEditQuestionById(request, proposedQuestionId);
     }
@@ -79,5 +79,10 @@ public class QuestionController {
     @GetMapping("/findProposed")
     public ProposedEditQuestion findProposedQuestionById(HttpServletRequest request, @RequestParam String proposedQuestionId) {
         return questionService.findProposedEditQuestion(request, proposedQuestionId);
+    }
+
+    @PostMapping("/acceptProposed")
+    public void acceptProposedQuestion(HttpServletRequest request, @RequestParam String proposedQuestionId) {
+        questionService.acceptProposedQuestion(request, proposedQuestionId);
     }
 }

@@ -57,6 +57,11 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    public List<Tag> findAllByQuestionId(String questionId) {
+        return repository.findAllByQuestionId(questionId);
+    }
+
+    @Override
     public void deleteTagById(Integer tagId) {
         repository.deleteById(tagId);
     }
@@ -64,12 +69,20 @@ public class TagServiceImpl implements TagService {
     @Override
     public void acceptTag(Integer tagId) {
         Optional<Tag> tagOptional = repository.findById(tagId);
-        if(tagOptional.isPresent())
-        {
+        if (tagOptional.isPresent()) {
             Tag tag = tagOptional.get();
             tag.setActive(true);
             repository.save(tag);
         }
+    }
 
+    @Override
+    public void deleteTagsByQuestionId(String modelId) {
+        repository.deleteAllByQuestionId(modelId);
+    }
+
+    @Override
+    public void updateTag(Tag tag) {
+        repository.save(tag);
     }
 }

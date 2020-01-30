@@ -40,5 +40,7 @@ public interface QuestionService {
 
     void deleteProposedEditQuestionById(HttpServletRequest request, String proposedQuestionId);
 
+    void acceptProposedQuestion(HttpServletRequest request, String proposedQuestionId);
+
     ProposedEditQuestion findProposedEditQuestion(HttpServletRequest request, String proposedQuestionId);
 }
