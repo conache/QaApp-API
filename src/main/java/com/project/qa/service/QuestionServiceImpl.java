@@ -219,7 +219,7 @@ public class QuestionServiceImpl implements QuestionService {
         ProposedEditQuestion proposedEditQuestion = questionObject == null ? new ProposedEditQuestion() : objectMapper.convertValue(questionObject, ProposedEditQuestion.class);
         List<String> proposedTags = proposedTagsObject == null ? new ArrayList<>() : objectMapper.convertValue(proposedTagsObject, new TypeReference<List<String>>() {
         });
-        ProposedEditQuestion question = (ProposedEditQuestion) questionManager.getByID(proposedEditQuestion.getModelId());
+        ProposedEditQuestion question = new ProposedEditQuestion(questionManager.getByID(proposedEditQuestion.getModelId()));
         question.setProposedAuthorId(user.getId());
         question.setProposedAuthorUsername(user.getUsername());
         question.setProposedDate(new Date());

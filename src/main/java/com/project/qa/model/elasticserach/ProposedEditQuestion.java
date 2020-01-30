@@ -13,7 +13,6 @@ public class ProposedEditQuestion extends Question {
     private String parentQuestionId;
 
     public ProposedEditQuestion() {
-        super();
     }
 
     public ProposedEditQuestion(String proposedAuthorId, Date proposedDate, String proposedAuthorUsername, String parentQuestionId) {
@@ -23,8 +22,9 @@ public class ProposedEditQuestion extends Question {
         this.parentQuestionId = parentQuestionId;
     }
 
-    public ProposedEditQuestion(String questionAuthorId, String groupName, String questionTitle, String questionText, Date questionPublishDate, List<Answer> questionsAnswers, List<String> questionTags) {
-        super(questionAuthorId, groupName, questionTitle, questionText, questionPublishDate, questionsAnswers, questionTags);
+
+    public ProposedEditQuestion(Question question) {
+        super(question.getQuestionAuthorId(), question.getQuestionAuthorName(), question.getGroupName(), question.getQuestionTitle(), question.getQuestionText(), question.getQuestionPublishDate(), question.getNoAnswers(), question.getQuestionsAnswers(), question.getQuestionTags());
     }
 
     public String getParentQuestionId() {

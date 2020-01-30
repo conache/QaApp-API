@@ -78,10 +78,21 @@ public class Question extends ModelBase {
     public Question(String questionAuthorId, String groupName, String questionTitle, String questionText, Date questionPublishDate, List<Answer> questionsAnswers, List<String> questionTags) {
         this.questionAuthorId = questionAuthorId;
         this.groupName = groupName;
-
         this.questionTitle = questionTitle;
         this.questionText = questionText;
         this.questionPublishDate = questionPublishDate;
+        this.questionsAnswers = questionsAnswers;
+        this.questionTags = questionTags;
+    }
+
+    public Question(String questionAuthorId, String questionAuthorName, String groupName, String questionTitle, String questionText, Date questionPublishDate, int noAnswers, List<Answer> questionsAnswers, List<String> questionTags) {
+        this.questionAuthorId = questionAuthorId;
+        this.questionAuthorName = questionAuthorName;
+        this.groupName = groupName;
+        this.questionTitle = questionTitle;
+        this.questionText = questionText;
+        this.questionPublishDate = questionPublishDate;
+        this.noAnswers = noAnswers;
         this.questionsAnswers = questionsAnswers;
         this.questionTags = questionTags;
     }
