@@ -102,9 +102,10 @@ public class AnswerServiceImpl implements AnswerService {
     public void deleteAnswer(String answerId, String questionId) {
         answerManager.delete(answerId, questionId);
 
-        Question q = questionManager.getByID(questionId);
-        q.setNoAnswers(q.getNoAnswers() - 1);
-        questionManager.update(q);
+        Question question = questionManager.getByID(questionId);
+        int noAnswers = question.getNoAnswers();
+        question.setNoAnswers(noAnswers - 1);
+        questionManager.update(question);
 
     }
 
@@ -115,9 +116,12 @@ public class AnswerServiceImpl implements AnswerService {
 
         answerManager.loadAnswers(question);
 
-        for (Answer answer : question.getQuestionsAnswers()) {
-            answer.setCorrectAnswer(false);
-            answerManager.update(answer, question.getModelId());
+        List<Answer> questionsAnswers = question.getQuestionsAnswers();
+        for (Answer answer : questionsAnswers) {
+            if (answer.isCorrectAnswer()) {
+                answer.setCorrectAnswer(false);
+                answerManager.update(answer, question.getModelId());
+            }
         }
         correctAnswer.setCorrectAnswer(true);
         answerManager.update(correctAnswer, correctAnswer.getParentId());

@@ -5,6 +5,7 @@ import com.project.qa.model.elasticserach.Question;
 import com.project.qa.service.QuestionService;
 import com.project.qa.service.TagService;
 import com.project.qa.service.UserService;
+import com.project.qa.utils.SNSMessageSender;
 import org.javatuples.Pair;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -75,5 +76,10 @@ public class UserController {
     @GetMapping("/questions")
     public Pair<List<Question>, Long> userQuestions(HttpServletRequest request, Pageable page, @RequestParam(required = false, defaultValue = "questionPublishDate") String sortBy) {
         return questionService.findCurrentUserQuestions(request, page, sortBy);
+    }
+
+    @GetMapping("/testSNS")
+    public String testSNS() {
+        return SNSMessageSender.test();
     }
 }

@@ -77,7 +77,7 @@ public class QuestionController {
     }
 
     @GetMapping("/findProposed")
-    public ProposedEditQuestion findProposedQuestionById(HttpServletRequest request, @RequestParam String proposedQuestionId) {
+    public Map<String, Object> findProposedQuestionById(HttpServletRequest request, @RequestParam String proposedQuestionId) {
         return questionService.findProposedEditQuestion(request, proposedQuestionId);
     }
 

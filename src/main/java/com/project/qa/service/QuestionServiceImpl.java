@@ -18,10 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.project.qa.utils.UserUtils.GROUP;
 import static com.project.qa.utils.UserUtils.getUserAttribute;
@@ -232,6 +229,7 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public void deleteProposedEditQuestionById(HttpServletRequest request, String proposedQuestionId) {
+        tagService.deleteTagsByQuestionId(proposedQuestionId);
         proposedQuestionManager.delete(proposedQuestionId);
     }
 
@@ -252,7 +250,12 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public ProposedEditQuestion findProposedEditQuestion(HttpServletRequest request, String proposedQuestionId) {
-        return proposedQuestionManager.getByID(proposedQuestionId);
+    public Map<String, Object> findProposedEditQuestion(HttpServletRequest request, String proposedQuestionId) {
+        Map<String, Object> result = new HashMap<>();
+
+        ProposedEditQuestion proposedEditQuestion = proposedQuestionManager.getByID(proposedQuestionId);
+        result.put("question", questionManager.getByID(proposedEditQuestion.getParentQuestionId()));
+        result.put("proposal", proposedEditQuestion);
+        return result;
     }
 }

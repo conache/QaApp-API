@@ -42,5 +42,5 @@ public interface QuestionService {
 
     void acceptProposedQuestion(HttpServletRequest request, String proposedQuestionId);
 
-    ProposedEditQuestion findProposedEditQuestion(HttpServletRequest request, String proposedQuestionId);
+    Map<String, Object> findProposedEditQuestion(HttpServletRequest request, String proposedQuestionId);
 }

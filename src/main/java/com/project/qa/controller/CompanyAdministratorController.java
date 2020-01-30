@@ -101,7 +101,6 @@ public class CompanyAdministratorController {
         return companyAdministratorService.addTag(request, tag);
     }
 
-
     @PutMapping("/acceptTag")
     public void acceptTag(HttpServletRequest request, @RequestParam Integer tagId) {
         companyAdministratorService.acceptTag(request, tagId);
