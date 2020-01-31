@@ -85,7 +85,7 @@ public class QuestionServiceImpl implements QuestionService {
         List<String> userGroups = getUserAttribute(userRepresentation, GROUP);
         int pageSize = pageable.getPageSize();
         int pageNumber = pageable.getPageNumber();
-        return questionManager.findByField("questionAuthorId", userRepresentation.getId(), pageSize, pageSize * (pageNumber - 1), userGroups.get(0), sortBy);
+        return questionManager.findByFieldAndNotExistField("questionAuthorId", userRepresentation.getId(), "parentQuestionId", pageSize, pageSize * (pageNumber - 1), userGroups.get(0), sortBy);
     }
 
     @Override

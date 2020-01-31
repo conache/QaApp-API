@@ -3,7 +3,6 @@ package com.project.qa.model.elasticserach;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.Date;
-import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ProposedEditQuestion extends Question {
