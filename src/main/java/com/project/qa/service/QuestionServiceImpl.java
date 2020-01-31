@@ -238,6 +238,7 @@ public class QuestionServiceImpl implements QuestionService {
         ProposedEditQuestion proposedEditQuestion = proposedQuestionManager.getByID(proposedQuestionId);
         Question question = questionManager.getByID(proposedEditQuestion.getParentQuestionId());
         question.setQuestionText(proposedEditQuestion.getQuestionText());
+        questionManager.update(question);
         String questionId = question.getModelId();
         tagService.deleteTagsByQuestionId(questionId);
 
