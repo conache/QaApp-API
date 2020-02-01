@@ -85,7 +85,8 @@ public class QuestionServiceImpl implements QuestionService {
         List<String> userGroups = getUserAttribute(userRepresentation, GROUP);
         int pageSize = pageable.getPageSize();
         int pageNumber = pageable.getPageNumber();
-        return questionManager.findByFieldAndNotExistField("questionAuthorId", userRepresentation.getId(), "parentQuestionId", pageSize, pageSize * (pageNumber - 1), userGroups.get(0), sortBy);
+        //return questionManager.findByFieldAndNotExistField("questionAuthorId", userRepresentation.getId(), "parentQuestionId", pageSize, pageSize * (pageNumber - 1), userGroups.get(0), sortBy);
+        return questionManager.findByField("questionAuthorId",userRepresentation.getId(),pageSize, pageSize * (pageNumber - 1), userGroups.get(0), sortBy);
     }
 
     @Override
@@ -200,8 +201,7 @@ public class QuestionServiceImpl implements QuestionService {
         String groupName = userGroups.get(0);
         int pageSize = pageable.getPageSize();
         int pageNumber = pageable.getPageNumber();
-
-        return proposedQuestionManager.findByFieldAndExistField("questionAuthorId", user.getId(), "proposedAuthorId", pageSize, pageSize * (pageNumber - 1), groupName, sortBy);
+        return proposedQuestionManager.findByField("questionAuthorId", user.getId(),pageSize, pageSize * (pageNumber - 1), groupName, sortBy);
     }
 
     @Override
@@ -238,15 +238,17 @@ public class QuestionServiceImpl implements QuestionService {
         ProposedEditQuestion proposedEditQuestion = proposedQuestionManager.getByID(proposedQuestionId);
         Question question = questionManager.getByID(proposedEditQuestion.getParentQuestionId());
         question.setQuestionText(proposedEditQuestion.getQuestionText());
+        question.setQuestionTags(proposedEditQuestion.getQuestionTags());
         questionManager.update(question);
-        String questionId = question.getModelId();
-        tagService.deleteTagsByQuestionId(questionId);
 
-        List<Tag> proposedQuestionTags = tagService.findAllByQuestionId(proposedQuestionId);
-        for (Tag tag : proposedQuestionTags) {
-            tag.setQuestionId(questionId);
-            tagService.updateTag(tag);
-        }
+//        String questionId = question.getModelId();
+//        tagService.deleteTagsByQuestionId(questionId);
+//
+//        List<Tag> proposedQuestionTags = tagService.findAllByQuestionId(proposedQuestionId);
+//        for (Tag tag : proposedQuestionTags) {
+//            tag.setQuestionId(questionId);
+//            tagService.updateTag(tag);
+//        }
         proposedQuestionManager.delete(proposedQuestionId);
     }
 

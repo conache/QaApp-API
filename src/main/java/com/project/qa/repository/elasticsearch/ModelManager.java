@@ -97,10 +97,6 @@ public class ModelManager<T extends ModelBase> {
     }
 
     public Pair<List<T>, Long> getAll(int size, int from, String groupName, String sortBy) {
-//        ArrayList<QueryBuilder> queryBuilders = new ArrayList<>();
-//        queryBuilders.add(QueryBuilders.termsQuery("groupName.keyword", groupName));
-//        queryBuilders.add(QueryBuilders.termQuery("type.keyword", this.supplier.getClass().getName()));
-
         QueryBuilder boolQueryBuilder = new BoolQueryBuilder().must(QueryBuilders.termsQuery("groupName.keyword", groupName)).must(QueryBuilders.termQuery("modelType.keyword", this.supplier.get().getModelType()));
         return getModelsFromFilterRequest(boolQueryBuilder, size, from, sortBy);
     }
@@ -182,25 +178,8 @@ public class ModelManager<T extends ModelBase> {
     public Pair<List<T>, Long> findByField(String field, Object value, int size, int from, String groupName, String sortBy) {
         field += ".keyword";
         QueryBuilder boolQueryBuilder = new BoolQueryBuilder().filter(QueryBuilders.termQuery(field, value.toString()))
-                .must(QueryBuilders.termsQuery("groupName.keyword", groupName));
-        return getModelsFromFilterRequest(boolQueryBuilder, size, from, sortBy);
-    }
-
-    public Pair<List<T>, Long> findByFieldAndExistField(String field, Object value, String existField, int size, int from, String groupName, String sortBy) {
-        field += ".keyword";
-        QueryBuilder boolQueryBuilder = new BoolQueryBuilder()
-                .filter(QueryBuilders.termQuery(field, value.toString()))
-                .filter(QueryBuilders.existsQuery(existField))
-                .must(QueryBuilders.termsQuery("groupName.keyword", groupName));
-        return getModelsFromFilterRequest(boolQueryBuilder, size, from, sortBy);
-    }
-
-    public Pair<List<T>, Long> findByFieldAndNotExistField(String field, Object value, String notExistField, int size, int from, String groupName, String sortBy) {
-        field += ".keyword";
-        QueryBuilder boolQueryBuilder = new BoolQueryBuilder()
-                .filter(QueryBuilders.termQuery(field, value.toString()))
-                .filter(new BoolQueryBuilder().mustNot(QueryBuilders.existsQuery(notExistField)))
-                .must(QueryBuilders.termsQuery("groupName.keyword", groupName));
+                .must(QueryBuilders.termsQuery("groupName.keyword", groupName))
+                .must(QueryBuilders.termQuery("modelType.keyword", this.supplier.get().getModelType()));
         return getModelsFromFilterRequest(boolQueryBuilder, size, from, sortBy);
     }
 
@@ -214,18 +193,6 @@ public class ModelManager<T extends ModelBase> {
         field += ".keyword";
         QueryBuilder boolQueryBuilder = new BoolQueryBuilder()
                 .filter(QueryBuilders.termsQuery(field, terms))
-                .must(QueryBuilders.termsQuery("groupName.keyword", groupName))
-                .must(QueryBuilders.termQuery("modelType.keyword", this.supplier.get().getModelType()));
-        return getModelsFromFilterRequest(boolQueryBuilder, size, from, sortBy);
-
-    }
-
-    public Pair<List<T>, Long> filterByFieldAndNotExist(String field, List<String> terms, String notExistField, int size, int from, String groupName, String sortBy) {
-
-        field += ".keyword";
-        QueryBuilder boolQueryBuilder = new BoolQueryBuilder()
-                .filter(QueryBuilders.termsQuery(field, terms))
-                .must(new BoolQueryBuilder().mustNot(QueryBuilders.existsQuery(notExistField)))
                 .must(QueryBuilders.termsQuery("groupName.keyword", groupName))
                 .must(QueryBuilders.termQuery("modelType.keyword", this.supplier.get().getModelType()));
         return getModelsFromFilterRequest(boolQueryBuilder, size, from, sortBy);
