@@ -1,6 +1,13 @@
 version: 0.2
 
 phases:
+  install:
+    commands:
+      # install Maven
+      - echo Installing Maven...
+      - install maven
+      # check Maven version
+      - mvn -version
   pre_build:
     commands:
       - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
@@ -8,6 +15,8 @@ phases:
       - IMAGE_TAG=latest
   build:
     commands:
+      - echo Running maven install in order to add application dependencies...
+      - mvn install
       - echo Building the Docker image...
       - docker build -t $REPOSITORY_URI:$IMAGE_TAG .
   post_build:
