@@ -201,7 +201,7 @@ public class ModelManager<T extends ModelBase> {
 
     public Pair<List<T>, Long> matchLikeThis(String field, String value, int size, int from, String groupName) {
         QueryBuilder boolQueryBuilder = QueryBuilders.boolQuery().must(QueryBuilders.matchQuery(field, value.toString())).must(QueryBuilders.termsQuery("groupName.keyword", groupName)).must(QueryBuilders.termQuery("modelType.keyword", this.supplier.get().getModelType()));
-        return getModelsFromFilterRequest(boolQueryBuilder, size, from, supplier.get().getSortBy());
+        return getModelsFromFilterRequest(boolQueryBuilder, size, from, "_score");
     }
 
     public void delete(T model) {
