@@ -1,0 +1,25 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      # install Maven
+      - echo Installing Maven...
+      - apt install -y maven
+      # check Maven version
+      - mvn -version
+  pre_build:
+    commands:
+      - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
+      - REPOSITORY_URI=972312342870.dkr.ecr.us-east-2.amazonaws.com/qa-platform
+      - IMAGE_TAG=latest
+  build:
+    commands:
+      - echo Running maven install in order to add application dependencies...
+      - mvn install
+      - echo Building the Docker image...
+      - docker build -t $REPOSITORY_URI:$IMAGE_TAG .
+  post_build:
+    commands:
+      - echo Pushing the Docker image...
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
