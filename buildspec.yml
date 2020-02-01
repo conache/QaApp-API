@@ -5,7 +5,7 @@ phases:
     commands:
       # install Maven
       - echo Installing Maven...
-      - install maven
+      - apt install maven
       # check Maven version
       - mvn -version
   pre_build:
