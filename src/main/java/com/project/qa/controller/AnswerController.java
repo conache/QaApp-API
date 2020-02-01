@@ -38,8 +38,8 @@ public class AnswerController {
     }
 
     @PostMapping("/update")
-    public void updateAnswer(@RequestBody Answer answer) {
-        answerService.updateAnswer(answer);
+    public void updateAnswer(HttpServletRequest request, @RequestBody Answer answer) {
+        answerService.updateAnswer(request, answer);
     }
 
     @DeleteMapping("/delete")
