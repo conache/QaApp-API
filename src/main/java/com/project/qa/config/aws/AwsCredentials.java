@@ -14,6 +14,7 @@ public class AwsCredentials {
     private String id;
     private String accessKey;
     private String secretKey;
+    private String awsSQSURL;
 
     public String getServiceName() {
         return serviceName;
@@ -69,5 +70,13 @@ public class AwsCredentials {
 
     public void setSecretKey(String secretKey) {
         this.secretKey = secretKey;
+    }
+
+    public String getAwsSQSURL() {
+        return awsSQSURL;
+    }
+
+    public void setAwsSQSURL(String awsSQSURL) {
+        this.awsSQSURL = awsSQSURL;
     }
 }

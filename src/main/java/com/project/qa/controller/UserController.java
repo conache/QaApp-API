@@ -4,9 +4,7 @@ import com.amazonaws.services.iot.client.AWSIotException;
 import com.project.qa.config.AwsIoTConfig;
 import com.project.qa.model.Tag;
 import com.project.qa.model.elasticserach.Question;
-import com.project.qa.service.QuestionService;
-import com.project.qa.service.TagService;
-import com.project.qa.service.UserService;
+import com.project.qa.service.*;
 import com.project.qa.utils.SNSMessageSender;
 import org.javatuples.Pair;
 import org.keycloak.representations.idm.GroupRepresentation;
@@ -49,10 +47,6 @@ public class UserController {
         return userService.getUserToken(request);
     }
 
-/*    @PutMapping("/edit")
-    public void editUser(HttpServletRequest request, @RequestBody UserRepresentation userRepresentation) {
-        userService.editUser(request, userRepresentation);
-    }*/
 
     @PostMapping("/addTag")
     public Integer addTag(HttpServletRequest request, @RequestBody Tag tag) {
@@ -77,10 +71,5 @@ public class UserController {
     @GetMapping("/questions")
     public Pair<List<Question>, Long> userQuestions(HttpServletRequest request, Pageable page, @RequestParam(required = false, defaultValue = "questionPublishDate") String sortBy) {
         return questionService.findCurrentUserQuestions(request, page, sortBy);
-    }
-
-    @GetMapping("/testSNS")
-    public void testSNS() throws AWSIotException {
-        AwsIoTConfig.test();
     }
 }

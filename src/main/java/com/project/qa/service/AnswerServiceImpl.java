@@ -1,11 +1,20 @@
 package com.project.qa.service;
 
+import com.amazonaws.auth.AWS4Signer;
+import com.amazonaws.auth.AWSCredentialsProvider;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
+import com.project.qa.config.aws.AWSRequestSigningApacheInterceptor;
+import com.project.qa.config.aws.AwsCredentials;
 import com.project.qa.enums.elasticsearch.VoteStatus;
 import com.project.qa.model.elasticserach.Answer;
 import com.project.qa.model.elasticserach.AnswerAsResponse;
 import com.project.qa.model.elasticserach.Question;
 import com.project.qa.repository.elasticsearch.ModelManager;
-import com.project.qa.utils.EncryptUtils;
+import org.apache.http.HttpHost;
+import org.apache.http.HttpRequestInterceptor;
+import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.javatuples.Pair;
 import org.joda.time.DateTime;
@@ -14,15 +23,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import static com.project.qa.utils.EncryptUtils.*;
 import static com.project.qa.utils.UserUtils.GROUP;
 import static com.project.qa.utils.UserUtils.getUserAttribute;
+
+import com.amazonaws.services.sqs.model.SendMessageRequest;
+import com.amazonaws.services.sqs.AmazonSQS;
+
 
 @Service
 public class AnswerServiceImpl implements AnswerService {
@@ -30,12 +43,15 @@ public class AnswerServiceImpl implements AnswerService {
     private final ModelManager<Answer> answerManager;
     private final ModelManager<Question> questionManager;
     private final UserService userService;
+    private final AwsCredentials credentials;
+
 
     @Autowired
-    public AnswerServiceImpl(@Qualifier("esHighLevelClient") RestHighLevelClient esClient, UserService userService) {
+    public AnswerServiceImpl(@Qualifier("esHighLevelClient") RestHighLevelClient esClient, UserService userService, AwsCredentials credentials) {
         this.answerManager = new ModelManager<>(Answer::new, esClient);
         this.questionManager = new ModelManager<>(Question::new, esClient);
         this.userService = userService;
+        this.credentials = credentials;
     }
 
     @Override
@@ -84,7 +100,28 @@ public class AnswerServiceImpl implements AnswerService {
             q.setNoAnswers(q.getNoAnswers() + 1);
             questionManager.update(q);
         }
+
+        publishNotification(answer.getParentId());
         return answerId;
+    }
+
+    private void publishNotification(String questionId) {
+        BasicAWSCredentials awsCredentials = new BasicAWSCredentials(credentials.getAccessKey(), credentials.getSecretKey());
+        AWSStaticCredentialsProvider credentialsProvider = new AWSStaticCredentialsProvider(awsCredentials);
+
+        AmazonSQS sqs = AmazonSQSClientBuilder.standard().withCredentials(credentialsProvider).withRegion(credentials.getRegion()).build();
+        HashMap<String,Object> result = new HashMap<>();
+        result.put("questionId",questionId);
+        List<String> list = new ArrayList<>();
+        result.put("userIds",list);
+
+        SendMessageRequest send_msg_request = new SendMessageRequest()
+                .withQueueUrl(credentials.getAwsSQSURL())
+                .withMessageBody(result.toString())
+                .withMessageGroupId("1")
+                .withMessageDeduplicationId("1");
+
+        sqs.sendMessage(send_msg_request);
     }
 
     @Override

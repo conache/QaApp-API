@@ -16,10 +16,10 @@ import org.springframework.stereotype.Component;
 public class AWSElasticsearchSettings {
 
     private final AwsCredentials credentials;
-
     @Autowired
     public AWSElasticsearchSettings(AwsCredentials credentials) {
         this.credentials = credentials;
+
     }
 
     @Bean
