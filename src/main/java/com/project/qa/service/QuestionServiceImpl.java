@@ -9,6 +9,7 @@ import com.project.qa.model.elasticserach.ProposedEditQuestion;
 import com.project.qa.model.elasticserach.Question;
 import com.project.qa.model.elasticserach.QuestionAsResponse;
 import com.project.qa.repository.elasticsearch.ModelManager;
+import com.project.qa.utils.EncryptUtils;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.javatuples.Pair;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -20,6 +21,8 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
+import static com.project.qa.utils.EncryptUtils.decrypt;
+import static com.project.qa.utils.EncryptUtils.encrypt;
 import static com.project.qa.utils.UserUtils.GROUP;
 import static com.project.qa.utils.UserUtils.getUserAttribute;
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -54,6 +57,7 @@ public class QuestionServiceImpl implements QuestionService {
         if (question.getDownVotes().contains(userRepresentation.getId())) {
             status = VoteStatus.DownVote;
         }
+        decrypt(question, question.getGroupName());
         return new QuestionAsResponse(question, status);
     }
 
@@ -76,7 +80,9 @@ public class QuestionServiceImpl implements QuestionService {
         List<String> userGroups = getUserAttribute(userRepresentation, GROUP);
         int pageSize = pageable.getPageSize();
         int pageNumber = pageable.getPageNumber();
-        return questionManager.getAll(pageSize, pageSize * (pageNumber - 1), userGroups.get(0));
+        Pair<List<Question>, Long>  result = questionManager.getAll(pageSize, pageSize * (pageNumber - 1), userGroups.get(0));
+        decrypt(result.getValue0(), userGroups.get(0));
+        return  result;
     }
 
     @Override
@@ -85,8 +91,9 @@ public class QuestionServiceImpl implements QuestionService {
         List<String> userGroups = getUserAttribute(userRepresentation, GROUP);
         int pageSize = pageable.getPageSize();
         int pageNumber = pageable.getPageNumber();
-        //return questionManager.findByFieldAndNotExistField("questionAuthorId", userRepresentation.getId(), "parentQuestionId", pageSize, pageSize * (pageNumber - 1), userGroups.get(0), sortBy);
-        return questionManager.findByField("questionAuthorId",userRepresentation.getId(),pageSize, pageSize * (pageNumber - 1), userGroups.get(0), sortBy);
+        Pair<List<Question>, Long>  result =  questionManager.findByField("questionAuthorId",userRepresentation.getId(),pageSize, pageSize * (pageNumber - 1), userGroups.get(0), sortBy);
+        decrypt(result.getValue0(), userGroups.get(0));
+        return  result;
     }
 
     @Override
@@ -95,17 +102,25 @@ public class QuestionServiceImpl implements QuestionService {
         List<String> userGroups = getUserAttribute(userRepresentation, GROUP);
         int pageSize = pageable.getPageSize();
         int pageNumber = pageable.getPageNumber();
+        Pair<List<Question>, Long>  result = null;
         if (!isEmpty(tags)) {
-            return questionManager.filterByField("questionTags", tags, pageSize, pageSize * (pageNumber - 1), userGroups.get(0), sortBy);
+            result = questionManager.filterByField("questionTags", tags, pageSize, pageSize * (pageNumber - 1), userGroups.get(0), sortBy);
         }
-        return questionManager.getAll(pageSize, pageSize * (pageNumber - 1), userGroups.get(0), sortBy);
+        else
+        {
+            result = questionManager.getAll(pageSize, pageSize * (pageNumber - 1), userGroups.get(0), sortBy);
+        }
+        decrypt(result.getValue0(), userGroups.get(0));
+        return  result;
     }
 
     @Override
     public List<Question> search(HttpServletRequest request, String text, int maxSize) {
         UserRepresentation userRepresentation = userService.findCurrentUser(request);
         List<String> userGroups = getUserAttribute(userRepresentation, GROUP);
-        return questionManager.matchLikeThis("questionTitle", text, maxSize, 0, userGroups.get(0)).getValue0();
+        List<Question> result = questionManager.matchLikeThis("questionTitle", text, maxSize, 0, userGroups.get(0)).getValue0();
+        decrypt(result,userGroups.get(0));
+        return  result;
     }
 
     @Override
@@ -119,6 +134,7 @@ public class QuestionServiceImpl implements QuestionService {
         question.setQuestionAuthorId(userRepresentation.getId());
         question.setQuestionAuthorName(userRepresentation.getFirstName() + " " + userRepresentation.getLastName());
         question.setQuestionPublishDate(new Date());
+        encrypt(question, groupName);
         String questionId = questionManager.index(question);
 
 
@@ -166,16 +182,17 @@ public class QuestionServiceImpl implements QuestionService {
         List<String> proposedTags = proposedTagsObject == null ? new ArrayList<>() : objectMapper.convertValue(proposedTagsObject, new TypeReference<List<String>>() {
         });
         question.setQuestionPublishDate(new Date());
+        encrypt(question, groupName);
         questionManager.update(question);
         saveProposedTags(question.getModelId(), groupName, proposedTags);
     }
 
+    
     @Override
     public void editQuestion(HttpServletRequest request, Question question, List<String> tags) {
         UserRepresentation user = userService.findCurrentUser(request);
         List<String> userGroups = getUserAttribute(user, GROUP);
         String groupName = userGroups.get(0);
-
         question.setQuestionPublishDate(new Date());
         questionManager.update(question);
         saveProposedTags(question.getModelId(), groupName, tags);
@@ -201,7 +218,9 @@ public class QuestionServiceImpl implements QuestionService {
         String groupName = userGroups.get(0);
         int pageSize = pageable.getPageSize();
         int pageNumber = pageable.getPageNumber();
-        return proposedQuestionManager.findByField("questionAuthorId", user.getId(),pageSize, pageSize * (pageNumber - 1), groupName, sortBy);
+        Pair<List<ProposedEditQuestion>, Long> result =  proposedQuestionManager.findByField("questionAuthorId", user.getId(),pageSize, pageSize * (pageNumber - 1), groupName, sortBy);
+        decrypt(result.getValue0(), groupName);
+        return  result;
     }
 
     @Override
@@ -222,6 +241,7 @@ public class QuestionServiceImpl implements QuestionService {
         question.setProposedDate(new Date());
         question.setQuestionText(proposedEditQuestion.getQuestionText());
         question.setParentQuestionId(storedQuestion.getModelId());
+        encrypt(question,groupName);
         String id = proposedQuestionManager.index(question);
         saveProposedTags(id, groupName, proposedTags);
         return id;
@@ -240,15 +260,6 @@ public class QuestionServiceImpl implements QuestionService {
         question.setQuestionText(proposedEditQuestion.getQuestionText());
         question.setQuestionTags(proposedEditQuestion.getQuestionTags());
         questionManager.update(question);
-
-//        String questionId = question.getModelId();
-//        tagService.deleteTagsByQuestionId(questionId);
-//
-//        List<Tag> proposedQuestionTags = tagService.findAllByQuestionId(proposedQuestionId);
-//        for (Tag tag : proposedQuestionTags) {
-//            tag.setQuestionId(questionId);
-//            tagService.updateTag(tag);
-//        }
         proposedQuestionManager.delete(proposedQuestionId);
     }
 

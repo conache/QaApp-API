@@ -7,8 +7,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.project.qa.model.elasticserach.Answer;
 import com.project.qa.model.elasticserach.ModelBase;
 import com.project.qa.model.elasticserach.Question;
-import org.apache.lucene.queryparser.xml.builders.BooleanQueryBuilder;
-import org.apache.lucene.search.BooleanQuery;
+import com.project.qa.utils.EncryptUtils;
 import org.javatuples.Pair;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
@@ -62,6 +61,7 @@ public class ModelManager<T extends ModelBase> {
         this.esClient = esClient;
     }
 
+
     public T getByID(String id) {
 
         GetRequest getRequest = new GetRequest(supplier.get().getIndex().toString(), id);
@@ -107,6 +107,7 @@ public class ModelManager<T extends ModelBase> {
         IndexRequest indexRequest = new IndexRequest().
                 index(t.getIndex().toString()).
                 source(modelMap);
+
         if (t instanceof Answer) {
             Answer answerModel = (Answer) t;
             indexRequest.routing(answerModel.getParentId());
@@ -152,6 +153,7 @@ public class ModelManager<T extends ModelBase> {
         }
 
     }
+
 
 
     public List<T> moreLikeThis(String[] fieldsToSearch, String text) {

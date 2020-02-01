@@ -31,7 +31,7 @@ public interface CompanyAdministratorService {
 
     Page<Tag> findProposedTags(HttpServletRequest request, Pageable pageable);
 
-    void deleteProposedTagById(HttpServletRequest request, Integer tagId);
+    void deleteTag(HttpServletRequest request, Integer tagId);
 
     void editTag(Tag tag);
 

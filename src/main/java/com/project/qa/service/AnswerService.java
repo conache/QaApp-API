@@ -17,7 +17,7 @@ public interface AnswerService {
 
     void addVote(HttpServletRequest request,String answerId, String questionId, boolean isUpVote);
 
-    void updateAnswer(Answer answer);
+    void updateAnswer(HttpServletRequest request, Answer answer);
 
     void deleteAnswer(String answerId, String questionId);
 

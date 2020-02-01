@@ -5,6 +5,7 @@ import com.project.qa.model.elasticserach.Answer;
 import com.project.qa.model.elasticserach.AnswerAsResponse;
 import com.project.qa.model.elasticserach.Question;
 import com.project.qa.repository.elasticsearch.ModelManager;
+import com.project.qa.utils.EncryptUtils;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.javatuples.Pair;
 import org.joda.time.DateTime;
@@ -18,6 +19,10 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static com.project.qa.utils.EncryptUtils.*;
+import static com.project.qa.utils.UserUtils.GROUP;
+import static com.project.qa.utils.UserUtils.getUserAttribute;
 
 @Service
 public class AnswerServiceImpl implements AnswerService {
@@ -51,6 +56,11 @@ public class AnswerServiceImpl implements AnswerService {
             }
             answers.add(new AnswerAsResponse(answer, status));
         }
+        UserRepresentation user = userService.findCurrentUser(request);
+        List<String> userGroups = getUserAttribute(user, GROUP);
+        String groupName = userGroups.get(0);
+
+        decrypt(answers,groupName);
         return new Pair<>(answers, qResult.getValue1());
 
     }
@@ -62,6 +72,12 @@ public class AnswerServiceImpl implements AnswerService {
         answer.setUserId(userRepresentation.getId());
         answer.setUserName(userRepresentation.getFirstName() + " " + userRepresentation.getLastName());
         answer.setPublishDate(new Date());
+        UserRepresentation user = userService.findCurrentUser(request);
+        List<String> userGroups = getUserAttribute(user, GROUP);
+        String groupName = userGroups.get(0);
+
+        encrypt(answer,groupName);
+
         String answerId = answerManager.index(answer);
         if (answerId != null) {
             Question q = questionManager.getByID(answer.getParentId());
@@ -85,7 +101,7 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     @Override
-    public void updateAnswer(Answer answer) {
+    public void updateAnswer(HttpServletRequest request, Answer answer) {
         Answer originalAnswer = answerManager.getByID(answer.getModelId(), answer.getParentId());
         answer.setDownVotes(originalAnswer.getDownVotes());
         answer.setUpVotes(originalAnswer.getUpVotes());
@@ -94,6 +110,12 @@ public class AnswerServiceImpl implements AnswerService {
         answer.setUserId(originalAnswer.getUserId());
         answer.setPublishDate(DateTime.now().toDate());
         answer.setCorrectAnswer(originalAnswer.isCorrectAnswer());
+
+        UserRepresentation user = userService.findCurrentUser(request);
+        List<String> userGroups = getUserAttribute(user, GROUP);
+        String groupName = userGroups.get(0);
+
+        encrypt(answer,groupName);
         answerManager.update(answer, answer.getParentId());
 
     }

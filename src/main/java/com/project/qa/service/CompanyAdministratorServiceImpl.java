@@ -137,7 +137,7 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
     }
 
     @Override
-    public void deleteProposedTagById(HttpServletRequest request, Integer tagId) {
+    public void deleteTag(HttpServletRequest request, Integer tagId) {
         Tag tag = tagService.findTagById(tagId);
         final String tagName = tag.getName();
         int pageStart = 0;
