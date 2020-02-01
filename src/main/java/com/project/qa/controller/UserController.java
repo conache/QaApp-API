@@ -1,5 +1,7 @@
 package com.project.qa.controller;
 
+import com.amazonaws.services.iot.client.AWSIotException;
+import com.project.qa.config.AwsIoTConfig;
 import com.project.qa.model.Tag;
 import com.project.qa.model.elasticserach.Question;
 import com.project.qa.service.QuestionService;
@@ -15,7 +17,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -79,7 +80,7 @@ public class UserController {
     }
 
     @GetMapping("/testSNS")
-    public String testSNS() {
-        return SNSMessageSender.test();
+    public void testSNS() throws AWSIotException {
+        AwsIoTConfig.test();
     }
 }

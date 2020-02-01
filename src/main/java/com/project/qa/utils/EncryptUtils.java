@@ -55,7 +55,7 @@ public class EncryptUtils {
     {
         if(isDebug)
             return;
-        
+
         if(model instanceof Question)
         {
             Question question = (Question) model;
