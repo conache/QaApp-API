@@ -1,11 +1,10 @@
 package com.project.qa.controller;
 
-import com.amazonaws.services.iot.client.AWSIotException;
-import com.project.qa.config.AwsIoTConfig;
 import com.project.qa.model.Tag;
 import com.project.qa.model.elasticserach.Question;
-import com.project.qa.service.*;
-import com.project.qa.utils.SNSMessageSender;
+import com.project.qa.service.QuestionService;
+import com.project.qa.service.TagService;
+import com.project.qa.service.UserService;
 import org.javatuples.Pair;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -71,5 +70,10 @@ public class UserController {
     @GetMapping("/questions")
     public Pair<List<Question>, Long> userQuestions(HttpServletRequest request, Pageable page, @RequestParam(required = false, defaultValue = "questionPublishDate") String sortBy) {
         return questionService.findCurrentUserQuestions(request, page, sortBy);
+    }
+
+    @PostMapping
+    public void subscribeToTopic(HttpServletRequest request, @RequestParam String questionId) {
+        questionService.subscribeToQuestion(request, questionId);
     }
 }

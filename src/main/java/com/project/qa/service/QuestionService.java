@@ -43,4 +43,6 @@ public interface QuestionService {
     void acceptProposedQuestion(HttpServletRequest request, String proposedQuestionId);
 
     Map<String, Object> findProposedEditQuestion(HttpServletRequest request, String proposedQuestionId);
+
+    void subscribeToQuestion(HttpServletRequest request, String questionId);
 }
