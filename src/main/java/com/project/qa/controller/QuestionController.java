@@ -38,7 +38,7 @@ public class QuestionController {
     }
 
     @GetMapping("/findAll")
-    public Pair<List<Question>, Long> filterQuestions(HttpServletRequest request, Pageable page, @RequestParam(required = false) ArrayList<String> tags, @RequestParam(required = false, defaultValue = "questionPublishDate") String sortBy) {
+    public Pair<List<QuestionAsResponse>, Long> filterQuestions(HttpServletRequest request, Pageable page, @RequestParam(required = false) ArrayList<String> tags, @RequestParam(required = false, defaultValue = "questionPublishDate") String sortBy) {
         return questionService.filterAllGroupQuestions(request, page, tags, sortBy);
     }
 

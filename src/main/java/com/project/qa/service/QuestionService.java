@@ -18,11 +18,11 @@ public interface QuestionService {
 
     void deleteQuestionById(String questionId);
 
-    Pair<List<Question>, Long> findAllGroupQuestions(HttpServletRequest request, Pageable pageable);
+    Pair<List<QuestionAsResponse>, Long> findAllGroupQuestions(HttpServletRequest request, Pageable pageable);
 
-    Pair<List<Question>, Long> findCurrentUserQuestions(HttpServletRequest request, Pageable pageable, String sortBy);
+    Pair<List<QuestionAsResponse>, Long> findCurrentUserQuestions(HttpServletRequest request, Pageable pageable, String sortBy);
 
-    Pair<List<Question>, Long> filterAllGroupQuestions(HttpServletRequest request, Pageable pageable, List<String> tags, String sortBy);
+    Pair<List<QuestionAsResponse>, Long> filterAllGroupQuestions(HttpServletRequest request, Pageable pageable, List<String> tags, String sortBy);
 
     List<Question> search(HttpServletRequest request, String text, int maxSize);
 

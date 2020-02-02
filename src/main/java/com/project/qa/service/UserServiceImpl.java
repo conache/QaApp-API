@@ -21,6 +21,7 @@ import java.util.List;
 
 import static com.project.qa.utils.KeycloakUtils.getEntityId;
 import static com.project.qa.utils.UserUtils.*;
+import static java.lang.Integer.parseInt;
 import static java.util.Collections.singletonList;
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -207,7 +208,7 @@ public class UserServiceImpl implements UserService {
         tag.setActive(false);
         return tagService.addTag(tag);
     }
-
+/*
     @Override
     public void updateUserScore(HttpServletRequest request) {
         UsersResource usersResource = keycloakConfig.getRealm(request).users();
@@ -217,5 +218,11 @@ public class UserServiceImpl implements UserService {
             addUserAttribute(userRepresentation, CORRECT_ANSWERS, singletonList("0"));
             userResource.update(userRepresentation);
         }
+    }*/
+
+    @Override
+    public int getUserAnswerScore(HttpServletRequest request, String userId) {
+        UserRepresentation user = findUserById(request, userId);
+        return parseInt(getUserAttribute(user, CORRECT_ANSWERS).get(0));
     }
 }

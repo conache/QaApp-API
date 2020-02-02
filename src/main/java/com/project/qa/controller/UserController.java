@@ -1,7 +1,7 @@
 package com.project.qa.controller;
 
 import com.project.qa.model.Tag;
-import com.project.qa.model.elasticserach.Question;
+import com.project.qa.model.elasticserach.QuestionAsResponse;
 import com.project.qa.service.QuestionService;
 import com.project.qa.service.TagService;
 import com.project.qa.service.UserService;
@@ -68,7 +68,7 @@ public class UserController {
     }
 
     @GetMapping("/questions")
-    public Pair<List<Question>, Long> userQuestions(HttpServletRequest request, Pageable page, @RequestParam(required = false, defaultValue = "questionPublishDate") String sortBy) {
+    public Pair<List<QuestionAsResponse>, Long> userQuestions(HttpServletRequest request, Pageable page, @RequestParam(required = false, defaultValue = "questionPublishDate") String sortBy) {
         return questionService.findCurrentUserQuestions(request, page, sortBy);
     }
 
@@ -82,9 +82,10 @@ public class UserController {
         questionService.unsubscribeFromQuestion(request, questionId);
     }
 
-    @GetMapping("/updateUsers")
+/*    @GetMapping("/updateUsers")
     public String updateUsers(HttpServletRequest request) {
         userService.updateUserScore(request);
         return null;
-    }
+    }*/
+
 }

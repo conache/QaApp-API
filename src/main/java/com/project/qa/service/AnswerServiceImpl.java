@@ -63,7 +63,8 @@ public class AnswerServiceImpl implements AnswerService {
             if (answer.getDownVotes().contains(userRepresentation.getId())) {
                 status = VoteStatus.DownVote;
             }
-            answers.add(new AnswerAsResponse(answer, status));
+            int userScore = userService.getUserAnswerScore(request, answer.getUserId());
+            answers.add(new AnswerAsResponse(answer, status, userScore));
         }
         UserRepresentation user = userService.findCurrentUser(request);
         List<String> userGroups = getUserAttribute(user, GROUP);

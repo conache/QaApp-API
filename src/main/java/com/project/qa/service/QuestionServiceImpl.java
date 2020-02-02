@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.project.qa.utils.EncryptUtils.decrypt;
 import static com.project.qa.utils.EncryptUtils.encrypt;
@@ -65,7 +66,8 @@ public class QuestionServiceImpl implements QuestionService {
             status = VoteStatus.DownVote;
         }
         decrypt(question, question.getGroupName());
-        return new QuestionAsResponse(question, status);
+        int score = userService.getUserAnswerScore(request, question.getQuestionAuthorId());
+        return new QuestionAsResponse(question, status, score);
     }
 
     @Override
@@ -83,29 +85,30 @@ public class QuestionServiceImpl implements QuestionService {
 
 
     @Override
-    public Pair<List<Question>, Long> findAllGroupQuestions(HttpServletRequest request, Pageable pageable) {
+    public Pair<List<QuestionAsResponse>, Long> findAllGroupQuestions(HttpServletRequest request, Pageable pageable) {
         UserRepresentation userRepresentation = userService.findCurrentUser(request);
         List<String> userGroups = getUserAttribute(userRepresentation, GROUP);
         int pageSize = pageable.getPageSize();
         int pageNumber = pageable.getPageNumber();
         Pair<List<Question>, Long> result = questionManager.getAll(pageSize, pageSize * (pageNumber - 1), userGroups.get(0));
-        decrypt(result.getValue0(), userGroups.get(0));
-        return result;
+        List<QuestionAsResponse> questionAsResponseList = getDecryptedQuestionsAsResponse(request, userGroups, result);
+        return new Pair<>(questionAsResponseList, result.getValue1());
     }
 
     @Override
-    public Pair<List<Question>, Long> findCurrentUserQuestions(HttpServletRequest request, Pageable pageable, String sortBy) {
+    public Pair<List<QuestionAsResponse>, Long> findCurrentUserQuestions(HttpServletRequest request, Pageable pageable, String sortBy) {
         UserRepresentation userRepresentation = userService.findCurrentUser(request);
         List<String> userGroups = getUserAttribute(userRepresentation, GROUP);
         int pageSize = pageable.getPageSize();
         int pageNumber = pageable.getPageNumber();
         Pair<List<Question>, Long> result = questionManager.findByField("questionAuthorId", userRepresentation.getId(), pageSize, pageSize * (pageNumber - 1), userGroups.get(0), sortBy);
-        decrypt(result.getValue0(), userGroups.get(0));
-        return result;
+        List<QuestionAsResponse> questionAsResponseList = getDecryptedQuestionsAsResponse(request, userGroups, result);
+        return new Pair<>(questionAsResponseList, result.getValue1());
     }
 
+
     @Override
-    public Pair<List<Question>, Long> filterAllGroupQuestions(HttpServletRequest request, Pageable pageable, List<String> tags, String sortBy) {
+    public Pair<List<QuestionAsResponse>, Long> filterAllGroupQuestions(HttpServletRequest request, Pageable pageable, List<String> tags, String sortBy) {
         UserRepresentation userRepresentation = userService.findCurrentUser(request);
         List<String> userGroups = getUserAttribute(userRepresentation, GROUP);
         int pageSize = pageable.getPageSize();
@@ -116,8 +119,8 @@ public class QuestionServiceImpl implements QuestionService {
         } else {
             result = questionManager.getAll(pageSize, pageSize * (pageNumber - 1), userGroups.get(0), sortBy);
         }
-        decrypt(result.getValue0(), userGroups.get(0));
-        return result;
+        List<QuestionAsResponse> questionAsResponseList = getDecryptedQuestionsAsResponse(request, userGroups, result);
+        return new Pair<>(questionAsResponseList, result.getValue1());
     }
 
     @Override
@@ -297,4 +300,14 @@ public class QuestionServiceImpl implements QuestionService {
     private void unsubscribeAll(String questionId) {
         questionSubscribeRepository.deleteAllByQuestionId(questionId);
     }
+
+    private List<QuestionAsResponse> getDecryptedQuestionsAsResponse(HttpServletRequest request, List<String> userGroups, Pair<List<Question>, Long> result) {
+        List<Question> questionList = result.getValue0();
+        decrypt(questionList, userGroups.get(0));
+        return questionList.stream().map(question -> {
+            int score = userService.getUserAnswerScore(request, question.getQuestionAuthorId());
+            return new QuestionAsResponse(question, null, score);
+        }).collect(Collectors.toList());
+    }
+
 }

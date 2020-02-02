@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.qa.config.KeycloakConfig;
 import com.project.qa.model.Tag;
 import com.project.qa.model.elasticserach.Question;
+import com.project.qa.model.elasticserach.QuestionAsResponse;
 import org.javatuples.Pair;
 import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.admin.client.resource.RoleMappingResource;
@@ -144,7 +145,7 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
         int pageSize = 10000;
         int remainingQuestionsToUpdate;
         do {
-            Pair<List<Question>, Long> questionPair = questionService.filterAllGroupQuestions(request, PageRequest.of(pageStart, pageSize), singletonList(tagName), "questionPublishDate");
+            Pair<List<QuestionAsResponse>, Long> questionPair = questionService.filterAllGroupQuestions(request, PageRequest.of(pageStart, pageSize), singletonList(tagName), "questionPublishDate");
             remainingQuestionsToUpdate = questionPair.getSize();
             for (Question question : questionPair.getValue0()) {
                 List<String> questionTags = question.getQuestionTags();

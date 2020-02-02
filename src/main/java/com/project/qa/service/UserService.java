@@ -49,5 +49,5 @@ public interface UserService {
     List<Tag> findActiveTags(HttpServletRequest request);
     Integer addTag(HttpServletRequest request, Tag tag);
 
-    void updateUserScore(HttpServletRequest request);
+    int getUserAnswerScore(HttpServletRequest request, String userId);
 }
