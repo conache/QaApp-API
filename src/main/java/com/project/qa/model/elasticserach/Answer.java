@@ -17,7 +17,7 @@ public class Answer extends ModelBase {
 
     private String userId;
     private String answerText;
-    private Boolean isCorrectAnswer;
+    private boolean isCorrectAnswer;
     private Date publishDate;
     private String questionId;
     private String userName;
@@ -39,11 +39,11 @@ public class Answer extends ModelBase {
         this.answerText = answerText;
     }
 
-    public Boolean isCorrectAnswer() {
+    public boolean isCorrectAnswer() {
         return isCorrectAnswer;
     }
 
-    public void setCorrectAnswer(Boolean correctAnswer) {
+    public void setCorrectAnswer(boolean correctAnswer) {
         isCorrectAnswer = correctAnswer;
     }
 
