@@ -12,6 +12,6 @@ import java.util.List;
 @Repository
 public interface QuestionSubscribeRepository extends JpaRepository<QuestionSubscribe, QuestionSubscribeId> {
 
-    @Query(value = "SELECT user_id from question_subscribe where question_id = :questionId", nativeQuery = true)
-    List<String> getUserIds(@Param("questionId") String questionId);
+    @Query(value = "SELECT user_email from question_subscribe where question_id = :questionId", nativeQuery = true)
+    List<String> getUsersEmail(@Param("questionId") String questionId);
 }

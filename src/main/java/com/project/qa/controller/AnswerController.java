@@ -1,5 +1,6 @@
 package com.project.qa.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.project.qa.model.elasticserach.Answer;
 import com.project.qa.model.elasticserach.AnswerAsResponse;
 import com.project.qa.service.AnswerService;
@@ -28,7 +29,7 @@ public class AnswerController {
     }
 
     @PostMapping("/addAnswer")
-    public String getAnswersForQuestion(HttpServletRequest request, @RequestBody Answer answer) {
+    public String getAnswersForQuestion(HttpServletRequest request, @RequestBody Answer answer) throws JsonProcessingException {
         return answerService.addAnswer(request, answer);
     }
 

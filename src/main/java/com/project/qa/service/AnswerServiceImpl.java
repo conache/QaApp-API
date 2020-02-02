@@ -1,20 +1,21 @@
 package com.project.qa.service;
 
-import com.amazonaws.auth.AWS4Signer;
-import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
-import com.project.qa.config.aws.AWSRequestSigningApacheInterceptor;
+import com.amazonaws.services.sqs.model.SendMessageRequest;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.qa.config.aws.AwsCredentials;
+import com.project.qa.enums.NotificationTypeEnum;
 import com.project.qa.enums.elasticsearch.VoteStatus;
+import com.project.qa.model.Notification;
 import com.project.qa.model.elasticserach.Answer;
 import com.project.qa.model.elasticserach.AnswerAsResponse;
 import com.project.qa.model.elasticserach.Question;
+import com.project.qa.repository.QuestionSubscribeRepository;
 import com.project.qa.repository.elasticsearch.ModelManager;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpRequestInterceptor;
-import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.javatuples.Pair;
 import org.joda.time.DateTime;
@@ -23,18 +24,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.project.qa.utils.EncryptUtils.*;
+import static com.project.qa.utils.EncryptUtils.decrypt;
+import static com.project.qa.utils.EncryptUtils.encrypt;
 import static com.project.qa.utils.UserUtils.GROUP;
 import static com.project.qa.utils.UserUtils.getUserAttribute;
-
-import com.amazonaws.services.sqs.model.SendMessageRequest;
-import com.amazonaws.services.sqs.AmazonSQS;
 
 
 @Service
@@ -44,14 +44,18 @@ public class AnswerServiceImpl implements AnswerService {
     private final ModelManager<Question> questionManager;
     private final UserService userService;
     private final AwsCredentials credentials;
+    private final QuestionSubscribeRepository questionSubscribeRepository;
+    private final ObjectMapper objectMapper;
 
 
     @Autowired
-    public AnswerServiceImpl(@Qualifier("esHighLevelClient") RestHighLevelClient esClient, UserService userService, AwsCredentials credentials) {
+    public AnswerServiceImpl(@Qualifier("esHighLevelClient") RestHighLevelClient esClient, UserService userService, AwsCredentials credentials, QuestionSubscribeRepository questionSubscribeRepository, ObjectMapper objectMapper) {
         this.answerManager = new ModelManager<>(Answer::new, esClient);
         this.questionManager = new ModelManager<>(Question::new, esClient);
         this.userService = userService;
         this.credentials = credentials;
+        this.questionSubscribeRepository = questionSubscribeRepository;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -76,13 +80,13 @@ public class AnswerServiceImpl implements AnswerService {
         List<String> userGroups = getUserAttribute(user, GROUP);
         String groupName = userGroups.get(0);
 
-        decrypt(answers,groupName);
+        decrypt(answers, groupName);
         return new Pair<>(answers, qResult.getValue1());
 
     }
 
     @Override
-    public String addAnswer(HttpServletRequest request, Answer answer) {
+    public String addAnswer(HttpServletRequest request, Answer answer) throws JsonProcessingException {
 
         UserRepresentation userRepresentation = userService.findCurrentUser(request);
         answer.setUserId(userRepresentation.getId());
@@ -92,28 +96,32 @@ public class AnswerServiceImpl implements AnswerService {
         List<String> userGroups = getUserAttribute(user, GROUP);
         String groupName = userGroups.get(0);
 
-        encrypt(answer,groupName);
+        encrypt(answer, groupName);
 
         String answerId = answerManager.index(answer);
         if (answerId != null) {
             Question q = questionManager.getByID(answer.getParentId());
             q.setNoAnswers(q.getNoAnswers() + 1);
             questionManager.update(q);
+            publishNotification(q);
         }
 
-        publishNotification(answer.getParentId());
         return answerId;
     }
 
-    private void publishNotification(String questionId) {
+    private void publishNotification(Question question) throws JsonProcessingException {
         BasicAWSCredentials awsCredentials = new BasicAWSCredentials(credentials.getAccessKey(), credentials.getSecretKey());
         AWSStaticCredentialsProvider credentialsProvider = new AWSStaticCredentialsProvider(awsCredentials);
 
         AmazonSQS sqs = AmazonSQSClientBuilder.standard().withCredentials(credentialsProvider).withRegion(credentials.getRegion()).build();
-        HashMap<String,Object> result = new HashMap<>();
-        result.put("questionId",questionId);
-        List<String> list = new ArrayList<>();
-        result.put("userIds",list);
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("users", questionSubscribeRepository.getUsersEmail(question.getModelId()));
+        Notification notification = new Notification();
+        notification.setObjectId(question.getModelId());
+        notification.setNotificationType(NotificationTypeEnum.QUESTION);
+        notification.setNotificationText("New answer for: " + question.getQuestionTitle());
+        result.put("notification", objectMapper.writeValueAsString(notification));
+
 
         SendMessageRequest send_msg_request = new SendMessageRequest()
                 .withQueueUrl(credentials.getAwsSQSURL())
@@ -152,7 +160,7 @@ public class AnswerServiceImpl implements AnswerService {
         List<String> userGroups = getUserAttribute(user, GROUP);
         String groupName = userGroups.get(0);
 
-        encrypt(answer,groupName);
+        encrypt(answer, groupName);
         answerManager.update(answer, answer.getParentId());
 
     }

@@ -1,5 +1,6 @@
 package com.project.qa.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.project.qa.model.elasticserach.Answer;
 import com.project.qa.model.elasticserach.AnswerAsResponse;
 import com.project.qa.model.elasticserach.Question;
@@ -13,7 +14,7 @@ public interface AnswerService {
 
     Pair<List<AnswerAsResponse>,Long> getAnswersForQuestion(HttpServletRequest request, String questionId, Pageable pageable, String sortBy);
 
-    String addAnswer(HttpServletRequest request,Answer answer);
+    String addAnswer(HttpServletRequest request,Answer answer) throws JsonProcessingException;
 
     void addVote(HttpServletRequest request,String answerId, String questionId, boolean isUpVote);
 

@@ -11,9 +11,9 @@ import javax.validation.constraints.Size;
 @Embeddable
 public class QuestionSubscribeId implements Serializable {
     @NotNull
-    @Column(name = "user_id")
+    @Column(name = "user_email")
     @Size(max = 255)
-    private String userId;
+    private String userEmail;
 
     @NotNull
     @Column(name = "question_id")
@@ -23,17 +23,17 @@ public class QuestionSubscribeId implements Serializable {
     public QuestionSubscribeId() {
     }
 
-    public QuestionSubscribeId(String userId, String questionId) {
-        this.userId = userId;
+    public QuestionSubscribeId(String userEmail, String questionId) {
+        this.userEmail = userEmail;
         this.questionId = questionId;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getUserEmail() {
+        return userEmail;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setUserEmail(String userId) {
+        this.userEmail = userId;
     }
 
     public String getQuestionId() {
@@ -49,12 +49,12 @@ public class QuestionSubscribeId implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         QuestionSubscribeId that = (QuestionSubscribeId) o;
-        return Objects.equals(userId, that.userId) &&
+        return Objects.equals(userEmail, that.userEmail) &&
                 Objects.equals(questionId, that.questionId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(userId, questionId);
+        return Objects.hash(userEmail, questionId);
     }
 }
