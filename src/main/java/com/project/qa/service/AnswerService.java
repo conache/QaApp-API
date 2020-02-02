@@ -22,6 +22,6 @@ public interface AnswerService {
 
     void deleteAnswer(String answerId, String questionId);
 
-    void markCorrectAnswer(HttpServletRequest request, String answerId, String questionId);
+    void markCorrectAnswer(HttpServletRequest request, String answerId, String questionId) throws JsonProcessingException;
 
 }

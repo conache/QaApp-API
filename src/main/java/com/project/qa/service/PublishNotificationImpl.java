@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.qa.config.aws.AwsCredentials;
 import com.project.qa.enums.NotificationTypeEnum;
 import com.project.qa.model.Notification;
+import com.project.qa.model.elasticserach.Answer;
 import com.project.qa.model.elasticserach.Question;
 import com.project.qa.repository.QuestionSubscribeRepository;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -53,6 +54,16 @@ public class PublishNotificationImpl implements PublishNotification {
         notification.setObjectId(question.getModelId());
         notification.setNotificationType(NotificationTypeEnum.PROPOSED_QUESTION);
         notification.setNotificationText("New proposed edit question for: " + question.getQuestionTitle());
+        publishNotification(userEmail, notification);
+    }
+
+    @Override
+    public void pushNotificationOnCorrectAnswer(UserRepresentation userRepresentation, Answer correctAnswer) throws JsonProcessingException {
+        List<String> userEmail = singletonList(userRepresentation.getEmail());
+        Notification notification = new Notification();
+        notification.setObjectId(correctAnswer.getParentId());
+        notification.setNotificationType(NotificationTypeEnum.CORRECT_ANSWER);
+        notification.setNotificationText("Your answer was marked as correct!");
         publishNotification(userEmail, notification);
     }
 

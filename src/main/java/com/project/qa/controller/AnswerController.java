@@ -49,7 +49,7 @@ public class AnswerController {
     }
 
     @PutMapping("/markCorrect")
-    public void markCorrectAnswer(HttpServletRequest request, @RequestParam String answerId, @RequestParam String questionId) {
+    public void markCorrectAnswer(HttpServletRequest request, @RequestParam String answerId, @RequestParam String questionId) throws JsonProcessingException {
         answerService.markCorrectAnswer(request, answerId, questionId);
     }
 }

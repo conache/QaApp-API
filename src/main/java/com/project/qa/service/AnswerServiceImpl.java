@@ -145,7 +145,7 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     @Override
-    public void markCorrectAnswer(HttpServletRequest request, String answerId, String questionId) {
+    public void markCorrectAnswer(HttpServletRequest request, String answerId, String questionId) throws JsonProcessingException {
         Answer correctAnswer = answerManager.getByID(answerId, questionId);
         Question question = questionManager.getByID(correctAnswer.getParentId());
 
@@ -161,6 +161,9 @@ public class AnswerServiceImpl implements AnswerService {
         }
         correctAnswer.setCorrectAnswer(true);
         updateUserScore(request, correctAnswer.getUserId(), 1);
+
+        UserRepresentation userRepresentation = userService.findUserById(request, correctAnswer.getUserId());
+        publishNotification.pushNotificationOnCorrectAnswer( userRepresentation, correctAnswer);
         answerManager.update(correctAnswer, correctAnswer.getParentId());
     }
 
