@@ -32,13 +32,15 @@ public class UserServiceImpl implements UserService {
     private final RoleService roleService;
     private final GroupService groupService;
     private final TagService tagService;
+    private final ClientService clientService;
 
     @Autowired
-    public UserServiceImpl(KeycloakConfig keycloakConfig, RoleService roleService, GroupService groupService, TagService tagService) {
+    public UserServiceImpl(KeycloakConfig keycloakConfig, RoleService roleService, GroupService groupService, TagService tagService, ClientService clientService) {
         this.keycloakConfig = keycloakConfig;
         this.roleService = roleService;
         this.groupService = groupService;
         this.tagService = tagService;
+        this.clientService = clientService;
     }
 
     @Override
@@ -144,6 +146,7 @@ public class UserServiceImpl implements UserService {
 
         addUserAttribute(user, GROUP, singletonList(groupRepresentation.getName()));
         addUserAttribute(user, JOB, singletonList(customUser.getJobName()));
+        addUserAttribute(user, CORRECT_ANSWERS, singletonList("0"));
 
         UsersResource usersResource = keycloakConfig.getRealm(request).users();
         Response response = usersResource.create(user);
@@ -195,6 +198,7 @@ public class UserServiceImpl implements UserService {
         return tagService.findAllByGroupIdAndActive(groups.get(0), true);
 
     }
+
     @Override
     public Integer addTag(HttpServletRequest request, Tag tag) {
         UserRepresentation currentUser = findCurrentUser(request);
@@ -202,5 +206,16 @@ public class UserServiceImpl implements UserService {
         tag.setGroupName(groups.get(0));
         tag.setActive(false);
         return tagService.addTag(tag);
+    }
+
+    @Override
+    public void updateUserScore(HttpServletRequest request) {
+        UsersResource usersResource = keycloakConfig.getRealm(request).users();
+        List<UserRepresentation> userRepresentations = usersResource.list();
+        for (UserRepresentation userRepresentation : userRepresentations) {
+            UserResource userResource = findUserResourceById(request, userRepresentation.getId());
+            addUserAttribute(userRepresentation, CORRECT_ANSWERS, singletonList("0"));
+            userResource.update(userRepresentation);
+        }
     }
 }

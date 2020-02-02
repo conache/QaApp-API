@@ -48,4 +48,6 @@ public interface UserService {
     Page<Tag> findActiveTagsPageable(HttpServletRequest request, Pageable pageable);
     List<Tag> findActiveTags(HttpServletRequest request);
     Integer addTag(HttpServletRequest request, Tag tag);
+
+    void updateUserScore(HttpServletRequest request);
 }

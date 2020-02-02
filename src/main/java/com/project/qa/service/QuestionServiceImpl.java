@@ -1,5 +1,6 @@
 package com.project.qa.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.qa.enums.elasticsearch.VoteStatus;
@@ -39,15 +40,17 @@ public class QuestionServiceImpl implements QuestionService {
     private final TagService tagService;
     private final QuestionSubscribeRepository questionSubscribeRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final PublishNotification publishNotification;
 
     @Autowired
-    public QuestionServiceImpl(@Qualifier("esHighLevelClient") RestHighLevelClient esClient, UserService userService, TagService tagService, QuestionSubscribeRepository questionSubscribeRepository) {
+    public QuestionServiceImpl(@Qualifier("esHighLevelClient") RestHighLevelClient esClient, UserService userService, TagService tagService, QuestionSubscribeRepository questionSubscribeRepository, PublishNotification publishNotification) {
         this.questionManager = new ModelManager<>(Question::new, esClient);
         this.answerManager = new ModelManager<>(Answer::new, esClient);
         this.proposedQuestionManager = new ModelManager<>(ProposedEditQuestion::new, esClient);
         this.userService = userService;
         this.tagService = tagService;
         this.questionSubscribeRepository = questionSubscribeRepository;
+        this.publishNotification = publishNotification;
     }
 
     @Override
@@ -226,7 +229,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public String addProposedQuestion(HttpServletRequest request, Map<String, Object> objectMap) {
+    public String addProposedQuestion(HttpServletRequest request, Map<String, Object> objectMap) throws JsonProcessingException {
         UserRepresentation user = userService.findCurrentUser(request);
         List<String> userGroups = getUserAttribute(user, GROUP);
         String groupName = userGroups.get(0);
@@ -245,7 +248,9 @@ public class QuestionServiceImpl implements QuestionService {
         question.setParentQuestionId(storedQuestion.getModelId());
         encrypt(question, groupName);
         String id = proposedQuestionManager.index(question);
+        question.setModelId(id);
         saveProposedTags(id, groupName, proposedTags);
+        publishNotification.pushNotificationOnProposedQuestion(question, userService.findUserById(request, question.getQuestionAuthorId()));
         return id;
     }
 

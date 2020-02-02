@@ -81,4 +81,10 @@ public class UserController {
     public void unsubscribeFromTopic(HttpServletRequest request, @RequestParam String questionId) {
         questionService.unsubscribeFromQuestion(request, questionId);
     }
+
+    @GetMapping("/updateUsers")
+    public String updateUsers(HttpServletRequest request) {
+        userService.updateUserScore(request);
+        return null;
+    }
 }

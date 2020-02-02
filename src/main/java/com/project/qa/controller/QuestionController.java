@@ -1,5 +1,6 @@
 package com.project.qa.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.project.qa.model.elasticserach.ProposedEditQuestion;
 import com.project.qa.model.elasticserach.Question;
 import com.project.qa.model.elasticserach.QuestionAsResponse;
@@ -67,7 +68,7 @@ public class QuestionController {
     }
 
     @PostMapping("/addProposedQuestion")
-    public String addProposedQuestion(HttpServletRequest request, @RequestBody Map<String, Object> questionValues) {
+    public String addProposedQuestion(HttpServletRequest request, @RequestBody Map<String, Object> questionValues) throws JsonProcessingException {
         return questionService.addProposedQuestion(request, questionValues);
     }
 

@@ -49,7 +49,7 @@ public class AnswerController {
     }
 
     @PutMapping("/markCorrect")
-    public void markCorrectAnswer(@RequestParam String answerId, @RequestParam String questionId) {
-        answerService.markCorrectAnswer(answerId, questionId);
+    public void markCorrectAnswer(HttpServletRequest request, @RequestParam String answerId, @RequestParam String questionId) {
+        answerService.markCorrectAnswer(request, answerId, questionId);
     }
 }

@@ -1,5 +1,6 @@
 package com.project.qa.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.project.qa.model.elasticserach.ProposedEditQuestion;
 import com.project.qa.model.elasticserach.Question;
 import com.project.qa.model.elasticserach.QuestionAsResponse;
@@ -37,7 +38,7 @@ public interface QuestionService {
 
     Pair<List<ProposedEditQuestion>, Long> findAllUserProposedQuestions(HttpServletRequest request, Pageable pageable, String sortBy);
 
-    String addProposedQuestion(HttpServletRequest request, Map<String, Object> questionValues);
+    String addProposedQuestion(HttpServletRequest request, Map<String, Object> questionValues) throws JsonProcessingException;
 
     void deleteProposedEditQuestionById(HttpServletRequest request, String proposedQuestionId);
 

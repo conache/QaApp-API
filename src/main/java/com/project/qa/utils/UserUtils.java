@@ -20,6 +20,7 @@ public class UserUtils {
     public final static String ROLE = "role";
     public final static String GROUP = "group";
     public final static String JOB = "job";
+    public final static String CORRECT_ANSWERS = "correctAnswers";
 
 
     public static void addUserAttribute(UserRepresentation user, String attributeKey, List<String> attributeValue) {

@@ -1,24 +1,15 @@
 package com.project.qa.service;
 
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.services.sqs.AmazonSQS;
-import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
-import com.amazonaws.services.sqs.model.SendMessageRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.qa.config.aws.AwsCredentials;
-import com.project.qa.enums.NotificationTypeEnum;
 import com.project.qa.enums.elasticsearch.VoteStatus;
-import com.project.qa.model.Notification;
 import com.project.qa.model.elasticserach.Answer;
 import com.project.qa.model.elasticserach.AnswerAsResponse;
 import com.project.qa.model.elasticserach.Question;
-import com.project.qa.repository.QuestionSubscribeRepository;
 import com.project.qa.repository.elasticsearch.ModelManager;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.javatuples.Pair;
 import org.joda.time.DateTime;
+import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -28,13 +19,14 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 import static com.project.qa.utils.EncryptUtils.decrypt;
 import static com.project.qa.utils.EncryptUtils.encrypt;
-import static com.project.qa.utils.UserUtils.GROUP;
-import static com.project.qa.utils.UserUtils.getUserAttribute;
+import static com.project.qa.utils.UserUtils.*;
+import static com.project.qa.utils.UserUtils.addUserAttribute;
+import static java.lang.Integer.parseInt;
+import static java.util.Collections.singletonList;
 
 
 @Service
@@ -43,19 +35,16 @@ public class AnswerServiceImpl implements AnswerService {
     private final ModelManager<Answer> answerManager;
     private final ModelManager<Question> questionManager;
     private final UserService userService;
-    private final AwsCredentials credentials;
-    private final QuestionSubscribeRepository questionSubscribeRepository;
-    private final ObjectMapper objectMapper;
+    private final PublishNotification publishNotification;
 
 
     @Autowired
-    public AnswerServiceImpl(@Qualifier("esHighLevelClient") RestHighLevelClient esClient, UserService userService, AwsCredentials credentials, QuestionSubscribeRepository questionSubscribeRepository, ObjectMapper objectMapper) {
+    public AnswerServiceImpl(@Qualifier("esHighLevelClient") RestHighLevelClient esClient, UserService userService, PublishNotification publishNotification) {
         this.answerManager = new ModelManager<>(Answer::new, esClient);
         this.questionManager = new ModelManager<>(Question::new, esClient);
         this.userService = userService;
-        this.credentials = credentials;
-        this.questionSubscribeRepository = questionSubscribeRepository;
-        this.objectMapper = objectMapper;
+        this.publishNotification = publishNotification;
+
     }
 
     @Override
@@ -103,35 +92,11 @@ public class AnswerServiceImpl implements AnswerService {
             Question q = questionManager.getByID(answer.getParentId());
             q.setNoAnswers(q.getNoAnswers() + 1);
             questionManager.update(q);
-            publishNotification(q, userRepresentation);
+
+            publishNotification.pushNotificationOnProposedQuestion(q, userRepresentation);
         }
 
         return answerId;
-    }
-
-    private void publishNotification(Question question, UserRepresentation userRepresentation) throws JsonProcessingException {
-        BasicAWSCredentials awsCredentials = new BasicAWSCredentials(credentials.getAccessKey(), credentials.getSecretKey());
-        AWSStaticCredentialsProvider credentialsProvider = new AWSStaticCredentialsProvider(awsCredentials);
-
-        AmazonSQS sqs = AmazonSQSClientBuilder.standard().withCredentials(credentialsProvider).withRegion(credentials.getRegion()).build();
-        HashMap<String, Object> result = new HashMap<>();
-        List<String> usersEmail = questionSubscribeRepository.getUsersEmail(question.getModelId());
-        usersEmail.remove(userRepresentation.getEmail());
-        result.put("users", usersEmail);
-        Notification notification = new Notification();
-        notification.setObjectId(question.getModelId());
-        notification.setNotificationType(NotificationTypeEnum.QUESTION);
-        notification.setNotificationText("New answer for: " + question.getQuestionTitle());
-        result.put("notification", objectMapper.writeValueAsString(notification));
-
-
-        SendMessageRequest send_msg_request = new SendMessageRequest()
-                .withQueueUrl(credentials.getAwsSQSURL())
-                .withMessageBody(objectMapper.writeValueAsString(result))
-                .withMessageGroupId("1")
-                .withMessageDeduplicationId("1");
-
-        sqs.sendMessage(send_msg_request);
     }
 
     @Override
@@ -179,7 +144,7 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     @Override
-    public void markCorrectAnswer(String answerId, String questionId) {
+    public void markCorrectAnswer(HttpServletRequest request, String answerId, String questionId) {
         Answer correctAnswer = answerManager.getByID(answerId, questionId);
         Question question = questionManager.getByID(correctAnswer.getParentId());
 
@@ -190,9 +155,21 @@ public class AnswerServiceImpl implements AnswerService {
             if (answer.isCorrectAnswer()) {
                 answer.setCorrectAnswer(false);
                 answerManager.update(answer, question.getModelId());
+                updateUserScore(request, correctAnswer.getUserId(), -1);
             }
         }
         correctAnswer.setCorrectAnswer(true);
+        updateUserScore(request, correctAnswer.getUserId(), 1);
         answerManager.update(correctAnswer, correctAnswer.getParentId());
+    }
+
+    private void updateUserScore(HttpServletRequest request, String userId, int value) {
+        UserResource userResource = userService.findUserResourceById(request, userId);
+        UserRepresentation userRepresentation = userResource.toRepresentation();
+        String correctAnswersScore = getUserAttribute(userRepresentation, CORRECT_ANSWERS).get(0);
+        int score = parseInt(correctAnswersScore);
+        score = score > 0 ? score + value : 0;
+        addUserAttribute(userRepresentation, CORRECT_ANSWERS, singletonList(String.valueOf(score)));
+        userResource.update(userRepresentation);
     }
 }
