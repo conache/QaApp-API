@@ -45,4 +45,6 @@ public interface QuestionService {
     Map<String, Object> findProposedEditQuestion(HttpServletRequest request, String proposedQuestionId);
 
     void subscribeToQuestion(HttpServletRequest request, String questionId);
+
+    void unsubscribeFromQuestion(HttpServletRequest request, String questionId);
 }

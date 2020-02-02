@@ -280,4 +280,11 @@ public class QuestionServiceImpl implements QuestionService {
         QuestionSubscribe questionSubscribe = new QuestionSubscribe(new QuestionSubscribeId(currentUser.getId(), questionId));
         questionSubscribeRepository.save(questionSubscribe);
     }
+
+    @Override
+    public void unsubscribeFromQuestion(HttpServletRequest request, String questionId) {
+        UserRepresentation currentUser = userService.findCurrentUser(request);
+        QuestionSubscribe questionSubscribe = new QuestionSubscribe(new QuestionSubscribeId(currentUser.getId(), questionId));
+        questionSubscribeRepository.delete(questionSubscribe);
+    }
 }

@@ -76,4 +76,9 @@ public class UserController {
     public void subscribeToTopic(HttpServletRequest request, @RequestParam String questionId) {
         questionService.subscribeToQuestion(request, questionId);
     }
+
+    @PostMapping("/unsubscribe")
+    public void unsubscribeFromTopic(HttpServletRequest request, @RequestParam String questionId) {
+        questionService.unsubscribeFromQuestion(request, questionId);
+    }
 }
