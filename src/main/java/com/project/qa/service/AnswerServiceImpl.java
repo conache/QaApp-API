@@ -103,19 +103,21 @@ public class AnswerServiceImpl implements AnswerService {
             Question q = questionManager.getByID(answer.getParentId());
             q.setNoAnswers(q.getNoAnswers() + 1);
             questionManager.update(q);
-            publishNotification(q);
+            publishNotification(q, userRepresentation);
         }
 
         return answerId;
     }
 
-    private void publishNotification(Question question) throws JsonProcessingException {
+    private void publishNotification(Question question, UserRepresentation userRepresentation) throws JsonProcessingException {
         BasicAWSCredentials awsCredentials = new BasicAWSCredentials(credentials.getAccessKey(), credentials.getSecretKey());
         AWSStaticCredentialsProvider credentialsProvider = new AWSStaticCredentialsProvider(awsCredentials);
 
         AmazonSQS sqs = AmazonSQSClientBuilder.standard().withCredentials(credentialsProvider).withRegion(credentials.getRegion()).build();
         HashMap<String, Object> result = new HashMap<>();
-        result.put("users", questionSubscribeRepository.getUsersEmail(question.getModelId()));
+        List<String> usersEmail = questionSubscribeRepository.getUsersEmail(question.getModelId());
+        usersEmail.remove(userRepresentation.getEmail());
+        result.put("users", usersEmail);
         Notification notification = new Notification();
         notification.setObjectId(question.getModelId());
         notification.setNotificationType(NotificationTypeEnum.QUESTION);
@@ -125,7 +127,7 @@ public class AnswerServiceImpl implements AnswerService {
 
         SendMessageRequest send_msg_request = new SendMessageRequest()
                 .withQueueUrl(credentials.getAwsSQSURL())
-                .withMessageBody(result.toString())
+                .withMessageBody(objectMapper.writeValueAsString(result))
                 .withMessageGroupId("1")
                 .withMessageDeduplicationId("1");
 

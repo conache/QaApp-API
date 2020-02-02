@@ -14,4 +14,7 @@ public interface QuestionSubscribeRepository extends JpaRepository<QuestionSubsc
 
     @Query(value = "SELECT user_email from question_subscribe where question_id = :questionId", nativeQuery = true)
     List<String> getUsersEmail(@Param("questionId") String questionId);
+
+    @Query(value = "DELETE from question_subscribe where question_id = :questionId", nativeQuery = true)
+    void deleteAllByQuestionId(@Param("questionId") String questionId);
 }

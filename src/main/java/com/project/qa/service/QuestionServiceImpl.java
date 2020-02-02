@@ -74,9 +74,10 @@ public class QuestionServiceImpl implements QuestionService {
         for (Answer answer : question.getQuestionsAnswers()) {
             answerManager.delete(answer.getModelId(), questionId);
         }
-
         questionManager.delete(questionId);
+        unsubscribeAll(questionId);
     }
+
 
     @Override
     public Pair<List<Question>, Long> findAllGroupQuestions(HttpServletRequest request, Pageable pageable) {
@@ -138,7 +139,7 @@ public class QuestionServiceImpl implements QuestionService {
         question.setQuestionPublishDate(new Date());
         encrypt(question, groupName);
         String questionId = questionManager.index(question);
-
+        subscribeToQuestion(request, questionId);
 
         Object proposedTagsObject = questionRequest.get("proposedTags");
         List<String> proposedTags = proposedTagsObject == null ? new ArrayList<>() : objectMapper.convertValue(proposedTagsObject, new TypeReference<List<String>>() {
@@ -286,5 +287,9 @@ public class QuestionServiceImpl implements QuestionService {
         UserRepresentation currentUser = userService.findCurrentUser(request);
         QuestionSubscribe questionSubscribe = new QuestionSubscribe(new QuestionSubscribeId(currentUser.getEmail(), questionId));
         questionSubscribeRepository.delete(questionSubscribe);
+    }
+
+    private void unsubscribeAll(String questionId) {
+        questionSubscribeRepository.deleteAllByQuestionId(questionId);
     }
 }
