@@ -40,6 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class ModelManager<T extends ModelBase> {
 
@@ -155,7 +156,6 @@ public class ModelManager<T extends ModelBase> {
     }
 
 
-
     public List<T> moreLikeThis(String[] fieldsToSearch, String text) {
         return moreLikeThis(fieldsToSearch, text, 1, 2, 0.5);
     }
@@ -234,7 +234,11 @@ public class ModelManager<T extends ModelBase> {
 
         ParentIdQueryBuilder queryBuilder = new ParentIdQueryBuilder("answer", model.getModelId());
         Answer answer = new Answer.AnswerBuilder().build();
-        SearchRequest searchRequest = new SearchRequest().source(SearchSourceBuilder.searchSource().query(queryBuilder).sort(answer.getSortBy(), SortOrder.DESC)).indices(model.getIndex().toString());
+        SearchRequest searchRequest = new SearchRequest()
+                .source(SearchSourceBuilder.searchSource()
+                        .query(queryBuilder)
+                        .sort(answer.getSortBy(), SortOrder.DESC))
+                .indices(model.getIndex().toString());
         try {
             model.setQuestionsAnswers(GetAnswers(searchRequest));
 
@@ -343,12 +347,13 @@ public class ModelManager<T extends ModelBase> {
 
     public Map<String, Object> writeModelAsMap(T t) {
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, true);
-        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
-        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_DEFAULT);
-        return objectMapper.convertValue(t, new TypeReference<HashMap<String, Object>>() {
+        Map<String, Object> map = objectMapper.convertValue(t, new TypeReference<HashMap<String, Object>>() {
         });
-
+        map = map.entrySet().stream()
+                .filter(entry -> entry.getValue() != null)
+                .collect(Collectors.toMap(Map.Entry::getKey,
+                        Map.Entry::getValue));
+        return map;
     }
 }
-

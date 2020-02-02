@@ -6,6 +6,7 @@ public class QuestionAsResponse extends Question {
 
     private VoteStatus voteStatus;
     private int userScore;
+    private boolean isCurrentUserSubscribed;
 
     public VoteStatus getVoteStatus() {
         return voteStatus;
@@ -23,9 +24,19 @@ public class QuestionAsResponse extends Question {
         this.userScore = userScore;
     }
 
-    public QuestionAsResponse(Question question, VoteStatus status, int userScore) {
+    public boolean isCurrentUserSubscribed() {
+        return isCurrentUserSubscribed;
+    }
+
+    public void setCurrentUserSubscribed(boolean currentUserSubscribed) {
+        isCurrentUserSubscribed = currentUserSubscribed;
+    }
+
+
+    public QuestionAsResponse(Question question, VoteStatus status, int userScore, boolean isCurrentUserSubscribed) {
         super(question.getQuestionAuthorId(), question.getGroupName(), question.getQuestionTitle(), question.getQuestionText(), question.getQuestionPublishDate(), null, question.getQuestionTags());
         this.voteStatus = status;
+        this.isCurrentUserSubscribed = isCurrentUserSubscribed;
         this.modelId = question.getModelId();
         this.score = question.getScore();
         this.setQuestionAuthorName(question.getQuestionAuthorName());

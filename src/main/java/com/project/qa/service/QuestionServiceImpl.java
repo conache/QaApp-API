@@ -67,7 +67,8 @@ public class QuestionServiceImpl implements QuestionService {
         }
         decrypt(question, question.getGroupName());
         int score = userService.getUserAnswerScore(request, question.getQuestionAuthorId());
-        return new QuestionAsResponse(question, status, score);
+        boolean isCurrentUserSubscribed = questionSubscribeRepository.isCurrentUserSubscribedToQuestion(question.getModelId(), userRepresentation.getEmail());
+        return new QuestionAsResponse(question, status, score, isCurrentUserSubscribed);
     }
 
     @Override
@@ -91,7 +92,7 @@ public class QuestionServiceImpl implements QuestionService {
         int pageSize = pageable.getPageSize();
         int pageNumber = pageable.getPageNumber();
         Pair<List<Question>, Long> result = questionManager.getAll(pageSize, pageSize * (pageNumber - 1), userGroups.get(0));
-        List<QuestionAsResponse> questionAsResponseList = getDecryptedQuestionsAsResponse(request, userGroups, result);
+        List<QuestionAsResponse> questionAsResponseList = getDecryptedQuestionsAsResponse(request, userRepresentation.getEmail(), userGroups, result);
         return new Pair<>(questionAsResponseList, result.getValue1());
     }
 
@@ -102,7 +103,7 @@ public class QuestionServiceImpl implements QuestionService {
         int pageSize = pageable.getPageSize();
         int pageNumber = pageable.getPageNumber();
         Pair<List<Question>, Long> result = questionManager.findByField("questionAuthorId", userRepresentation.getId(), pageSize, pageSize * (pageNumber - 1), userGroups.get(0), sortBy);
-        List<QuestionAsResponse> questionAsResponseList = getDecryptedQuestionsAsResponse(request, userGroups, result);
+        List<QuestionAsResponse> questionAsResponseList = getDecryptedQuestionsAsResponse(request, userRepresentation.getEmail(), userGroups, result);
         return new Pair<>(questionAsResponseList, result.getValue1());
     }
 
@@ -119,7 +120,7 @@ public class QuestionServiceImpl implements QuestionService {
         } else {
             result = questionManager.getAll(pageSize, pageSize * (pageNumber - 1), userGroups.get(0), sortBy);
         }
-        List<QuestionAsResponse> questionAsResponseList = getDecryptedQuestionsAsResponse(request, userGroups, result);
+        List<QuestionAsResponse> questionAsResponseList = getDecryptedQuestionsAsResponse(request, userRepresentation.getEmail(), userGroups, result);
         return new Pair<>(questionAsResponseList, result.getValue1());
     }
 
@@ -301,12 +302,13 @@ public class QuestionServiceImpl implements QuestionService {
         questionSubscribeRepository.deleteAllByQuestionId(questionId);
     }
 
-    private List<QuestionAsResponse> getDecryptedQuestionsAsResponse(HttpServletRequest request, List<String> userGroups, Pair<List<Question>, Long> result) {
+    private List<QuestionAsResponse> getDecryptedQuestionsAsResponse(HttpServletRequest request, String userEmail, List<String> userGroups, Pair<List<Question>, Long> result) {
         List<Question> questionList = result.getValue0();
         decrypt(questionList, userGroups.get(0));
         return questionList.stream().map(question -> {
             int score = userService.getUserAnswerScore(request, question.getQuestionAuthorId());
-            return new QuestionAsResponse(question, null, score);
+            boolean isCurrentUserSubscribed = questionSubscribeRepository.isCurrentUserSubscribedToQuestion(question.getModelId(), userEmail);
+            return new QuestionAsResponse(question, null, score, isCurrentUserSubscribed);
         }).collect(Collectors.toList());
     }
 

@@ -17,7 +17,7 @@ public class Answer extends ModelBase {
 
     private String userId;
     private String answerText;
-    private boolean isCorrectAnswer;
+    private Boolean isCorrectAnswer;
     private Date publishDate;
     private String questionId;
     private String userName;
@@ -39,11 +39,11 @@ public class Answer extends ModelBase {
         this.answerText = answerText;
     }
 
-    public boolean isCorrectAnswer() {
+    public Boolean isCorrectAnswer() {
         return isCorrectAnswer;
     }
 
-    public void setCorrectAnswer(boolean correctAnswer) {
+    public void setCorrectAnswer(Boolean correctAnswer) {
         isCorrectAnswer = correctAnswer;
     }
 
@@ -79,7 +79,7 @@ public class Answer extends ModelBase {
     public Answer() {
     }
 
-    public Answer(String userId, String answerText,  boolean isCorrectAnswer, Date publishDate, String questionId, String userName, int score) {
+    public Answer(String userId, String answerText, boolean isCorrectAnswer, Date publishDate, String questionId, String userName, int score) {
         this.userId = userId;
         this.answerText = answerText;
         this.isCorrectAnswer = isCorrectAnswer;
@@ -148,7 +148,7 @@ public class Answer extends ModelBase {
         }
 
         public Answer build() {
-            return new Answer(userId, answerText, isCorrectAnswer, publishDate, questionId, "",0);
+            return new Answer(userId, answerText, isCorrectAnswer, publishDate, questionId, "", 0);
         }
 
         public String getUserName() {
