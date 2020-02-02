@@ -1,12 +1,17 @@
 package com.project.qa.repository;
 
 import com.project.qa.model.QuestionSubscribe;
-import com.project.qa.model.QuestionSubscribeIdentity;
+import com.project.qa.model.QuestionSubscribeId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
-public interface QuestionSubscribeRepository extends JpaRepository<QuestionSubscribe, QuestionSubscribeIdentity> {
+import java.util.List;
 
-    @Query(value = "SELECT userid from question_subscribe where questionid = :questionId", nativeQuery = true)
-    String getUserId(String questionId);
+@Repository
+public interface QuestionSubscribeRepository extends JpaRepository<QuestionSubscribe, QuestionSubscribeId> {
+
+    @Query(value = "SELECT user_id from question_subscribe where question_id = :questionId", nativeQuery = true)
+    List<String> getUserIds(@Param("questionId") String questionId);
 }

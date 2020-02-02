@@ -9,20 +9,20 @@ import javax.persistence.Table;
 public class QuestionSubscribe {
 
     @EmbeddedId
-    private QuestionSubscribeIdentity questionSubscribeIdentity;
+    private QuestionSubscribeId questionSubscribeId;
 
     public QuestionSubscribe() {
     }
-    public QuestionSubscribe(QuestionSubscribeIdentity questionSubscribeIdentity){
-        this.questionSubscribeIdentity= questionSubscribeIdentity;
+    public QuestionSubscribe(QuestionSubscribeId questionSubscribeId){
+        this.questionSubscribeId = questionSubscribeId;
     }
 
-    public QuestionSubscribeIdentity getQuestionSubscribeIdentity() {
-        return questionSubscribeIdentity;
+    public QuestionSubscribeId getQuestionSubscribeId() {
+        return questionSubscribeId;
     }
 
-    public void setQuestionSubscribeIdentity(QuestionSubscribeIdentity questionSubscribeIdentity) {
-        this.questionSubscribeIdentity = questionSubscribeIdentity;
+    public void setQuestionSubscribeId(QuestionSubscribeId questionSubscribeId) {
+        this.questionSubscribeId = questionSubscribeId;
     }
 
 }

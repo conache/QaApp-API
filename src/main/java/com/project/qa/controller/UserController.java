@@ -72,7 +72,7 @@ public class UserController {
         return questionService.findCurrentUserQuestions(request, page, sortBy);
     }
 
-    @PostMapping
+    @PostMapping("/subscribe")
     public void subscribeToTopic(HttpServletRequest request, @RequestParam String questionId) {
         questionService.subscribeToQuestion(request, questionId);
     }

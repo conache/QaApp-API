@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.qa.enums.elasticsearch.VoteStatus;
 import com.project.qa.model.QuestionSubscribe;
-import com.project.qa.model.QuestionSubscribeIdentity;
+import com.project.qa.model.QuestionSubscribeId;
 import com.project.qa.model.Tag;
 import com.project.qa.model.elasticserach.Answer;
 import com.project.qa.model.elasticserach.ProposedEditQuestion;
@@ -277,7 +277,7 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public void subscribeToQuestion(HttpServletRequest request, String questionId) {
         UserRepresentation currentUser = userService.findCurrentUser(request);
-        QuestionSubscribe questionSubscribe = new QuestionSubscribe(new QuestionSubscribeIdentity(currentUser.getId(), questionId));
+        QuestionSubscribe questionSubscribe = new QuestionSubscribe(new QuestionSubscribeId(currentUser.getId(), questionId));
         questionSubscribeRepository.save(questionSubscribe);
     }
 }
