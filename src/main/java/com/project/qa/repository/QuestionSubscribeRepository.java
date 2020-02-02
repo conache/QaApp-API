@@ -18,6 +18,6 @@ public interface QuestionSubscribeRepository extends JpaRepository<QuestionSubsc
     @Query(value = "DELETE from question_subscribe where question_id = :questionId", nativeQuery = true)
     void deleteAllByQuestionId(@Param("questionId") String questionId);
 
-    @Query(value = "SELECT 1 from question_subscribe where question_id = :questionId and user_email =:userEmail", nativeQuery = true)
+    @Query(value = "SELECT CAST(CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END AS BIT) from question_subscribe where question_id = :questionId and user_email =:userEmail", nativeQuery = true)
     boolean isCurrentUserSubscribedToQuestion(@Param("questionId") String questionId, @Param("userEmail") String userEmail);
 }
