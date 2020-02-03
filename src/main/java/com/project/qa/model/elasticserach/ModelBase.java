@@ -34,13 +34,16 @@ public abstract class ModelBase {
     public String getModelId() {
         return modelId;
     }
+
     public void setModelId(String modelId) {
         this.modelId = modelId;
     }
+
     public String getModelType()
     {
         return  this.getClass().getName();
     }
+
     public int getScore() {
         return score;
     }

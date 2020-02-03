@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
+import static com.project.qa.enums.Roles.ROLE_USER;
 import static com.project.qa.utils.KeycloakUtils.getEntityId;
 import static com.project.qa.utils.UserUtils.*;
 import static java.lang.Integer.parseInt;
@@ -148,6 +149,7 @@ public class UserServiceImpl implements UserService {
         addUserAttribute(user, GROUP, singletonList(groupRepresentation.getName()));
         addUserAttribute(user, JOB, singletonList(customUser.getJobName()));
         addUserAttribute(user, CORRECT_ANSWERS, singletonList("0"));
+        addUserAttribute(user, ROLE, singletonList(ROLE_USER.name()));
 
         UsersResource usersResource = keycloakConfig.getRealm(request).users();
         Response response = usersResource.create(user);

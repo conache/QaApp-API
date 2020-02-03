@@ -141,7 +141,7 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
     public void deleteTag(HttpServletRequest request, Integer tagId) {
         Tag tag = tagService.findTagById(tagId);
         final String tagName = tag.getName();
-        int pageStart = 0;
+        int pageStart = 1;
         int pageSize = 10000;
         int remainingQuestionsToUpdate;
         do {

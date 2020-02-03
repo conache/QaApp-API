@@ -311,5 +311,4 @@ public class QuestionServiceImpl implements QuestionService {
             return new QuestionAsResponse(question, null, score, isCurrentUserSubscribed);
         }).collect(Collectors.toList());
     }
-
 }

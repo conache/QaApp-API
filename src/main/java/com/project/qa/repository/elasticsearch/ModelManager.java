@@ -77,7 +77,6 @@ public class ModelManager<T extends ModelBase> {
 
     private T getModelsFromGetRequest(GetRequest getRequest) {
         try {
-
             GetResponse getResponse = esClient.get(getRequest, RequestOptions.DEFAULT);
             ObjectMapper oMapper = new ObjectMapper();
             Reader reader = new StringReader(getResponse.getSourceAsString());
