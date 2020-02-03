@@ -36,6 +36,7 @@ public class QuestionAsResponse extends Question {
     public QuestionAsResponse(Question question, VoteStatus status, int userScore, boolean isCurrentUserSubscribed) {
         super(question.getQuestionAuthorId(), question.getGroupName(), question.getQuestionTitle(), question.getQuestionText(), question.getQuestionPublishDate(), null, question.getQuestionTags());
         this.voteStatus = status;
+        this.setNoAnswers(question.getNoAnswers());
         this.isCurrentUserSubscribed = isCurrentUserSubscribed;
         this.modelId = question.getModelId();
         this.score = question.getScore();
