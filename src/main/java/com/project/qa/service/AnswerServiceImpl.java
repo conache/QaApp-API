@@ -93,7 +93,6 @@ public class AnswerServiceImpl implements AnswerService {
             Question q = questionManager.getByID(answer.getParentId());
             q.setNoAnswers(q.getNoAnswers() + 1);
             questionManager.update(q);
-
             publishNotification.pushNotificationOnNewAnswer(q, userRepresentation);
         }
 
