@@ -94,7 +94,7 @@ public class AnswerServiceImpl implements AnswerService {
             q.setNoAnswers(q.getNoAnswers() + 1);
             questionManager.update(q);
 
-            publishNotification.pushNotificationOnProposedQuestion(q, userRepresentation);
+            publishNotification.pushNotificationOnNewAnswer(q, userRepresentation);
         }
 
         return answerId;
