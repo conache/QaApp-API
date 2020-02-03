@@ -79,9 +79,7 @@ public class PublishNotificationImpl implements PublishNotification {
 
         SendMessageRequest send_msg_request = new SendMessageRequest()
                 .withQueueUrl(credentials.getAwsSQSURL())
-                .withMessageBody(objectMapper.writeValueAsString(result))
-                .withMessageGroupId("1")
-                .withMessageDeduplicationId("1");
+                .withMessageBody(objectMapper.writeValueAsString(result));
 
         sqs.sendMessage(send_msg_request);
     }
