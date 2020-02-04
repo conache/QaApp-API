@@ -146,7 +146,7 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
         Tag tag = tagService.findTagById(tagId);
         final String tagName = tag.getName();
         int pageStart = 1;
-        int pageSize = 10000;
+        int pageSize = 9999;
         int remainingQuestionsToUpdate;
         do {
             Pair<List<QuestionAsResponse>, Long> questionPair = questionService.filterAllGroupQuestions(request, PageRequest.of(pageStart, pageSize), singletonList(tagName), "questionPublishDate");
@@ -157,7 +157,8 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
                 question.setQuestionTags(questionTags);
                 questionService.editQuestion(request, question, emptyList());
             }
-        } while (remainingQuestionsToUpdate > 0);
+            pageStart++;
+        } while (remainingQuestionsToUpdate == pageSize);
         tagService.deleteTagById(tagId);
     }
 
