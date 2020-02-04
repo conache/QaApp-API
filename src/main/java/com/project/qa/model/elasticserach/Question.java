@@ -109,7 +109,7 @@ public class Question extends ModelBase {
 
     @Override
     public void accept(Visitor visitor) {
-        visitor.visitQuestion(this);
+        visitor.visit(this);
     }
 
     public Question() {} //needed for automapper

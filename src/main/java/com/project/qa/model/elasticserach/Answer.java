@@ -5,7 +5,6 @@ import com.project.qa.enums.elasticsearch.Index;
 import com.project.qa.utils.Visitor;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -79,7 +78,7 @@ public class Answer extends ModelBase {
 
     @Override
     public void accept(Visitor visitor) {
-        visitor.visitAnswer(this);
+        visitor.visit(this);
     }
 
     public Answer() {

@@ -23,10 +23,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static com.project.qa.utils.EncryptUtils.decrypt;
-import static com.project.qa.utils.EncryptUtils.encrypt;
 import static com.project.qa.utils.UserUtils.*;
-import static com.project.qa.utils.UserUtils.addUserAttribute;
 import static java.lang.Integer.parseInt;
 import static java.util.Collections.singletonList;
 
