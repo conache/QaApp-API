@@ -171,7 +171,13 @@ public class AnswerServiceImpl implements AnswerService {
         UserRepresentation userRepresentation = userResource.toRepresentation();
         String correctAnswersScore = getUserAttribute(userRepresentation, CORRECT_ANSWERS).get(0);
         int score = parseInt(correctAnswersScore);
-        score = score != 0 ? score + value : 0;
+        if (score == 0) {
+            if (value > 0) {
+                score += value;
+            }
+        } else {
+            score += value;
+        }
         addUserAttribute(userRepresentation, CORRECT_ANSWERS, singletonList(String.valueOf(score)));
         userResource.update(userRepresentation);
     }
