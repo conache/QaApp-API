@@ -157,7 +157,7 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
                 question.setQuestionTags(questionTags);
                 questionService.editQuestion(request, question, emptyList());
             }
-        } while (remainingQuestionsToUpdate != 0);
+        } while (remainingQuestionsToUpdate > 0);
         tagService.deleteTagById(tagId);
     }
 
