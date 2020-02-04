@@ -244,17 +244,18 @@ public class QuestionServiceImpl implements QuestionService {
         List<String> proposedTags = proposedTagsObject == null ? new ArrayList<>() : objectMapper.convertValue(proposedTagsObject, new TypeReference<List<String>>() {
         });
         Question storedQuestion = questionManager.getByID(proposedEditQuestion.getModelId());
-        ProposedEditQuestion question = new ProposedEditQuestion(storedQuestion);
-        question.setProposedAuthorId(user.getId());
-        question.setProposedAuthorUsername(user.getUsername());
-        question.setProposedDate(new Date());
-        question.setQuestionText(proposedEditQuestion.getQuestionText());
-        question.setParentQuestionId(storedQuestion.getModelId());
-        encrypt(question, groupName);
-        String id = proposedQuestionManager.index(question);
-        question.setModelId(id);
+        ProposedEditQuestion finalProposedQuestion = new ProposedEditQuestion(storedQuestion);
+        finalProposedQuestion.setProposedAuthorId(user.getId());
+        finalProposedQuestion.setProposedAuthorUsername(user.getUsername());
+        finalProposedQuestion.setProposedDate(new Date());
+        finalProposedQuestion.setQuestionText(proposedEditQuestion.getQuestionText());
+        finalProposedQuestion.setParentQuestionId(storedQuestion.getModelId());
+        finalProposedQuestion.setModelId(null);
+        encrypt(finalProposedQuestion, groupName);
+        String id = proposedQuestionManager.index(finalProposedQuestion);
+        finalProposedQuestion.setModelId(id);
         saveProposedTags(id, groupName, proposedTags);
-        publishNotification.pushNotificationOnProposedQuestion(question, userService.findUserById(request, question.getQuestionAuthorId()));
+        publishNotification.pushNotificationOnProposedQuestion(finalProposedQuestion, userService.findUserById(request, finalProposedQuestion.getQuestionAuthorId()));
         return id;
     }
 
