@@ -78,6 +78,7 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
         UserRepresentation currentUser = userResource.toRepresentation();
         addUserAttribute(currentUser, GROUP, singletonList(groupName));
         addUserAttribute(currentUser, ROLE, singletonList(ROLE_COMPANY_ADMINISTRATOR.name()));
+        addUserAttribute(currentUser, CORRECT_ANSWERS, singletonList("0"));
 
         userResource.update(currentUser);
 
