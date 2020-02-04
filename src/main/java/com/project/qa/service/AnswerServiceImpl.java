@@ -162,7 +162,7 @@ public class AnswerServiceImpl implements AnswerService {
         updateUserScore(request, correctAnswer.getUserId(), 1);
 
         UserRepresentation userRepresentation = userService.findUserById(request, correctAnswer.getUserId());
-        publishNotification.pushNotificationOnCorrectAnswer( userRepresentation, correctAnswer);
+        publishNotification.pushNotificationOnCorrectAnswer(userRepresentation, correctAnswer);
         answerManager.update(correctAnswer, correctAnswer.getParentId());
     }
 
@@ -171,7 +171,7 @@ public class AnswerServiceImpl implements AnswerService {
         UserRepresentation userRepresentation = userResource.toRepresentation();
         String correctAnswersScore = getUserAttribute(userRepresentation, CORRECT_ANSWERS).get(0);
         int score = parseInt(correctAnswersScore);
-        score = score > 0 ? score + value : 0;
+        score = score != 0 ? score + value : 0;
         addUserAttribute(userRepresentation, CORRECT_ANSWERS, singletonList(String.valueOf(score)));
         userResource.update(userRepresentation);
     }
