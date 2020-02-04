@@ -150,7 +150,7 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
         int remainingQuestionsToUpdate;
         do {
             Pair<List<QuestionAsResponse>, Long> questionPair = questionService.filterAllGroupQuestions(request, PageRequest.of(pageStart, pageSize), singletonList(tagName), "questionPublishDate");
-            remainingQuestionsToUpdate = questionPair.getSize();
+            remainingQuestionsToUpdate = questionPair.getValue1().intValue();
             for (Question question : questionPair.getValue0()) {
                 List<String> questionTags = question.getQuestionTags();
                 questionTags.remove(tag.getName());
