@@ -202,7 +202,9 @@ public class QuestionServiceImpl implements QuestionService {
         UserRepresentation user = userService.findCurrentUser(request);
         List<String> userGroups = getUserAttribute(user, GROUP);
         String groupName = userGroups.get(0);
+
         question.setQuestionPublishDate(new Date());
+        encrypt(question, groupName);
         questionManager.update(question);
         saveProposedTags(question.getModelId(), groupName, tags);
     }
