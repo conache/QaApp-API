@@ -248,7 +248,7 @@ public class ModelManager<T extends ModelBase> {
 
     public Pair<List<Answer>, Long> getAnswersForQuestion(String id, int size, int from, String sortBy) {
 
-        Question model = new Question.QuestionBuilder().build();
+        Question model = new Question();
         Answer answer = new Answer.AnswerBuilder().build();
         ParentIdQueryBuilder queryBuilder = new ParentIdQueryBuilder("answer", id);
 

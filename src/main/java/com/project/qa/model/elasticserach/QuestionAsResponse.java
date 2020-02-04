@@ -17,30 +17,56 @@ public class QuestionAsResponse extends Question {
     }
 
     public int getUserScore() {
-        return userScore;
-    }
+        return userScore;}
 
     public void setUserScore(int userScore) {
         this.userScore = userScore;
     }
 
     public boolean isCurrentUserSubscribed() {
-        return isCurrentUserSubscribed;
-    }
+        return isCurrentUserSubscribed; }
 
     public void setCurrentUserSubscribed(boolean currentUserSubscribed) {
         isCurrentUserSubscribed = currentUserSubscribed;
     }
 
-
-    public QuestionAsResponse(Question question, VoteStatus status, int userScore, boolean isCurrentUserSubscribed) {
-        super(question.getQuestionAuthorId(), question.getGroupName(), question.getQuestionTitle(), question.getQuestionText(), question.getQuestionPublishDate(), null, question.getQuestionTags());
+     private QuestionAsResponse(Question question, VoteStatus status, int userScore, boolean isCurrentUserSubscribed) {
+        super(question.getQuestionAuthorId(),question.getQuestionAuthorName(), question.getGroupName(), question.getQuestionTitle(), question.getQuestionText(), question.getQuestionPublishDate(),question.getNoAnswers(), question.getQuestionsAnswers(),question.getQuestionTags());
         this.voteStatus = status;
-        this.setNoAnswers(question.getNoAnswers());
         this.isCurrentUserSubscribed = isCurrentUserSubscribed;
-        this.modelId = question.getModelId();
         this.score = question.getScore();
-        this.setQuestionAuthorName(question.getQuestionAuthorName());
         this.userScore = userScore;
+        this.modelId = question.getModelId();
+    }
+
+    static public class QuestionAsResponseBuilder {
+        private Question question;
+        private VoteStatus status;
+        private int userScore;
+        private boolean isCurrentUserSubscribed;
+
+        public QuestionAsResponseBuilder setQuestion(Question question) {
+            this.question = question;
+            return this;
+        }
+
+        public QuestionAsResponseBuilder setStatus(VoteStatus status) {
+            this.status = status;
+            return this;
+        }
+
+        public QuestionAsResponseBuilder setUserScore(int userScore) {
+            this.userScore = userScore;
+            return this;
+        }
+
+        public QuestionAsResponseBuilder setIsCurrentUserSubscribed(boolean isCurrentUserSubscribed) {
+            this.isCurrentUserSubscribed = isCurrentUserSubscribed;
+            return this;
+        }
+
+        public QuestionAsResponse build() {
+            return new QuestionAsResponse(question, status, userScore, isCurrentUserSubscribed);
+        }
     }
 }

@@ -13,6 +13,8 @@ import com.project.qa.model.elasticserach.Question;
 import com.project.qa.model.elasticserach.QuestionAsResponse;
 import com.project.qa.repository.QuestionSubscribeRepository;
 import com.project.qa.repository.elasticsearch.ModelManager;
+import com.project.qa.utils.DecryptVisitor;
+import com.project.qa.utils.EncryptVisitor;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.javatuples.Pair;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -65,10 +67,17 @@ public class QuestionServiceImpl implements QuestionService {
         if (question.getDownVotes().contains(userRepresentation.getId())) {
             status = VoteStatus.DownVote;
         }
-        decrypt(question, question.getGroupName());
+        question.accept(new DecryptVisitor());
         int score = userService.getUserAnswerScore(request, question.getQuestionAuthorId());
         boolean isCurrentUserSubscribed = questionSubscribeRepository.isCurrentUserSubscribedToQuestion(question.getModelId(), userRepresentation.getEmail());
-        return new QuestionAsResponse(question, status, score, isCurrentUserSubscribed);
+
+        QuestionAsResponse questionAsResponse = new QuestionAsResponse.QuestionAsResponseBuilder()
+                .setUserScore(score)
+                .setQuestion(question)
+                .setStatus(status)
+                .setIsCurrentUserSubscribed(isCurrentUserSubscribed)
+                .build();
+        return questionAsResponse;
     }
 
     @Override
@@ -129,7 +138,7 @@ public class QuestionServiceImpl implements QuestionService {
         UserRepresentation userRepresentation = userService.findCurrentUser(request);
         List<String> userGroups = getUserAttribute(userRepresentation, GROUP);
         List<Question> result = questionManager.matchLikeThis("questionTitle", text, maxSize, 0, userGroups.get(0)).getValue0();
-        decrypt(result, userGroups.get(0));
+        result.forEach(question -> question.accept(new DecryptVisitor()));
         return result;
     }
 
@@ -144,7 +153,7 @@ public class QuestionServiceImpl implements QuestionService {
         question.setQuestionAuthorId(userRepresentation.getId());
         question.setQuestionAuthorName(userRepresentation.getFirstName() + " " + userRepresentation.getLastName());
         question.setQuestionPublishDate(new Date());
-        encrypt(question, groupName);
+        question.accept(new EncryptVisitor());
         String questionId = questionManager.index(question);
         subscribeToQuestion(request, questionId);
 
@@ -192,7 +201,7 @@ public class QuestionServiceImpl implements QuestionService {
         List<String> proposedTags = proposedTagsObject == null ? new ArrayList<>() : objectMapper.convertValue(proposedTagsObject, new TypeReference<List<String>>() {
         });
         question.setQuestionPublishDate(new Date());
-        encrypt(question, groupName);
+        question.accept(new EncryptVisitor());
         questionManager.update(question);
         saveProposedTags(question.getModelId(), groupName, proposedTags);
     }
@@ -228,7 +237,7 @@ public class QuestionServiceImpl implements QuestionService {
         int pageSize = pageable.getPageSize();
         int pageNumber = pageable.getPageNumber();
         Pair<List<ProposedEditQuestion>, Long> result = proposedQuestionManager.findByField("questionAuthorId", user.getId(), pageSize, pageSize * (pageNumber - 1), groupName, sortBy);
-        decrypt(result.getValue0(), groupName);
+        result.getValue0().stream().forEach(question -> question.accept(new DecryptVisitor()));
         return result;
     }
 
@@ -250,7 +259,7 @@ public class QuestionServiceImpl implements QuestionService {
         question.setProposedDate(new Date());
         question.setQuestionText(proposedEditQuestion.getQuestionText());
         question.setParentQuestionId(storedQuestion.getModelId());
-        encrypt(question, groupName);
+        question.accept(new EncryptVisitor());
         String id = proposedQuestionManager.index(question);
         question.setModelId(id);
         saveProposedTags(id, groupName, proposedTags);
@@ -304,11 +313,21 @@ public class QuestionServiceImpl implements QuestionService {
 
     private List<QuestionAsResponse> getDecryptedQuestionsAsResponse(HttpServletRequest request, String userEmail, List<String> userGroups, Pair<List<Question>, Long> result) {
         List<Question> questionList = result.getValue0();
-        decrypt(questionList, userGroups.get(0));
+
+        questionList.stream().forEach(question -> question.accept(new DecryptVisitor()));
+
         return questionList.stream().map(question -> {
             int score = userService.getUserAnswerScore(request, question.getQuestionAuthorId());
             boolean isCurrentUserSubscribed = questionSubscribeRepository.isCurrentUserSubscribedToQuestion(question.getModelId(), userEmail);
-            return new QuestionAsResponse(question, null, score, isCurrentUserSubscribed);
+
+            QuestionAsResponse questionAsResponse = new QuestionAsResponse.
+                    QuestionAsResponseBuilder().
+                    setQuestion(question).
+                    setIsCurrentUserSubscribed(isCurrentUserSubscribed).
+                    setUserScore(score).
+                    build();
+
+            return questionAsResponse;
         }).collect(Collectors.toList());
     }
 }

@@ -2,6 +2,7 @@ package com.project.qa.model.elasticserach;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.project.qa.enums.elasticsearch.Index;
+import com.project.qa.utils.Visitor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,7 @@ public abstract class ModelBase {
     protected int score;
     protected List<String> upVotes;
     protected List<String> downVotes;
+    protected String groupName;
 
     public List<String> getUpVotes() {
         return upVotes;
@@ -83,6 +85,13 @@ public abstract class ModelBase {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public abstract Object getJoinField() throws Exception;
     public abstract String getSortBy();
+    public abstract void accept(Visitor visitor);
 
+    public String getGroupName() {
+        return groupName;
+    }
 
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
 }

@@ -6,6 +6,8 @@ import com.project.qa.model.elasticserach.Answer;
 import com.project.qa.model.elasticserach.AnswerAsResponse;
 import com.project.qa.model.elasticserach.Question;
 import com.project.qa.repository.elasticsearch.ModelManager;
+import com.project.qa.utils.DecryptVisitor;
+import com.project.qa.utils.EncryptVisitor;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.javatuples.Pair;
 import org.joda.time.DateTime;
@@ -66,11 +68,9 @@ public class AnswerServiceImpl implements AnswerService {
             int userScore = userService.getUserAnswerScore(request, answer.getUserId());
             answers.add(new AnswerAsResponse(answer, status, userScore));
         }
-        UserRepresentation user = userService.findCurrentUser(request);
-        List<String> userGroups = getUserAttribute(user, GROUP);
-        String groupName = userGroups.get(0);
 
-        decrypt(answers, groupName);
+        answers.forEach(answer -> answer.accept(new DecryptVisitor()));
+
         return new Pair<>(answers, qResult.getValue1());
 
     }
@@ -82,12 +82,8 @@ public class AnswerServiceImpl implements AnswerService {
         answer.setUserId(userRepresentation.getId());
         answer.setUserName(userRepresentation.getFirstName() + " " + userRepresentation.getLastName());
         answer.setPublishDate(new Date());
-        UserRepresentation user = userService.findCurrentUser(request);
-        List<String> userGroups = getUserAttribute(user, GROUP);
-        String groupName = userGroups.get(0);
-
-        encrypt(answer, groupName);
-
+        answer.accept(new EncryptVisitor());
+        answer.setGroupName(userRepresentation.getGroups().get(0));
         String answerId = answerManager.index(answer);
         if (answerId != null) {
             Question q = questionManager.getByID(answer.getParentId());
@@ -122,12 +118,7 @@ public class AnswerServiceImpl implements AnswerService {
         answer.setUserId(originalAnswer.getUserId());
         answer.setPublishDate(DateTime.now().toDate());
         answer.setCorrectAnswer(originalAnswer.isCorrectAnswer());
-
-        UserRepresentation user = userService.findCurrentUser(request);
-        List<String> userGroups = getUserAttribute(user, GROUP);
-        String groupName = userGroups.get(0);
-
-        encrypt(answer, groupName);
+        answer.accept(new EncryptVisitor());
         answerManager.update(answer, answer.getParentId());
 
     }

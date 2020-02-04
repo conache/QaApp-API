@@ -2,6 +2,7 @@ package com.project.qa.model.elasticserach;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.project.qa.enums.elasticsearch.Index;
+import com.project.qa.utils.Visitor;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
@@ -74,6 +75,11 @@ public class Answer extends ModelBase {
     @Override
     public String getSortBy() {
         return "publishDate";
+    }
+
+    @Override
+    public void accept(Visitor visitor) {
+        visitor.visitAnswer(this);
     }
 
     public Answer() {
