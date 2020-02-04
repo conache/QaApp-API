@@ -119,11 +119,14 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
 
     @Override
     public void editUser(HttpServletRequest request, UserRepresentation userRepresentation) {
-        userService.editUser(request, userRepresentation);
-        String roleName = getUserAttribute(userRepresentation, ROLE).get(0);
+        String newRoleName = getUserAttribute(userRepresentation, ROLE).get(0);
 
         UserResource userResource = userService.findUserResource(request, userRepresentation);
-        roleService.setUserRole(request, userResource, roleName);
+        String oldRoleName = getUserAttribute(userRepresentation, ROLE).get(0);
+        if (!newRoleName.equals(oldRoleName)) {
+            roleService.setUserRole(request, userResource, newRoleName);
+        }
+        userService.editUser(request, userRepresentation);
     }
 
     @Override
