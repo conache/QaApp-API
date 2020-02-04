@@ -1,6 +1,5 @@
 package com.project.qa.utils;
 
-import com.project.qa.enums.Roles;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -16,7 +15,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 
 public class UserUtils {
 
-    public final static List<String> defaultRequiredActions = asList(VERIFY_EMAIL.name(), UPDATE_PASSWORD.toString());
+    public final static List<String> defaultRequiredActions = asList(UPDATE_PASSWORD.toString());
     public final static String ROLE = "role";
     public final static String GROUP = "group";
     public final static String JOB = "job";
