@@ -13,8 +13,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static com.project.qa.utils.UserUtils.ROLE;
 import static com.project.qa.utils.UserUtils.addUserAttribute;
@@ -34,12 +32,6 @@ public class RoleServiceImpl implements RoleService {
 
     private RolesResource getRolesResource(HttpServletRequest request) {
         return keycloakConfig.getRealm(request).roles();
-    }
-
-
-    @Override
-    public List<RoleRepresentation> findAllRoles(HttpServletRequest request) {
-        return keycloakConfig.getRealm(request).roles().list();
     }
 
     @Override
@@ -71,15 +63,6 @@ public class RoleServiceImpl implements RoleService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User client role " + roleName + " not found"));
     }
 
-    @Override
-    public List<String> findUserRealmRoles(UserResource user) {
-        List<RoleRepresentation> rolesRepresentations = user.roles().realmLevel().listEffective();
-
-        return rolesRepresentations
-                .stream()
-                .map(RoleRepresentation::getName)
-                .collect(Collectors.toList());
-    }
 
     public void removeClientUserRoles(UserResource userResource, String clientId) {
         RoleScopeResource roleScopeResource = userResource.roles().clientLevel(clientId);

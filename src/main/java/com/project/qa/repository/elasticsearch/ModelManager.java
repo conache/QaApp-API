@@ -46,7 +46,7 @@ public class ModelManager<T extends ModelBase> {
 
     private Supplier<T> supplier;
 
-    protected RestHighLevelClient esClient;
+    public RestHighLevelClient esClient;
 
     private Class<T> type;
 
@@ -185,7 +185,6 @@ public class ModelManager<T extends ModelBase> {
     }
 
     public Pair<List<T>, Long> filterByField(String field, List<String> terms, int size, int from, String groupName) {
-
         return filterByField(field, terms, size, from, groupName, supplier.get().getSortBy());
     }
 

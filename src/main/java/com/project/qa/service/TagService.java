@@ -11,13 +11,7 @@ public interface TagService {
 
     Tag findTagById(Integer tagId);
 
-    Page<Tag> findAllByGroupName(String groupId, Pageable page);
-
     Page<Tag> findAllByGroupIdAndActive(String groupId, boolean active, Pageable pageable);
-
-    Page<Tag> findAllByGroupIdAndQuestionId(String groupId, String questionId, Pageable pageable);
-
-    List<Tag> findAllByQuestionId(String questionId);
 
     List<Tag> findAllByGroupIdAndActive(String groupName, boolean active);
 
@@ -27,5 +21,4 @@ public interface TagService {
 
     void deleteTagsByQuestionId(String modelId);
 
-    void updateTag(Tag tag);
 }

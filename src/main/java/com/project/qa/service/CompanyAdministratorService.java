@@ -19,21 +19,17 @@ public interface CompanyAdministratorService {
 
     void deleteGroupById(HttpServletRequest request, String name);
 
-    void deleteGroupByName(HttpServletRequest request, String name);
-
     Response deleteUserFromGroup(HttpServletRequest request, String userId);
 
     UserRepresentation findUserById(HttpServletRequest request, String userId);
 
     void editUser(HttpServletRequest request, UserRepresentation userRepresentation);
 
-    void saveAllUsers(List<UserRepresentation> read);
-
     Page<Tag> findProposedTags(HttpServletRequest request, Pageable pageable);
 
     void deleteTag(HttpServletRequest request, Integer tagId);
 
-    void editTag(Tag tag);
+    int editTag(Tag tag);
 
     Integer addTag(HttpServletRequest request, Tag tag);
 

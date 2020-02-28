@@ -37,11 +37,6 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public Page<Tag> findAllByGroupName(String groupName, Pageable pageable) {
-        return repository.findAllByGroupName(groupName, pageable);
-    }
-
-    @Override
     public Page<Tag> findAllByGroupIdAndActive(String groupName, boolean active, Pageable pageable) {
         return repository.findAllByGroupNameAndActive(groupName, active, pageable);
     }
@@ -49,16 +44,6 @@ public class TagServiceImpl implements TagService {
     @Override
     public List<Tag> findAllByGroupIdAndActive(String groupName, boolean active) {
         return repository.findAllByGroupNameAndActive(groupName, active);
-    }
-
-    @Override
-    public Page<Tag> findAllByGroupIdAndQuestionId(String groupName, String questionId, Pageable pageable) {
-        return repository.findAllByGroupNameAndQuestionId(groupName, questionId, pageable);
-    }
-
-    @Override
-    public List<Tag> findAllByQuestionId(String questionId) {
-        return repository.findAllByQuestionId(questionId);
     }
 
     @Override
@@ -81,8 +66,4 @@ public class TagServiceImpl implements TagService {
         repository.deleteAllByQuestionId(modelId);
     }
 
-    @Override
-    public void updateTag(Tag tag) {
-        repository.save(tag);
-    }
 }

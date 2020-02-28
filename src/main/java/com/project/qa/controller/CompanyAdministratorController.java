@@ -5,7 +5,6 @@ import com.project.qa.model.Tag;
 import com.project.qa.service.AdminService;
 import com.project.qa.service.CompanyAdministratorService;
 import com.project.qa.service.GroupService;
-import com.project.qa.utils.CsvUtils;
 import org.apache.http.HttpException;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +12,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Map;
 
 @RestController
@@ -69,16 +65,6 @@ public class CompanyAdministratorController {
     @PutMapping(path = "/editUser")
     public void editUser(HttpServletRequest request, @RequestBody UserRepresentation userRepresentation) {
         companyAdministratorService.editUser(request, userRepresentation);
-    }
-
-    @PostMapping(value = "/uploadCsv", consumes = "text/csv")
-    public void uploadSimple(@RequestBody InputStream body) throws IOException {
-        companyAdministratorService.saveAllUsers(CsvUtils.read(UserRepresentation.class, body));
-    }
-
-    @PostMapping(value = "/uploadCsv", consumes = "multipart/form-data")
-    public void uploadMultipart(@RequestParam("file") MultipartFile file) throws IOException {
-        companyAdministratorService.saveAllUsers(CsvUtils.read(UserRepresentation.class, file.getInputStream()));
     }
 
     @GetMapping("/tags")

@@ -66,8 +66,7 @@ public class AnswerServiceImpl implements AnswerService {
             int userScore = userService.getUserAnswerScore(request, answer.getUserId());
             answers.add(new AnswerAsResponse(answer, status, userScore));
         }
-        UserRepresentation user = userService.findCurrentUser(request);
-        List<String> userGroups = getUserAttribute(user, GROUP);
+        List<String> userGroups = getUserAttribute(userRepresentation, GROUP);
         String groupName = userGroups.get(0);
 
         decrypt(answers, groupName);

@@ -1,6 +1,5 @@
 package com.project.qa.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.qa.config.KeycloakConfig;
 import com.project.qa.model.Tag;
 import com.project.qa.model.elasticserach.Question;
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -41,10 +39,9 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
     private final RoleService roleService;
     private final TagService tagService;
     private final QuestionService questionService;
-    private final ObjectMapper objectMapper;
 
     @Autowired
-    public CompanyAdministratorServiceImpl(KeycloakConfig keycloakConfig, ClientService clientService, UserService userService, GroupService groupService, RoleService roleService, TagService tagService, QuestionService questionService, ObjectMapper objectMapper) {
+    public CompanyAdministratorServiceImpl(KeycloakConfig keycloakConfig, ClientService clientService, UserService userService, GroupService groupService, RoleService roleService, TagService tagService, QuestionService questionService) {
         this.keycloakConfig = keycloakConfig;
         this.clientService = clientService;
         this.userService = userService;
@@ -52,7 +49,6 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
         this.roleService = roleService;
         this.tagService = tagService;
         this.questionService = questionService;
-        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -87,7 +83,7 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
         keycloakConfig.getRealm(request).users().get(currentUser.getId()).joinGroup(groupId);
     }
 
-    private void addRolesToGroup(HttpServletRequest request, GroupResource group) {
+    public void addRolesToGroup(HttpServletRequest request, GroupResource group) {
         RoleRepresentation role = roleService.findRealmRoleByName(request, ROLE_USER.name());
 
         RoleMappingResource roleMappingResource = group.roles();
@@ -103,10 +99,6 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
         groupService.deleteGroupById(request, id);
     }
 
-    @Override
-    public void deleteGroupByName(HttpServletRequest request, String name) {
-        groupService.deleteGroupByName(request, name);
-    }
 
     @Override
     public Response deleteUserFromGroup(HttpServletRequest request, String userId) {
@@ -122,16 +114,12 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
         String newRoleName = getUserAttribute(userRepresentation, ROLE).get(0);
 
         UserResource userResource = userService.findUserResource(request, userRepresentation);
-        String oldRoleName = getUserAttribute(userRepresentation, ROLE).get(0);
+        UserRepresentation oldUser = userResource.toRepresentation();
+        String oldRoleName = getUserAttribute(oldUser, ROLE).get(0);
         if (!newRoleName.equals(oldRoleName)) {
             roleService.setUserRole(request, userResource, newRoleName);
         }
         userService.editUser(request, userRepresentation);
-    }
-
-    @Override
-    public void saveAllUsers(List<UserRepresentation> read) {
-//        userService.addUser(re)
     }
 
     @Override
@@ -164,8 +152,8 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
     }
 
     @Override
-    public void editTag(Tag tag) {
-        tagService.addTag(tag);
+    public int editTag(Tag tag) {
+        return tagService.addTag(tag);
     }
 
     @Override
@@ -181,7 +169,6 @@ public class CompanyAdministratorServiceImpl implements CompanyAdministratorServ
     public Integer acceptTag(HttpServletRequest request, Integer tagId) {
         tagService.acceptTag(tagId);
         questionService.appendTagToQuestion(tagId);
-
         return tagId;
     }
 

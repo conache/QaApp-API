@@ -3,7 +3,6 @@ package com.project.qa.service;
 import com.project.qa.model.CustomUser;
 import org.apache.http.HttpException;
 import org.keycloak.representations.idm.GroupRepresentation;
-import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,13 +19,11 @@ public class AdminServiceImpl implements AdminService {
 
     private final UserService userService;
     private final GroupService groupService;
-    private final RoleService roleService;
 
     @Autowired
-    public AdminServiceImpl(UserService userService, GroupService groupService, RoleService roleService) {
+    public AdminServiceImpl(UserService userService, GroupService groupService) {
         this.userService = userService;
         this.groupService = groupService;
-        this.roleService = roleService;
     }
 
     @Override
@@ -40,12 +37,5 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public List<GroupRepresentation> findGroups(HttpServletRequest request) {
         return groupService.findGroups(request);
-    }
-
-    @Override
-    public void deleteGroupWithUsers(HttpServletRequest request, String groupId) {
-        List<UserRepresentation> users = groupService.findAllGroupMembers(request, groupId);
-        users.forEach(el -> userService.deleteUser(request, el.getId(), groupId));
-        groupService.deleteGroupById(request, groupId);
     }
 }
