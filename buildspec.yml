@@ -3,6 +3,9 @@ version: 0.2
 phases:
   install:
     commands:
+      - apt install software-properties-common
+      - apt-add-repository universe
+      - apt update
       # install Maven
       - echo Installing Maven...
       - apt install -y maven
