@@ -30,7 +30,7 @@ public class RoleServiceImpl implements RoleService {
         this.clientService = clientService;
     }
 
-    private RolesResource getRolesResource(HttpServletRequest request) {
+    public RolesResource getRolesResource(HttpServletRequest request) {
         return keycloakConfig.getRealm(request).roles();
     }
 

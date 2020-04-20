@@ -16,6 +16,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.project.qa.enums.Roles.ROLE_USER;
@@ -123,7 +125,7 @@ public class UserServiceImpl implements UserService {
 
         String userId = getEntityId(response);
         UserResource userResource = usersResource.get(userId);
-        userResource.executeActionsEmail(defaultRequiredActions);
+        userResource.executeActionsEmail(Arrays.asList("UPDATE_PASSWORD"));
         roleService.setUserRole(request, userResource, customUser.getRoleName());
         userResource.joinGroup(groupRepresentation.getId());
         return userId;

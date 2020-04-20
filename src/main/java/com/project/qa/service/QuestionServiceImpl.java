@@ -34,9 +34,9 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 @Service
 public class QuestionServiceImpl implements QuestionService {
 
-    private final ModelManager<Question> questionManager;
-    private final ModelManager<ProposedEditQuestion> proposedQuestionManager;
-    private final ModelManager<Answer> answerManager;
+    private ModelManager<Question> questionManager;
+    private ModelManager<ProposedEditQuestion> proposedQuestionManager;
+    private ModelManager<Answer> answerManager;
     private final UserService userService;
     private final TagService tagService;
     private final QuestionSubscribeRepository questionSubscribeRepository;
@@ -52,6 +52,18 @@ public class QuestionServiceImpl implements QuestionService {
         this.tagService = tagService;
         this.questionSubscribeRepository = questionSubscribeRepository;
         this.publishNotification = publishNotification;
+    }
+
+    public void setQuestionManager(ModelManager<Question> questionManager) {
+        this.questionManager = questionManager;
+    }
+
+    public void setProposedQuestionManager(ModelManager<ProposedEditQuestion> proposedQuestionManager) {
+        this.proposedQuestionManager = proposedQuestionManager;
+    }
+
+    public void setAnswerManager(ModelManager<Answer> answerManager) {
+        this.answerManager = answerManager;
     }
 
     @Override
@@ -81,9 +93,9 @@ public class QuestionServiceImpl implements QuestionService {
             answerManager.delete(answer.getModelId(), questionId);
         }
         questionManager.delete(questionId);
-        unsubscribeAll(questionId);
-    }
+        questionSubscribeRepository.deleteAllByQuestionId(questionId);
 
+    }
 
     @Override
     public Pair<List<QuestionAsResponse>, Long> findAllGroupQuestions(HttpServletRequest request, Pageable pageable) {
@@ -301,11 +313,8 @@ public class QuestionServiceImpl implements QuestionService {
         questionSubscribeRepository.delete(questionSubscribe);
     }
 
-    private void unsubscribeAll(String questionId) {
-        questionSubscribeRepository.deleteAllByQuestionId(questionId);
-    }
 
-    private List<QuestionAsResponse> getDecryptedQuestionsAsResponse(HttpServletRequest request, String userEmail, List<String> userGroups, Pair<List<Question>, Long> result) {
+    public List<QuestionAsResponse> getDecryptedQuestionsAsResponse(HttpServletRequest request, String userEmail, List<String> userGroups, Pair<List<Question>, Long> result) {
         List<Question> questionList = result.getValue0();
         decrypt(questionList, userGroups.get(0));
         return questionList.stream().map(question -> {
