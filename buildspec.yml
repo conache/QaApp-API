@@ -3,6 +3,9 @@ version: 0.2
 phases:
   install:
     commands:
+      - apt install software-properties-common
+      - apt-add-repository universe
+      - apt update
       # install Maven
       - echo Installing Maven...
       - apt install -y maven
@@ -11,7 +14,7 @@ phases:
   pre_build:
     commands:
       - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
-      - REPOSITORY_URI=972312342870.dkr.ecr.us-east-2.amazonaws.com/qa-platform
+      - REPOSITORY_URI=972312342870.dkr.ecr.eu-central-1.amazonaws.com/qa-platform
       - IMAGE_TAG=latest
   build:
     commands:

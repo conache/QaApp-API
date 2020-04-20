@@ -14,7 +14,7 @@ sudo usermod -aG docker ubuntu
 sudo apt install awscli
 
 # AWS login
-$(aws ecr get-login --region us-east-2 --no-include-email)
+$(aws ecr get-login --region eu-central-1 --no-include-email)
 
 # pull docker image for running the server application
-docker pull 972312342870.dkr.ecr.us-east-2.amazonaws.com/qa-platform:latest
+docker pull 972312342870.dkr.ecr.eu-central-1.amazonaws.com/qa-platform:latest
